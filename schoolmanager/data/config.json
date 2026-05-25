@@ -1,0 +1,33 @@
+{
+  "schema": 5,
+  "setup_complete": false,
+  "locale": "es_ES",
+  "brand": {
+    "title_es": "School Manager",
+    "title_en": "School Manager",
+    "logo": "logo.png",
+    "show_logo": true,
+    "title": "School Manager",
+    "menu_title": "School Manager",
+    "menu_title_es": "School Manager",
+    "menu_title_en": "School Manager",
+    "organization": "Educational center"
+  },
+  "theme": {
+    "palette": "teal-red",
+    "primary": "#07384D",
+    "secondary": "#075D61",
+    "accent": "#B6252B",
+    "soft": "#F4FAFC",
+    "background": "#EEF6F9",
+    "card": "#FFFFFF",
+    "text": "#07384D",
+    "muted": "#5F7180",
+    "border": "#D7E6EC",
+    "dark": false
+  },
+  "credits": {
+    "license": "GPLv3+",
+    "license_url": "https://www.gnu.org/licenses/gpl-3.0.html"
+  }
+}

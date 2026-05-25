@@ -1,0 +1,107 @@
+name: 🐞 Bug report
+description: Report a reproducible problem with School Manager
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please do **not** include passwords, tokens, private IPs, personal data, real student data or private tickets.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-checks
+      options:
+        - label: I am using the plugin folder name `schoolmanager`.
+          required: true
+        - label: I cleared GLPI cache and refreshed the browser with Ctrl + F5.
+          required: true
+        - label: I checked that this issue does not expose private data.
+          required: true
+
+  - type: input
+    id: glpi-version
+    attributes:
+      label: GLPI version
+      placeholder: "Example: 10.0.17 or 11.0.7"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "Example: 1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "Example: 8.2"
+
+  - type: input
+    id: server
+    attributes:
+      label: Server stack
+      placeholder: "Example: Ubuntu Server + Apache + MariaDB"
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Guided tickets
+        - IT dashboard
+        - Stock
+        - Assets
+        - Classrooms
+        - Maps
+        - Configuration
+        - Translations
+        - Installer/update script
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Plugin language
+      options:
+        - Spanish
+        - English
+        - Other
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to...
+        2. Click...
+        3. Save...
+        4. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Paste only non-sensitive logs or screenshots.

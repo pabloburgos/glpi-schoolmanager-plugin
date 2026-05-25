@@ -1,0 +1,55 @@
+name: ✨ Feature request
+description: Suggest an improvement for School Manager
+title: "[Feature]: "
+labels: ["enhancement", "needs triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: What would you like to add or improve?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Guided tickets
+        - IT dashboard
+        - Stock
+        - Assets
+        - Classrooms
+        - Maps
+        - Configuration
+        - Translations
+        - Documentation
+        - Installer/update script
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: school-use
+    attributes:
+      label: Why is it useful for schools?
+      description: Explain the real school workflow this would improve.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: Describe how it should work from the user's point of view.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context or screenshots

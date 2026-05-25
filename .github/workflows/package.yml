@@ -1,0 +1,32 @@
+name: Package release ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build downloadable ZIP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create package
+        run: |
+          PACKAGE="glpi-schoolmanager-plugin.zip"
+          rm -f "$PACKAGE"
+          zip -qr "$PACKAGE" .             -x '.git/*'             -x '*.zip'             -x '.github/workflows/*'
+          sha256sum "$PACKAGE" > "$PACKAGE.sha256"
+          unzip -t "$PACKAGE"
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: glpi-schoolmanager-plugin
+          path: |
+            glpi-schoolmanager-plugin.zip
+            glpi-schoolmanager-plugin.zip.sha256

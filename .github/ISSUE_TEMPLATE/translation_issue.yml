@@ -1,0 +1,45 @@
+name: 🌍 Translation issue
+description: Report mixed, missing or incorrect text
+title: "[Translation]: "
+labels: ["translation", "needs triage"]
+body:
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - Spanish
+        - English
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Page or module
+      placeholder: "Example: IT stock, Request details, Configuration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current text
+      placeholder: "Text currently shown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected text
+      placeholder: "Correct text"
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Add a screenshot if it helps locate the text.

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate plugin package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli shellcheck unzip zip
+
+      - name: Check required repository files
+        run: |
+          test -f README.md
+          test -f README_ES.md
+          test -f LICENSE
+          test -f CHANGELOG.md
+          test -f SECURITY.md
+          test -f CONTRIBUTING.md
+          test -f schoolmanager/setup.php
+          test -f scripts/install-or-update.sh
+
+      - name: Validate PHP syntax
+        run: |
+          find schoolmanager -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validate JSON files
+        run: |
+          find . -type f -name '*.json' -not -path './.git/*' -print0 | while IFS= read -r -d '' file; do
+            php -r 'json_decode(file_get_contents($argv[1])); if (json_last_error() !== JSON_ERROR_NONE) { fwrite(STDERR, $argv[1] . ": " . json_last_error_msg() . PHP_EOL); exit(1); }' "$file"
+          done
+
+      - name: Validate shell scripts
+        run: |
+          find scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck
+
+      - name: Build test ZIP
+        run: |
+          zip -qr schoolmanager-ci-package.zip . -x '.git/*' '*.zip'
+          unzip -t schoolmanager-ci-package.zip

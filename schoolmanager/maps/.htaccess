@@ -1,0 +1,9 @@
+# Public School Manager uploads: logos and plans must be readable by the browser.
+Options -Indexes
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>

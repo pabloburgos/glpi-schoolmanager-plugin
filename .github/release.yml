@@ -1,0 +1,32 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - github-actions
+  categories:
+    - title: 🚀 Features
+      labels:
+        - enhancement
+        - feature
+    - title: 🐞 Fixes
+      labels:
+        - bug
+        - fix
+    - title: 🎨 UI/UX
+      labels:
+        - ui
+        - ux
+    - title: 🌍 Translations
+      labels:
+        - translation
+    - title: 📝 Documentation
+      labels:
+        - documentation
+    - title: 🔧 Maintenance
+      labels:
+        - maintenance
+        - refactor
+    - title: Other changes
+      labels:
+        - "*"
