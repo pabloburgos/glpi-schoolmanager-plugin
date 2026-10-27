@@ -446,10 +446,6 @@ $oldAffectedAsset = pc_post('affected_asset', '__none__');
 $oldCategoryId = (int)pc_post('itilcategories_id', 0);
 ?>
 <style>
-<?php
-$cssFile = __DIR__ . '/../css/gestion-schoolmanager-theme.css';
-if (is_file($cssFile)) { echo file_get_contents($cssFile); }
-?>
 /* v178: categoria compacta estable */
 .pc-form{min-height:calc(100vh - 70px);padding:22px;background:linear-gradient(135deg,#f4f8fb 0%,#fff 54%,#fff9e8 100%)}
 .pc-card{max-width:1420px;margin:0 auto;background:#fff;border:1px solid #d7e6ec;border-radius:28px;box-shadow:0 24px 70px rgba(8,59,84,.10);overflow:hidden}

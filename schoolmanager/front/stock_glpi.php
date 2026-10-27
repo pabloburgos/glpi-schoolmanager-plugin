@@ -55,6 +55,9 @@ if (($_GET['export'] ?? '') === 'csv') {
 }
 
 function st_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
+function st_tr(string $key, ?string $fallback = null): string {
+    return function_exists('plugin_schoolmanager_tr') ? plugin_schoolmanager_tr($key, $fallback) : ($fallback ?? $key);
+}
 function st_token() {
     if (class_exists('Session') && method_exists('Session', 'getNewCSRFToken')) {
         static $tok = null; if ($tok === null) { $tok = Session::getNewCSRFToken(); } return '<input type="hidden" name="_glpi_csrf_token" value="' . st_h($tok) . '">';
@@ -147,19 +150,19 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
 </style>
 <div class="stp"><div class="stp-wrap">
     <header class="stp-top">
-        <div class="stp-brand"><img class="stp-logo" src="<?= st_h($logoUrl) ?>" alt="School Manager"><div class="stp-title"><div class="stp-kicker">School Manager · IT center</div><h1>Stock TIC</h1><p>Fast control for spare parts and consumables without overloaded screens.</p></div></div>
-        <div class="stp-actions"><a class="stp-btn ghost" href="<?= st_h($root) ?>/plugins/schoolmanager/front/panel_tic.php?v=286"><?= st_svg('chart') ?>Panel TIC</a><a class="stp-btn red" href="<?= st_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=286"><?= st_svg('home') ?>Inicio</a><button class="stp-btn primary" type="button" id="openCreateStock"><?= st_svg('plus') ?>Nuevo stock</button></div>
+        <div class="stp-brand"><img class="stp-logo" src="<?= st_h($logoUrl) ?>" alt="School Manager"><div class="stp-title"><div class="stp-kicker">School Manager · <?= st_h(st_tr('it_center', 'IT Center')) ?></div><h1><?= st_h(st_tr('stock_tic', 'Stock TIC')) ?></h1><p><?= st_h(st_tr('stock_subtitle', 'Fast control for spare parts and consumables without overloaded screens.')) ?></p></div></div>
+        <div class="stp-actions"><a class="stp-btn ghost" href="<?= st_h($root) ?>/plugins/schoolmanager/front/panel_tic.php?v=286"><?= st_svg('chart') ?><?= st_h(st_tr('tic_panel', 'Panel TIC')) ?></a><a class="stp-btn red" href="<?= st_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=286"><?= st_svg('home') ?><?= st_h(st_tr('home', 'Inicio')) ?></a><button class="stp-btn primary" type="button" id="openCreateStock"><?= st_svg('plus') ?><?= st_h(st_tr('new_stock', 'Nuevo stock')) ?></button></div>
     </header>
 
     <?php if ($msg !== ''): ?><div class="stp-msg ok"><?= st_h($msg) ?></div><?php endif; ?>
     <?php if ($err !== ''): ?><div class="stp-msg err"><?= st_h($err) ?></div><?php endif; ?>
 
     <section class="stp-metrics" aria-label="Resumen de stock">
-        <div class="stp-metric"><span class="icon"><?= st_svg('box') ?></span><div><b><?= (int)$summary['items'] ?></b><span>articulos</span></div></div>
-        <div class="stp-metric"><span class="icon"><?= st_svg('cart') ?></span><div><b><?= (int)$summary['available'] ?></b><span>disponibles</span></div></div>
-        <div class="stp-metric warn"><span class="icon"><?= st_svg('alert') ?></span><div><b><?= (int)$summary['low'] ?></b><span>stock bajo</span></div></div>
-        <div class="stp-metric danger"><span class="icon"><?= st_svg('minus') ?></span><div><b><?= (int)$summary['empty'] ?></b><span>sin stock</span></div></div>
-        <div class="stp-metric"><span class="icon"><?= st_svg('filter') ?></span><div><b><?= count($items) ?></b><span>en vista</span></div></div>
+        <div class="stp-metric"><span class="icon"><?= st_svg('box') ?></span><div><b><?= (int)($summary['items'] ?? 0) ?></b><span><?= st_h(st_tr('stock_items', 'articulos')) ?></span></div></div>
+        <div class="stp-metric"><span class="icon"><?= st_svg('cart') ?></span><div><b><?= (int)($summary['units'] ?? ($summary['available'] ?? 0)) ?></b><span><?= st_h(st_tr('stock_available', 'disponibles')) ?></span></div></div>
+        <div class="stp-metric warn"><span class="icon"><?= st_svg('alert') ?></span><div><b><?= (int)($summary['low'] ?? 0) ?></b><span><?= st_h(st_tr('stock_low', 'stock bajo')) ?></span></div></div>
+        <div class="stp-metric danger"><span class="icon"><?= st_svg('minus') ?></span><div><b><?= (int)($summary['empty'] ?? 0) ?></b><span><?= st_h(st_tr('stock_empty', 'sin stock')) ?></span></div></div>
+        <div class="stp-metric"><span class="icon"><?= st_svg('filter') ?></span><div><b><?= count($items) ?></b><span><?= st_h(st_tr('stock_in_view', 'en vista')) ?></span></div></div>
     </section>
 
     <section class="stp-control">

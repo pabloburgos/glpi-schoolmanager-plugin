@@ -91,6 +91,9 @@ function smgr_stock_field_exists($table, $field) {
 
         foreach ($candidates as $candidate) {
             try {
+                if (method_exists($DB, 'tableExists') && !$DB->tableExists($candidate)) {
+                    continue;
+                }
                 if (method_exists($DB, 'fieldExists') && $DB->fieldExists($candidate, $field)) { return true; }
             } catch (Throwable $e) {}
             $tableEsc = addslashes($candidate); $fieldEsc = addslashes($field);

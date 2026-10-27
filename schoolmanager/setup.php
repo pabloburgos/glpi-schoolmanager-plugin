@@ -84,25 +84,35 @@ function plugin_init_schoolmanager() {
     if (function_exists('plugin_schoolmanager_require_initial_setup')) { plugin_schoolmanager_require_initial_setup(); }
     if (function_exists('plugin_schoolmanager_guard_current_feature')) { plugin_schoolmanager_guard_current_feature(); }
 
-    // Carga global de recursos del plugin.
-    // Incluye un redireccionador suave para perfiles profesor/self-service.
-    $schoolmanager_theme_ver = @filemtime(__DIR__ . '/css/generated-theme.css') ?: time();
-    $schoolmanager_config_ver = @filemtime(__DIR__ . '/js/generated-config.js') ?: time();
+    // Carga de recursos del plugin sin query strings para evitar warnings en GLPI Html.php.
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    $isSchoolManagerPage = (strpos($uri, '/plugins/schoolmanager/') !== false);
+
     $schoolmanager_js = [
-        'js/generated-config.js?v=' . $schoolmanager_config_ver,
+        'js/generated-config.js',
         'js/location-selector-integration.js',
         'js/profesor-home-redirect.js',
         'js/profesor-catalog-block.js',
-        'js/custom-combobox.js',
-        'js/schoolmanager-page-transition.js',
-        'js/schoolmanager-i18n.js',
     ];
+    if ($isSchoolManagerPage) {
+        $schoolmanager_js[] = 'js/custom-combobox.js';
+        $schoolmanager_js[] = 'js/schoolmanager-page-transition.js';
+        $schoolmanager_js[] = 'js/schoolmanager-i18n.js';
+    }
     $PLUGIN_HOOKS['add_javascript']['schoolmanager'] = $schoolmanager_js;
+
     $schoolmanager_theme = function_exists('plugin_schoolmanager_theme_values') ? plugin_schoolmanager_theme_values() : ['palette'=>'teal-red'];
     $schoolmanager_theme_file = 'css/themes/' . preg_replace('/[^a-z0-9_-]/i', '', (string)($schoolmanager_theme['palette'] ?? 'teal-red')) . '.css';
-    $schoolmanager_css = ['css/location-selector-integration.css', 'css/gestion-schoolmanager-theme.css'];
-    if (is_file(__DIR__ . '/' . $schoolmanager_theme_file)) { $schoolmanager_css[] = $schoolmanager_theme_file . '?v=' . (@filemtime(__DIR__ . '/' . $schoolmanager_theme_file) ?: $schoolmanager_theme_ver); }
-    $schoolmanager_css[] = 'css/generated-theme.css?v=' . $schoolmanager_theme_ver;
+    $schoolmanager_css = ['css/location-selector-integration.css'];
+    if ($isSchoolManagerPage) {
+        $schoolmanager_css[] = 'css/gestion-schoolmanager-theme.css';
+        if (is_file(__DIR__ . '/' . $schoolmanager_theme_file)) {
+            $schoolmanager_css[] = $schoolmanager_theme_file;
+        }
+        if (is_file(__DIR__ . '/css/generated-theme.css')) {
+            $schoolmanager_css[] = 'css/generated-theme.css';
+        }
+    }
     $PLUGIN_HOOKS['add_css']['schoolmanager'] = $schoolmanager_css;
     if (class_exists('Glpi\Plugin\Hooks')) {
         $PLUGIN_HOOKS[\Glpi\Plugin\Hooks::ADD_JAVASCRIPT]['schoolmanager'] = $schoolmanager_js;

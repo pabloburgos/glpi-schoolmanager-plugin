@@ -4,8 +4,14 @@
 
 ### Added
 
-- **Official Multilingual Support**: Native support for **French (`fr_FR`)**, **German (`de_DE`)**, and **Italian (`it_IT`)**, joining English and Spanish.
+- **Official Multilingual Support**: Native support for **French (`fr_FR`)**, **German (`de_DE`)**, and **Italian (`it_IT`)**, joining English and Spanish with 296 synchronized UI keys.
 - **English as Primary Base Language**: Set English (`en_GB`) as the canonical base language for templates, fallbacks, and UI references.
+- **Server-Side Rendering (SSR) i18n**: Eliminated Flash of Untranslated Content (FOUC) by rendering localized strings on the server (`smcfg_tr()`) before page delivery.
+- **4 Modern, Simple, Accessible Themes**:
+  - `teal-red`: Modern Teal with clean contrast.
+  - `ocean`: Nordic Blue with cool sky tones.
+  - `forest`: Campus Emerald with amber accents.
+  - `graphite`: Graphite Dark mode with WCAG AA compliant contrast (> 4.5:1 ratio).
 - **In-Browser Language Center & Visual Editor**: Complete translation management interface inside GLPI settings (`front/configuracion.php`):
   - In-browser string editor with live search, English reference column, and one-click saving.
   - Direct download button for the official English translation template (`template.php`).
@@ -14,6 +20,19 @@
 - **Dynamic Locale Discovery**: The plugin automatically detects any `.php` or `.json` dictionary in `schoolmanager/locales/` and populates the settings selector automatically.
 - **AI Translation Guide**: Ready-to-copy AI prompt in the template and settings UI to generate new language packs in seconds via LLMs (ChatGPT, Claude, Gemini).
 - **GitHub Multilingual Documentation**: Added localized READMEs (`README_FR.md`, `README_DE.md`, `README_IT.md`), language request issue template, and updated contribution guides.
+
+### Fixed
+
+- **Infinite Duplication in Client Translation**: Fixed recursive substring replacements in `schoolmanager-i18n.js` where words like `Italian` or `General` continuously grew into `Italianooooo` and `Generalee`.
+- **GLPI Native Navigation Bar Integrity**: Scoped all plugin CSS so it only affects `/plugins/schoolmanager/` pages, preventing global style leakages into native GLPI topbar and breadcrumbs.
+- **Sidebar Menu Branding Cache**: Invalidate `$_SESSION['glpimenu']` upon saving settings so custom app names update immediately in the GLPI sidebar without manual logout.
+- **Squished Action Buttons**: Added `white-space: nowrap !important` and `flex-shrink: 0 !important` to building and room management buttons in `configuracion.php`.
+- **Consistent Emoji Navigation**: Unified all 7 configuration tabs with consistent visual emojis (`⚙️`, `🌐`, `🧩`, `🎨`, `🗺️`, `🏫`, `⚡`).
+- **PHP Warnings**:
+  - Handled missing `glpi_consumableitemtypes` table check via `$DB->tableExists()` in `inc/stock_helpers.php`.
+  - Fixed `Undefined array key "available"` in `front/stock_glpi.php:159`.
+  - Removed query strings (`?v=...`) from `$PLUGIN_HOOKS` asset registrations in `setup.php` to eliminate GLPI `Html.php` warnings.
+- **Removed Redundant Inline CSS**: Eliminated heavy inline `@readfile(gestion-schoolmanager-theme.css)` from 6 front pages, improving load times and enabling reliable theme switching.
 
 ### Improved
 

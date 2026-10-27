@@ -113,7 +113,6 @@ $roomsJson = json_encode(array_values(array_filter($aulasAll, static fn($a) => !
 @media(max-width:1180px){.pc-types{grid-template-columns:repeat(3,minmax(0,1fr))!important}}@media(max-width:680px){.pc-types{grid-template-columns:1fr!important}.pc-type{justify-content:flex-start!important}}
 
 </style>
-<style id="gestion-schoolmanager-global-override"><?php @readfile(__DIR__ . '/../css/gestion-schoolmanager-theme.css'); ?></style>
 
 <div class="pc-form" id="pcForm" data-rooms='<?= htmlspecialchars($roomsJson, ENT_QUOTES, 'UTF-8') ?>' data-root="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>" data-version="<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>">
   <div class="pc-card">

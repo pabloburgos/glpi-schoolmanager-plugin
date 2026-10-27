@@ -379,7 +379,7 @@ foreach ($tickets as $t) {
 @media(max-width:560px){.pc-requests .pc-brand .pc-logo{height:92px!important;}.pc-requests .pc-btn-home{width:100%!important;}}
 
 </style>
-<style id="gestion-schoolmanager-global-override"><?php @readfile(__DIR__ . '/../css/gestion-schoolmanager-theme.css'); ?>
+<style id="schoolmanager-requests-state-cards">
 /* v249: tarjetas por estado sin barra lateral, logo robusto e inicio unificado */
 .pc-requests .pc-ticket::before{display:none!important;content:none!important;}
 .pc-requests .pc-ticket{border-width:1px!important;box-shadow:0 14px 34px rgba(7,56,77,.08)!important;}

@@ -74,8 +74,16 @@ GLPI School Manager provides native, out-of-the-box multilingual support with **
 No developer tools or terminal commands required! From **GLPI > Tools > School Manager > Settings > 🌐 Languages**, administrators can:
 - **Automatic Language Detection**: Detects the active GLPI session language and switches smoothly, with automatic fallback to English.
 - **In-Browser String Editor**: Edit and translate any string directly from the browser with real-time search and save changes instantly.
-- **Official English Template (`template.php`)**: Download the canonical 183-key template (`schoolmanager/locales/template.php`) with ready-to-use AI translation prompts.
+- **Official English Template (`template.php`)**: Download the canonical 296-key template (`schoolmanager/locales/template.php`) with ready-to-use AI translation prompts.
 - **Custom Language Packs**: Upload `.php` or `.json` translation files (e.g. `pt_PT`, `ca_ES`, `nl_NL`). The plugin dynamically discovers new files and registers them in the settings combobox immediately.
+
+### Modern Themes & Accessibility (WCAG AA)
+
+School Manager includes 4 modern, functional themes accessible directly from **Settings > 🎨 Branding & Themes**:
+- **Modern Teal (`teal-red`)**: Classic clean education theme with teal primary and ruby accents.
+- **Nordic Blue (`ocean`)**: Bright ice-blue palette with sky accents and crisp typography.
+- **Campus Emerald (`forest`)**: Academic green palette with warm amber highlights.
+- **Graphite Dark (`graphite`)**: High-contrast WCAG AA accessible dark mode with slate surfaces and glowing indicators.
 
 <a id="requirements"></a>
 

@@ -20,7 +20,6 @@ echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@
 @media(max-width:860px){.av-hero{align-items:flex-start;flex-direction:column}.av-actions{width:100%;justify-content:flex-start}.av-item{grid-template-columns:auto 1fr}.av-item .av-btn{grid-column:1/-1;width:100%}.av-logo{height:62px}.av h1{font-size:42px}}
 @media(max-width:560px){.av{padding:8px}.av-hero{border-radius:22px;padding:16px}.av-brand{align-items:flex-start;gap:12px}.av-logo{height:50px;max-width:160px}.av-item{grid-template-columns:1fr;padding:15px}.av-ico{width:50px;height:50px}.av-btn{width:100%}}
 </style>
-<style id="gestion-schoolmanager-global-override"><?php @readfile(__DIR__ . '/../css/gestion-schoolmanager-theme.css'); ?></style>
 
 
 <style id="schoolmanager-v251-avisos-buttons">

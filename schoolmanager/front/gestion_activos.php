@@ -80,7 +80,6 @@ if ($sort === 'location' && $rows) {
 Html::header('Gestión de activos', $_SERVER['PHP_SELF'], 'tools', 'PluginSchoolmanagerMapa');
 require_once(__DIR__ . '/../inc/ui_helpers.php');
 ?>
-<style id="gestion-schoolmanager-global-override"><?php @readfile(__DIR__ . '/../css/gestion-schoolmanager-theme.css'); ?></style>
 <style>
 .gsm-assets{--primary:#06384a;--primary2:#0b5265;--teal:#0f8f86;--gold:#d6a11d;--red:#b6252b;--red-dark:#8f1a22;--ink:#082f3f;--muted:#607386;--line:#d7e3e9;--soft:#f5f8fb;--cream:#fbf6ee;min-height:calc(100vh - 80px);padding:clamp(10px,1.4vw,22px);background:linear-gradient(180deg,#f7fafc 0%,#f2f6f9 100%);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
 .gsm-assets *{box-sizing:border-box}
