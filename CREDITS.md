@@ -6,7 +6,7 @@
 
 ## Authors
 
-- **Pablo Burgos**
+- **Pablo Burgos** (<pabloburgostena@faltax.app>)
 - **Alejandro Galán**
 
 ## Project origin

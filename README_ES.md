@@ -201,6 +201,11 @@ Navegación por planos y ubicaciones.
 | [CREDITS.md](CREDITS.md) | Créditos y agradecimientos. |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios. |
 
+## Autores
+
+- **Pablo Burgos** (<pabloburgostena@faltax.app>)
+- **Alejandro Galán**
+
 ## Licencia
 
 School Manager se distribuye bajo GNU General Public License v3.0 or later.

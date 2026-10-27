@@ -1,24 +1,143 @@
 /* Gestion School Manager - Paleta global v1.5.8
    Azul GLPI + rojo activo, aplicada a todo el plugin. */
 :root{
-  --sm-bg:#f3f7fb;
-  --sm-bg-soft:#eaf3f8;
-  --sm-card:#ffffff;
-  --sm-card-soft:#f8fbff;
-  --sm-navy:#083b54;
-  --sm-navy-2:#062f43;
-  --sm-blue:#0b5f7a;
-  --sm-blue-2:#0d7192;
-  --sm-red:#e53935;
-  --sm-red-2:#c92828;
-  --sm-red-soft:#ffecec;
-  --sm-border:#cddde7;
-  --sm-border-2:#b8ceda;
-  --sm-ink:#102638;
-  --sm-muted:#5e7482;
-  --sm-success:#2fbf71;
-  --sm-warning:#f2a900;
-  --sm-shadow:0 18px 55px rgba(8,59,84,.11);
+  --sm-bg: var(--sm-background, #f3f7fb);
+  --sm-bg-soft: var(--sm-soft, #eaf3f8);
+  --sm-card: var(--sm-card, #ffffff);
+  --sm-card-soft: var(--sm-soft, #f8fbff);
+  --sm-navy: var(--sm-primary, #083b54);
+  --sm-navy-2: color-mix(in srgb, var(--sm-primary, #083b54) 80%, black);
+  --sm-blue: var(--sm-secondary, #0b5f7a);
+  --sm-blue-2: color-mix(in srgb, var(--sm-secondary, #0b5f7a) 85%, black);
+  --sm-red: var(--sm-accent, #e53935);
+  --sm-red-2: color-mix(in srgb, var(--sm-accent, #e53935) 80%, black);
+  --sm-red-soft: color-mix(in srgb, var(--sm-accent, #e53935) 12%, white);
+  --sm-border: var(--sm-border, #cddde7);
+  --sm-border-2: color-mix(in srgb, var(--sm-border, #cddde7) 80%, black);
+  --sm-ink: var(--sm-text, #102638);
+  --sm-muted: var(--sm-muted, #5e7482);
+  --sm-success: #2fbf71;
+  --sm-warning: #f2a900;
+  --sm-shadow: 0 18px 55px color-mix(in srgb, var(--sm-primary, #083b54) 11%, transparent);
+}
+
+/* Lightweight preloader overlay */
+.sm-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: var(--sm-bg, #f3f7fb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+.sm-preloader.sm-preloader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.sm-preloader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.sm-preloader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3.5px solid color-mix(in srgb, var(--sm-primary, #07384D) 20%, transparent);
+  border-top-color: var(--sm-primary, #07384D);
+  border-right-color: var(--sm-accent, #B6252B);
+  border-radius: 50%;
+  animation: smSpin 0.75s linear infinite;
+}
+.sm-preloader-text {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--sm-primary, #07384D);
+  letter-spacing: -0.01em;
+}
+@keyframes smSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Global Button & Chip Stabilization across GLPI Tabler resets */
+:is(.sm-btn, .sid-btn, .stp-btn, .pc-btn, .al-btn, .av-btn, .gsm-btn, .pe-btn, .pcd-btn, .pcas-btn, .pcda-btn, .tr-btn, .smdoc-btn, .smc-btn, .smn-action-btn) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  font-weight: 800 !important;
+  transition: all .16s ease !important;
+  line-height: 1.25 !important;
+}
+
+/* Neutral / Secondary buttons: explicit solid white background and crisp border to prevent transparent/unreadable links */
+:is(.sm-btn, .sid-btn, .stp-btn, .pc-btn, .al-btn, .av-btn, .gsm-btn, .pe-btn, .pcd-btn, .pcas-btn, .pcda-btn, .tr-btn, .smdoc-btn, .smc-btn):not(.primary):not(.red):not(.danger):not(.dark):not(.gold):not([type="submit"]) {
+  background: #ffffff !important;
+  color: var(--sm-navy, #07384d) !important;
+  border: 1.5px solid var(--sm-border, #cbd5e1) !important;
+  box-shadow: 0 2px 6px rgba(7,56,77,.05) !important;
+}
+:is(.sm-btn, .sid-btn, .stp-btn, .pc-btn, .al-btn, .av-btn, .gsm-btn, .pe-btn, .pcd-btn, .pcas-btn, .pcda-btn, .tr-btn, .smdoc-btn, .smc-btn):not(.primary):not(.red):not(.danger):not(.dark):not(.gold):not([type="submit"]):hover {
+  background: var(--sm-bg-soft, #f0f7fb) !important;
+  color: var(--sm-navy, #07384d) !important;
+  border-color: var(--sm-secondary, #075d61) !important;
+  box-shadow: 0 6px 16px rgba(7,56,77,.10) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Danger / Delete buttons: strictly red across all themes */
+:is(.sm-btn.red, .sid-btn.red, .stp-btn.danger, .stp-btn.red, .pe-btn.red, .sid-mini.out, .pc-btn-cancel, .pc-btn.red) {
+  background: linear-gradient(135deg, #b6252b, #8b1e1e) !important;
+  border: 1.5px solid #8b1e1e !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(182,37,43,.20) !important;
+}
+:is(.sm-btn.red, .sid-btn.red, .stp-btn.danger, .stp-btn.red, .pe-btn.red, .sid-mini.out, .pc-btn-cancel, .pc-btn.red):hover {
+  background: linear-gradient(135deg, #cc2c33, #9f1c22) !important;
+  border-color: #721616 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(182,37,43,.28) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Chips: pill-shaped, crisp borders, readable contrast */
+:is(.chip, .stp-chip, .smc-chip, .gsm-chip, .sid-chip, .pcd-chip, .smdoc-chip, .pcda-open-chip) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  background: #ffffff !important;
+  color: var(--sm-navy, #07384d) !important;
+  border: 1.5px solid var(--sm-border, #cbd5e1) !important;
+  box-shadow: 0 2px 6px rgba(7,56,77,.04) !important;
+  transition: all .15s ease !important;
+}
+:is(.chip, .stp-chip, .smc-chip, .gsm-chip, .sid-chip, .pcd-chip, .smdoc-chip, .pcda-open-chip):hover {
+  background: var(--sm-bg-soft, #f1f5f9) !important;
+  border-color: var(--sm-secondary, #0c6672) !important;
+  color: var(--sm-navy, #07384d) !important;
+  transform: translateY(-1px) !important;
+}
+:is(.chip, .stp-chip, .smc-chip, .gsm-chip, .sid-chip, .pcd-chip, .smdoc-chip, .pcda-open-chip).active {
+  background: linear-gradient(135deg, var(--sm-secondary, #0c6672), var(--sm-navy, #07384d)) !important;
+  color: #ffffff !important;
+  border-color: var(--sm-navy, #07384d) !important;
+  box-shadow: 0 4px 14px rgba(7,56,77,.18) !important;
+}
+:is(.chip, .stp-chip, .smc-chip, .gsm-chip, .sid-chip, .pcd-chip, .smdoc-chip, .pcda-open-chip).active strong {
+  color: #ffffff !important;
 }
 
 /* Fondos generales de todas las pantallas del plugin */

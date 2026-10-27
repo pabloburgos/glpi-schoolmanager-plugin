@@ -209,6 +209,11 @@ Classroom map and location navigation.
 | [CREDITS.md](CREDITS.md) | Credits and acknowledgements. |
 | [CHANGELOG.md](CHANGELOG.md) | Change history. |
 
+## Authors
+
+- **Pablo Burgos** (<pabloburgostena@faltax.app>)
+- **Alejandro Galán**
+
 ## License
 
 School Manager is distributed under the GNU General Public License v3.0 or later.

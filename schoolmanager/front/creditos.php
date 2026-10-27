@@ -32,10 +32,10 @@ $root = $CFG_GLPI['root_doc'] ?? '';
 .smc-box a{font-weight:950;color:#07384d;text-decoration:none}
 .smc-box a:hover{text-decoration:underline}
 .smc-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-.smc-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;border-radius:16px;padding:0 18px;font-weight:900;text-decoration:none!important;border:1px solid #d7e6ec;color:#07384d;background:#fff;transition:.18s ease}
-.smc-btn:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(7,56,77,.10);border-color:#b6252b;color:#07384d}
-.smc-btn.primary{background:linear-gradient(135deg,#8b1e1e 0%,#a92323 58%,#b72c31 100%);border-color:#8b1e1e;color:#fff!important;box-shadow:0 14px 28px rgba(139,30,30,.18)}
-.smc-btn.primary:hover{background:linear-gradient(135deg,#9f2424 0%,#bd3131 100%);color:#fff!important}
+.smc-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:48px!important;border-radius:16px!important;padding:0 18px!important;font-weight:900!important;text-decoration:none!important;border:1.5px solid #d7e6ec!important;color:#07384d!important;background:#fff!important;transition:.18s ease!important}
+.smc-btn:hover{transform:translateY(-2px)!important;box-shadow:0 12px 24px rgba(7,56,77,.10)!important;border-color:#b6252b!important;color:#07384d!important;background:#f8fcfe!important}
+.smc-btn.primary{background:linear-gradient(135deg,#8b1e1e 0%,#a92323 58%,#b72c31 100%)!important;border-color:#8b1e1e!important;color:#fff!important;box-shadow:0 14px 28px rgba(139,30,30,.18)!important}
+.smc-btn.primary:hover{background:linear-gradient(135deg,#9f2424 0%,#bd3131 100%)!important;color:#fff!important}
 @media(max-width:760px){.schoolmanager-credits{padding:0 12px}.smc-card{padding:24px}.smc-top{grid-template-columns:1fr}.smc-logo{width:96px;height:96px}.smc-box b{font-size:24px}}
 </style>
 <div class="schoolmanager-credits">
@@ -58,15 +58,16 @@ $root = $CFG_GLPI['root_doc'] ?? '';
 
     <div class="smc-grid">
       <article class="smc-box">
-        <span class="smc-label"><?= htmlspecialchars(plugin_schoolmanager_tr('authors'), ENT_QUOTES, 'UTF-8') ?></span>
-        <b><?= $authors ?></b>
-        <p><?= htmlspecialchars(plugin_schoolmanager_tr('credits_by'), ENT_QUOTES, 'UTF-8') ?> <?= $authors ?></p>
+        <span class="smc-label"><?= htmlspecialchars(plugin_schoolmanager_tr('authors', 'Autores'), ENT_QUOTES, 'UTF-8') ?></span>
+        <b>Pablo Burgos</b>
+        <p><?= htmlspecialchars(plugin_schoolmanager_tr('pro_contact', 'Contacto profesional'), ENT_QUOTES, 'UTF-8') ?>: <a href="mailto:pabloburgostena@faltax.app" style="color:var(--sm-primary,#07384d);font-weight:900;text-decoration:underline">pabloburgostena@faltax.app</a></p>
+        <p style="margin-top:6px;font-size:13px;color:#607582"><?= htmlspecialchars(plugin_schoolmanager_tr('coauthor', 'Coautor'), ENT_QUOTES, 'UTF-8') ?>: Alejandro Galán</p>
       </article>
 
       <article class="smc-box">
-        <span class="smc-label">License</span>
+        <span class="smc-label"><?= htmlspecialchars(plugin_schoolmanager_tr('license', 'Licencia'), ENT_QUOTES, 'UTF-8') ?></span>
         <b><a href="<?= $url ?>" target="_blank" rel="noopener"><?= $license ?></a></b>
-        <p>GNU General Public License v3.0 or later · <a href="<?= $url ?>" target="_blank" rel="noopener">Ver texto completo</a></p>
+        <p>GNU General Public License v3.0 or later · <a href="<?= $url ?>" target="_blank" rel="noopener"><?= htmlspecialchars(plugin_schoolmanager_tr('view_full_text', 'Ver texto completo'), ENT_QUOTES, 'UTF-8') ?></a></p>
       </article>
     </div>
 

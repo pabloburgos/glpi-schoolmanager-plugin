@@ -217,23 +217,18 @@ function smgr_stock_common_find_rows($class, array $criteria = [], $order = 'nam
 function smgr_stock_db_request_rows($table, array $where = [], $order = 'name ASC', $limit = 500) {
     global $DB;
     if (!isset($DB) || !method_exists($DB, 'request')) { return []; }
-    $rows = [];
-    $candidates = smgr_stock_table_candidates($table);
     $resolved = smgr_stock_resolve_table($table);
-    if ($resolved !== '') { array_unshift($candidates, $resolved); }
-    $candidates = array_values(array_unique(array_filter($candidates)));
-    foreach ($candidates as $candidate) {
-        try {
-            $opts = ['FROM' => $candidate, 'LIMIT' => (int)$limit];
-            if ($where) { $opts['WHERE'] = $where; }
-            if ($order !== '') { $opts['ORDER'] = $order; }
-            foreach ($DB->request($opts) as $row) {
-                $row = smgr_stock_db_row_to_array($row);
-                if ($row) { $rows[] = $row; }
-            }
-            if ($rows) { return $rows; }
-        } catch (Throwable $e) {}
-    }
+    if ($resolved === '') { return []; }
+    $rows = [];
+    try {
+        $opts = ['FROM' => $resolved, 'LIMIT' => (int)$limit];
+        if ($where) { $opts['WHERE'] = $where; }
+        if ($order !== '') { $opts['ORDER'] = $order; }
+        foreach ($DB->request($opts) as $row) {
+            $row = smgr_stock_db_row_to_array($row);
+            if ($row) { $rows[] = $row; }
+        }
+    } catch (Throwable $e) {}
     return $rows;
 }
 

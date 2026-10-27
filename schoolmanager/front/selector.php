@@ -162,16 +162,16 @@ if (false && $building === 'ED2' && in_array($floor, ['P0','P3'], true) && is_ar
   </div>
   <div class="pc-grid">
     <aside class="pc-side">
-      <h2>Plano y aulas</h2>
+      <h2><?= htmlspecialchars(plugin_schoolmanager_tr('selector_plan_and_rooms', 'Plano y aulas'), ENT_QUOTES, 'UTF-8') ?></h2>
       <div class="pc-tabs" style="grid-template-columns:repeat(<?= max(1, count(plugin_schoolmanager_buildings())) ?>,minmax(0,1fr))!important">
         <?php foreach (plugin_schoolmanager_buildings() as $b): $bc = strtoupper((string)$b['code']); $df = plugin_schoolmanager_default_floor_code($bc); ?>
           <a class="pc-tab <?= $building===$bc?'active':'' ?>" href="?building=<?= urlencode($bc) ?>&floor=<?= urlencode($df) ?>&mode=<?= urlencode($mode) ?><?= $embed ? '&embed=1' : '' ?>"><?= htmlspecialchars(plugin_schoolmanager_label($b, 'name', $bc), ENT_QUOTES, 'UTF-8') ?></a>
         <?php endforeach; ?>
       </div>
-      <div class="pc-search"><span class="pc-svgicon pc-i-search" aria-hidden="true"></span><input id="pcSearch" autocomplete="off" placeholder="Buscar: 101, biblioteca, ESO..."></div>
+      <div class="pc-search"><span class="pc-svgicon pc-i-search" aria-hidden="true"></span><input id="pcSearch" autocomplete="off" placeholder="<?= htmlspecialchars(plugin_schoolmanager_tr('selector_search_placeholder', 'Buscar: 101, biblioteca, ESO...'), ENT_QUOTES, 'UTF-8') ?>"></div>
       <div class="pc-filterrow">
-        <select class="pc-select" id="pcFloorFilter"><option value=""><?= htmlspecialchars(plugin_schoolmanager_tr('all_floors'), ENT_QUOTES, 'UTF-8') ?></option><?php foreach ($floors as $key => $f): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $key===$floor?'selected':'' ?>><?= htmlspecialchars($f['label'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select>
-        <select class="pc-select" id="pcSort"><option value="floor">Orden por planta</option><option value="name">Orden por aula</option><option value="desc">Orden por descripción</option></select>
+        <select class="pc-select" id="pcFloorFilter"><option value=""><?= htmlspecialchars(plugin_schoolmanager_tr('all_floors', 'Todas las plantas'), ENT_QUOTES, 'UTF-8') ?></option><?php foreach ($floors as $key => $f): ?><option value="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" <?= $key===$floor?'selected':'' ?>><?= htmlspecialchars($f['label'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select>
+        <select class="pc-select" id="pcSort"><option value="floor"><?= htmlspecialchars(plugin_schoolmanager_tr('sort_by_floor', 'Orden por planta'), ENT_QUOTES, 'UTF-8') ?></option><option value="name"><?= htmlspecialchars(plugin_schoolmanager_tr('sort_by_room', 'Orden por aula'), ENT_QUOTES, 'UTF-8') ?></option><option value="desc"><?= htmlspecialchars(plugin_schoolmanager_tr('sort_by_desc', 'Orden por descripción'), ENT_QUOTES, 'UTF-8') ?></option></select>
       </div>
       <div class="pc-floors">
         <?php foreach ($floors as $key => $f): ?>
@@ -186,9 +186,9 @@ if (false && $building === 'ED2' && in_array($floor, ['P0','P3'], true) && is_ar
       </div>
     </aside>
     <main class="pc-main">
-      <div class="pc-mainbar"><h2><?= htmlspecialchars($building . ' · ' . $floors[$floor]['label'], ENT_QUOTES, 'UTF-8') ?></h2><div class="pc-hint">Select a room from the list or plan · v<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?></div></div>
+      <div class="pc-mainbar"><h2><?= htmlspecialchars($building . ' · ' . $floors[$floor]['label'], ENT_QUOTES, 'UTF-8') ?></h2><div class="pc-hint"><?= htmlspecialchars(plugin_schoolmanager_tr('selector_hint', 'Select a room from the list or plan'), ENT_QUOTES, 'UTF-8') ?> · v<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?></div></div>
       <div class="pc-planbox" id="planBox">
-        <div class="pc-planbar"><span>Plano seleccionable</span><span><?= $floors[$floor]['ready'] ? 'Click en aula' : 'Por hacer' ?></span></div>
+        <div class="pc-planbar"><span><?= htmlspecialchars(plugin_schoolmanager_tr('selector_interactive_plan', 'Plano seleccionable'), ENT_QUOTES, 'UTF-8') ?></span><span><?= $floors[$floor]['ready'] ? htmlspecialchars(plugin_schoolmanager_tr('selector_click_room', 'Click en aula'), ENT_QUOTES, 'UTF-8') : htmlspecialchars(plugin_schoolmanager_tr('selector_todo', 'Por hacer'), ENT_QUOTES, 'UTF-8') ?></span></div>
         <?php if ($floors[$floor]['ready'] && $nativePlan && $nativeBbox && $nativeZones): ?>
           <?php
             $pad = max(35, min(120, max((float)$nativeBbox['w'], (float)$nativeBbox['h']) * 0.07));
@@ -198,7 +198,7 @@ if (false && $building === 'ED2' && in_array($floor, ['P0','P3'], true) && is_ar
             $vh = (float)$nativeBbox['h'] + ($pad * 2);
           ?>
           <div class="pc-svgplan" id="pcSvgPlan" data-native-plan="1">
-            <svg class="pc-ed2-svg" id="pcEd2Svg" viewBox="<?= htmlspecialchars($vx . ' ' . $vy . ' ' . $vw . ' ' . $vh, ENT_QUOTES, 'UTF-8') ?>" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Plano rápido <?= htmlspecialchars($building . ' ' . $floor, ENT_QUOTES, 'UTF-8') ?>">
+            <svg class="pc-ed2-svg" id="pcEd2Svg" viewBox="<?= htmlspecialchars($vx . ' ' . $vy . ' ' . $vw . ' ' . $vh, ENT_QUOTES, 'UTF-8') ?>" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Plano <?= htmlspecialchars($building . ' ' . $floor, ENT_QUOTES, 'UTF-8') ?>">
               <?php if ($building === 'ED2' && $floor === 'P3'): ?>
                 <image class="pc-ed2-bg" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/maps/planos/ED2/ED2-' . $floor . '-base.png?v=' . PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>" x="<?= htmlspecialchars((string)$nativeBbox['x'], ENT_QUOTES, 'UTF-8') ?>" y="<?= htmlspecialchars((string)$nativeBbox['y'], ENT_QUOTES, 'UTF-8') ?>" width="<?= htmlspecialchars((string)$nativeBbox['w'], ENT_QUOTES, 'UTF-8') ?>" height="<?= htmlspecialchars((string)$nativeBbox['h'], ENT_QUOTES, 'UTF-8') ?>" preserveAspectRatio="none" />
               <?php else: ?>
@@ -224,16 +224,16 @@ if (false && $building === 'ED2' && in_array($floor, ['P0','P3'], true) && is_ar
               <div class="pc-click-overlay" id="pcClickOverlay" aria-hidden="false"></div>
             <?php endif; ?>
         <?php else: ?>
-          <div class="pc-under"><div class="pc-under-card"><div class="emoji"><span class="pc-svgicon pc-i-construction" aria-hidden="true"></span></div><h3>Plano por hacer</h3><p>El <?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8') ?> está preparado para cargar sus planos cuando los tengas exportados.</p></div></div>
+          <div class="pc-under"><div class="pc-under-card"><div class="emoji"><span class="pc-svgicon pc-i-construction" aria-hidden="true"></span></div><h3><?= htmlspecialchars(plugin_schoolmanager_tr('selector_plan_pending', 'Plano por hacer'), ENT_QUOTES, 'UTF-8') ?></h3><p><?= sprintf(htmlspecialchars(plugin_schoolmanager_tr('selector_building_ready_plans', 'El %s está preparado para cargar sus planos cuando los tengas exportados.'), ENT_QUOTES, 'UTF-8'), htmlspecialchars($building, ENT_QUOTES, 'UTF-8')) ?></p></div></div>
         
 <?php endif; ?>
-        <div class="pc-loading" id="pcLoading"><div><div class="pc-spinner"></div><strong>Cargando plano...</strong></div></div><div class="pc-plan-error" id="pcPlanError"><div class="pc-plan-error-card"><h3>No se ha podido cargar el plano</h3><p>El plano del Edificio 2 ha tardado demasiado o el navegador lo ha bloqueado. Puedes seguir seleccionando el aula desde la lista de la izquierda.</p><button class="pc-btn primary" type="button" id="pcReloadPlan">Reintentar cargar plano</button></div></div>
+        <div class="pc-loading" id="pcLoading"><div><div class="pc-spinner"></div><strong><?= htmlspecialchars(plugin_schoolmanager_tr('selector_loading_plan', 'Cargando plano...'), ENT_QUOTES, 'UTF-8') ?></strong></div></div><div class="pc-plan-error" id="pcPlanError"><div class="pc-plan-error-card"><h3><?= htmlspecialchars(plugin_schoolmanager_tr('selector_failed_load_plan', 'No se ha podido cargar el plano'), ENT_QUOTES, 'UTF-8') ?></h3><p><?= htmlspecialchars(plugin_schoolmanager_tr('selector_plan_timeout_help', 'El plano ha tardado demasiado o el navegador lo ha bloqueado. Puedes seguir seleccionando el aula desde la lista de la izquierda.'), ENT_QUOTES, 'UTF-8') ?></p><button class="pc-btn primary" type="button" id="pcReloadPlan"><?= htmlspecialchars(plugin_schoolmanager_tr('selector_retry_load_plan', 'Reintentar cargar plano'), ENT_QUOTES, 'UTF-8') ?></button></div></div>
       </div>
-      <section class="pc-result empty" id="pcResult">Selecciona un aula desde el plano o desde la lista.</section>
+      <section class="pc-result empty" id="pcResult"><?= htmlspecialchars(plugin_schoolmanager_tr('selector_select_prompt', 'Selecciona un aula desde el plano o desde la lista.'), ENT_QUOTES, 'UTF-8') ?></section>
     </main>
   </div>
 </div>
-<div class="pc-toast" id="pcToast">Copiado</div>
+<div class="pc-toast" id="pcToast"><?= htmlspecialchars(plugin_schoolmanager_tr('copied', 'Copiado'), ENT_QUOTES, 'UTF-8') ?></div>
 
 <script>
 (function(){
@@ -247,6 +247,25 @@ const ROOT = <?= json_encode($root, JSON_UNESCAPED_SLASHES) ?>;
  const HAS_NATIVE_PLAN = <?= $nativePlan && $nativeZones ? 'true' : 'false' ?>;
  const CAN_OPEN_NATIVE = <?= $canOpenNative ? 'true' : 'false' ?>;
  const IS_EMBED = <?= $embed ? 'true' : 'false' ?>;
+ const I18N = {
+   zoneNoLink: <?= json_encode(plugin_schoolmanager_tr('selector_zone_no_link', 'Esta zona no tiene enlace de aula asociado.')) ?>,
+   noDescription: <?= json_encode(plugin_schoolmanager_tr('no_description', 'Sin descripción')) ?>,
+   markedOnPlan: <?= json_encode(plugin_schoolmanager_tr('marked_on_plan', 'Marcado en el plano: ')) ?>,
+   markedOnPlanError: <?= json_encode(plugin_schoolmanager_tr('marked_on_plan_error', 'No se pudo marcar el plano')) ?>,
+   planNotAvailable: <?= json_encode(plugin_schoolmanager_tr('plan_not_available', 'Plano no disponible para marcar')) ?>,
+   roomDetails: <?= json_encode(plugin_schoolmanager_tr('room_details', 'Detalles del aula')) ?>,
+   viewInGlpi: <?= json_encode(plugin_schoolmanager_tr('view_in_glpi', 'Ver en GLPI')) ?>,
+   applyLocation: <?= json_encode(plugin_schoolmanager_tr('apply_location', 'Aplicar ubicación')) ?>,
+   selectedLocation: <?= json_encode(plugin_schoolmanager_tr('selected_location', 'Ubicación seleccionada')) ?>,
+   code: <?= json_encode(plugin_schoolmanager_tr('code', 'Código')) ?>,
+   floor: <?= json_encode(plugin_schoolmanager_tr('floor', 'Planta')) ?>,
+   selectedRoomActions: <?= json_encode(plugin_schoolmanager_tr('selected_room_actions', 'Acciones del aula seleccionada')) ?>,
+   roomSelectedPrefix: <?= json_encode(plugin_schoolmanager_tr('room_selected_prefix', 'Aula seleccionada: ')) ?>,
+   idCopiedPrefix: <?= json_encode(plugin_schoolmanager_tr('id_copied_prefix', 'ID copiada: ')) ?>,
+   locationSent: <?= json_encode(plugin_schoolmanager_tr('location_sent', 'Ubicación enviada')) ?>,
+   noFormConnectedCopied: <?= json_encode(plugin_schoolmanager_tr('no_form_connected_copied', 'No hay formulario conectado. ID copiada.')) ?>,
+   roomNotFoundInList: <?= json_encode(plugin_schoolmanager_tr('room_not_found_in_list', 'No se ha encontrado el aula en la lista')) ?>
+ };
  const app = document.getElementById('pcSelector'), list=document.getElementById('pcList'), empty=document.getElementById('pcEmpty'), search=document.getElementById('pcSearch'), floorFilter=document.getElementById('pcFloorFilter'), sortSelect=document.getElementById('pcSort'), result=document.getElementById('pcResult'), toast=document.getElementById('pcToast'), frame=document.getElementById('pcFrame'), loading=document.getElementById('pcLoading'), clickOverlay=document.getElementById('pcClickOverlay');
  let selected=null;
  let lastPlanSelectionAt=0;
@@ -362,10 +381,10 @@ const ROOT = <?= json_encode($root, JSON_UNESCAPED_SLASHES) ?>;
    // No se usan coordenadas ni texto cercano como fallback general porque confundia BIBLIO/DIR/SEC y P3.
    const hit = byId(p.id) || find(p.href||'') || byCodeOrLabel(p.code) || byCodeOrLabel(p.label) || find(p.title||'');
    if(hit){ lastPlanSelectionAt=Date.now(); select(hit,true); }
-   else { if(Date.now()-lastPlanSelectionAt>900){ showToast('Esta zona no tiene enlace de aula asociado.'); } }
+   else { if(Date.now()-lastPlanSelectionAt>900){ showToast(I18N.zoneNoLink); } }
  }, false);
  function filtered(){ const q=norm(search.value), fl=floorFilter.value; let arr=DATA.filter(a=>{const hay=norm([a.aula,a.codigo,a.descripcion,a.planta,a.building].join(' ')); return (!q||hay.includes(q))&&(!fl||a.floor===fl);}); const s=sortSelect.value; arr.sort((a,b)=>{if(s==='name')return (a.aula||'').localeCompare(b.aula||'',undefined,{numeric:true}); if(s==='desc')return (a.descripcion||'').localeCompare(b.descripcion||''); return (floorRank(a.floor)-floorRank(b.floor)) || ((a.is_numbered?1:0)-(b.is_numbered?1:0)) || (a.aula||'').localeCompare(b.aula||'',undefined,{numeric:true});}); return arr; }
- function render(){ const arr=filtered(); list.innerHTML=''; empty.style.display=arr.length?'none':'block'; arr.forEach(a=>{const btn=document.createElement('button'); btn.type='button'; btn.className='pc-item'+(selected&&selected.codigo===a.codigo?' active':''); btn.innerHTML='<div class="pc-avatar">'+esc(initials(a))+'</div><div><div class="pc-room">'+esc(a.aula)+'</div><div class="pc-desc">'+esc(a.descripcion||'Sin descripción')+'</div></div><div class="pc-code">'+esc(a.codigo)+'</div>'; btn.onclick=()=>select(a,false); btn.ondblclick=()=>{ if(MODE==='select'){ useLocation(a); } else { location.href=CAN_OPEN_NATIVE&&a.id?openUrl(a):detailsUrl(a); } }; list.appendChild(btn); }); }
+ function render(){ const arr=filtered(); list.innerHTML=''; empty.style.display=arr.length?'none':'block'; arr.forEach(a=>{const btn=document.createElement('button'); btn.type='button'; btn.className='pc-item'+(selected&&selected.codigo===a.codigo?' active':''); btn.innerHTML='<div class="pc-avatar">'+esc(initials(a))+'</div><div><div class="pc-room">'+esc(a.aula)+'</div><div class="pc-desc">'+esc(a.descripcion||I18N.noDescription)+'</div></div><div class="pc-code">'+esc(a.codigo)+'</div>'; btn.onclick=()=>select(a,false); btn.ondblclick=()=>{ if(MODE==='select'){ useLocation(a); } else { location.href=CAN_OPEN_NATIVE&&a.id?openUrl(a):detailsUrl(a); } }; list.appendChild(btn); }); }
  function markNativePlan(){
    document.querySelectorAll('.pc-ed2-zone').forEach(z=>{const hit=selected && (z.dataset.code===selected.codigo || String(z.dataset.id||'')===String(selected.id||'')); z.classList.toggle('active', !!hit);});
    document.querySelectorAll('.pc-click-zone').forEach(z=>{const hit=selected && (String(z.dataset.id||'')===String(selected.id||'') || cleanCode(z.dataset.code)===cleanCode(selected.codigo)); z.classList.toggle('active', !!hit);});
@@ -376,26 +395,26 @@ const ROOT = <?= json_encode($root, JSON_UNESCAPED_SLASHES) ?>;
      try{
        frame.contentWindow.postMessage({type:'schoolmanager-highlight-room',id:String(a.id||''),code:String(a.codigo||''),room:String(a.aula||'')}, '*');
        frame.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
-       showToast('Marcado en el plano: '+(a.aula||a.codigo||''));
-     }catch(e){ showToast('No se pudo marcar el plano'); }
+       showToast(I18N.markedOnPlan + (a.aula||a.codigo||''));
+     }catch(e){ showToast(I18N.markedOnPlanError); }
    } else {
-     showToast('Plano no disponible para marcar');
+     showToast(I18N.planNotAvailable);
    }
  }
  function select(a, fromPlan){
    selected=a; render(); markNativePlan(); result.classList.remove('empty');
-   const detailsBtn = '<a class="pc-btn primary" data-pc-action="details" href="'+attr(detailsUrl(a))+'"><span class="pc-svgicon pc-i-info" aria-hidden="true"></span><span>Detalles del aula</span></a>';
-   const nativeBtn = a.id ? '<a class="pc-btn glpi" data-pc-action="native" href="'+attr(openUrl(a))+'"><span class="pc-svgicon pc-i-external" aria-hidden="true"></span><span>Ver en GLPI</span></a>' : '';
-   const selectBtn = MODE==='select' ? '<button class="pc-btn select" data-pc-action="apply" type="button" id="pcUse"><span class="pc-svgicon pc-i-check" aria-hidden="true"></span><span>Aplicar ubicación</span></button>' : '';
+   const detailsBtn = '<a class="pc-btn primary" data-pc-action="details" href="'+attr(detailsUrl(a))+'"><span class="pc-svgicon pc-i-info" aria-hidden="true"></span><span>'+esc(I18N.roomDetails)+'</span></a>';
+   const nativeBtn = a.id ? '<a class="pc-btn glpi" data-pc-action="native" href="'+attr(openUrl(a))+'"><span class="pc-svgicon pc-i-external" aria-hidden="true"></span><span>'+esc(I18N.viewInGlpi)+'</span></a>' : '';
+   const selectBtn = MODE==='select' ? '<button class="pc-btn select" data-pc-action="apply" type="button" id="pcUse"><span class="pc-svgicon pc-i-check" aria-hidden="true"></span><span>'+esc(I18N.applyLocation)+'</span></button>' : '';
    const actionsHtml = detailsBtn + nativeBtn + selectBtn;
-   result.innerHTML='<div class="pc-room-details"><small>Ubicación seleccionada</small><h3>'+esc(a.aula)+' · '+esc(a.descripcion||'')+'</h3><p><span><b>Código</b> '+esc(a.codigo)+'</span><span><b>ID GLPI</b> '+esc(a.id||'—')+'</span><span><b>Planta</b> '+esc(a.planta)+'</span></p></div><div class="pc-result-actions" aria-label="Acciones del aula seleccionada">'+actionsHtml+'</div>';
+   result.innerHTML='<div class="pc-room-details"><small>'+esc(I18N.selectedLocation)+'</small><h3>'+esc(a.aula)+' · '+esc(a.descripcion||'')+'</h3><p><span><b>'+esc(I18N.code)+'</b> '+esc(a.codigo)+'</span><span><b>ID GLPI</b> '+esc(a.id||'—')+'</span><span><b>'+esc(I18N.floor)+'</b> '+esc(a.planta)+'</span></p></div><div class="pc-result-actions" aria-label="'+esc(I18N.selectedRoomActions)+'">'+actionsHtml+'</div>';
    // seguridad: si alguna regla antigua intenta vaciar acciones, se reconstruye en el siguiente frame
    requestAnimationFrame(()=>{ const box=result.querySelector('.pc-result-actions'); if(box && !box.children.length){ box.innerHTML=actionsHtml; } });
    const use=document.getElementById('pcUse'); if(use) use.onclick=()=>useLocation(a);
-   if(fromPlan){ lastPlanSelectionAt=Date.now(); showToast('Aula seleccionada: '+a.aula); }
+   if(fromPlan){ lastPlanSelectionAt=Date.now(); showToast(I18N.roomSelectedPrefix + a.aula); }
  }
- function copy(v){navigator.clipboard&&navigator.clipboard.writeText(String(v||'')); showToast('ID copiada: '+(v||'—'))}
- function useLocation(a){const payload={type:'schoolmanager:location-selected',id:parseInt(a.id||0,10),name:a.aula,code:a.codigo,building:a.building,floor:a.floor,description:a.descripcion,openUrl:openUrl(a)}; if(window.parent&&window.parent!==window){window.parent.postMessage(payload, window.location.origin); showToast('Ubicación enviada'); return;} if(window.opener&&!window.opener.closed){window.opener.postMessage(payload, window.location.origin); showToast('Ubicación enviada'); setTimeout(()=>window.close(),450);} else {copy(a.id); showToast('No hay formulario conectado. ID copiada.')}}
+ function copy(v){navigator.clipboard&&navigator.clipboard.writeText(String(v||'')); showToast(I18N.idCopiedPrefix + (v||'—'))}
+ function useLocation(a){const payload={type:'schoolmanager:location-selected',id:parseInt(a.id||0,10),name:a.aula,code:a.codigo,building:a.building,floor:a.floor,description:a.descripcion,openUrl:openUrl(a)}; if(window.parent&&window.parent!==window){window.parent.postMessage(payload, window.location.origin); showToast(I18N.locationSent); return;} if(window.opener&&!window.opener.closed){window.opener.postMessage(payload, window.location.origin); showToast(I18N.locationSent); setTimeout(()=>window.close(),450);} else {copy(a.id); showToast(I18N.noFormConnectedCopied)}}
  function showToast(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1900)}
  function esc(s){return (s??'').toString().replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))} function attr(s){return esc(s)}
  search.oninput=render; floorFilter.onchange=render; sortSelect.onchange=render;
@@ -419,7 +438,7 @@ const ROOT = <?= json_encode($root, JSON_UNESCAPED_SLASHES) ?>;
        if(!z) return;
        ev.preventDefault(); ev.stopPropagation();
        const hit=find([z.dataset.id?('id='+z.dataset.id):'', z.dataset.code||'', z.dataset.label||''].join(' '));
-       if(hit) select(hit,true); else showToast('No se ha encontrado el aula en la lista');
+       if(hit) select(hit,true); else showToast(I18N.roomNotFoundInList);
      }, true);
      svgPlan.addEventListener('keydown', function(ev){
        if(ev.key!=='Enter' && ev.key!==' ') return;

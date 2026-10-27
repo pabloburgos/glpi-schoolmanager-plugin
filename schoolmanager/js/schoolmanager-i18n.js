@@ -4,9 +4,22 @@
     return;
   }
 
+  function isSpanish(){
+    var loc = (window.SCHOOLMANAGER_CONFIG && window.SCHOOLMANAGER_CONFIG.locale) || (window.CFG_GLPI && window.CFG_GLPI.current_language) || document.documentElement.lang || '';
+    loc = loc.toLowerCase().replace('-', '_');
+    return loc === 'es_es' || loc === 'es' || loc.indexOf('es_') === 0;
+  }
+
+  // Fast path: if language is Spanish, server-side templates are already canonical Spanish
+  if (isSpanish()) {
+    return;
+  }
+
   let dict = null;
   let keys = [];
+  let masterRegex = null;
   let running = false;
+  let observerInitialized = false;
 
   function keepOuterWhitespace(text, value){
     const start = (text.match(/^\s*/) || [''])[0];
@@ -35,29 +48,26 @@
     const clean = String(text).replace(/\s+/g, ' ').trim();
     if (!clean) return text;
 
-    // 1. Exact match (fastest and safest)
+    // 1. Exact match (fastest and safest O(1))
     if (Object.prototype.hasOwnProperty.call(dict, clean)) {
       return keepOuterWhitespace(text, dict[clean]);
     }
 
-    if (clean.length > 300) return text;
+    if (clean.length > 400 || !masterRegex) return text;
 
-    // 2. Safe whole-word / phrase match (prevent partial substring collisions like Italian -> Italianoo)
-    let next = clean;
-    for (const k of keys) {
-      if (k.length < 3 || !Object.prototype.hasOwnProperty.call(dict, k)) continue;
-      const targetVal = dict[k];
-      if (next === k) return keepOuterWhitespace(text, targetVal);
-
-      // Only match with word boundaries to prevent corrupting substrings inside words
-      const rx = new RegExp('(^|[^\\p{L}\\p{N}_])' + escapeRegExp(k) + '(?=[^\\p{L}\\p{N}_]|$)', 'gu');
-      if (rx.test(next)) {
-        next = next.replace(rx, function(m, p1){
-          return p1 + targetVal;
-        });
-      }
+    // 2. Safe precompiled master regex replacement
+    try {
+      masterRegex.lastIndex = 0;
+      const replaced = clean.replace(masterRegex, function(match, p1, p2){
+        if (p2 && Object.prototype.hasOwnProperty.call(dict, p2)) {
+          return p1 + dict[p2];
+        }
+        return match;
+      });
+      return replaced !== clean ? keepOuterWhitespace(text, replaced) : text;
+    } catch(e) {
+      return text;
     }
-    return next !== clean ? keepOuterWhitespace(text, next) : text;
   }
 
   function translateAttr(node, attr){
@@ -113,43 +123,105 @@
     }
   }
 
+  function setupObserver(){
+    if (observerInitialized || !document.body) return;
+    observerInitialized = true;
+    var pendingNodes = [];
+    var walkRaf = null;
+    function scheduleWalk(){
+      if (walkRaf) return;
+      walkRaf = requestAnimationFrame(function(){
+        walkRaf = null;
+        if (running) return;
+        running = true;
+        try {
+          while (pendingNodes.length > 0) {
+            var n = pendingNodes.shift();
+            walk(n);
+          }
+        } finally {
+          running = false;
+        }
+      });
+    }
+
+    // Only observe added child elements, NEVER characterData to avoid recursive loop
+    const mo = new MutationObserver(function(mutations){
+      if (running) return;
+      for (let m = 0; m < mutations.length; m++) {
+        const added = mutations[m].addedNodes;
+        if (added && added.length > 0) {
+          for (let n = 0; n < added.length; n++) {
+            if (added[n].nodeType === 1 && added[n].classList && (added[n].classList.contains('sm-no-translate') || added[n].classList.contains('pc-combo'))) {
+              continue;
+            }
+            pendingNodes.push(added[n]);
+          }
+        }
+      }
+      if (pendingNodes.length > 0) {
+        scheduleWalk();
+      }
+    });
+    mo.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['placeholder', 'title', 'aria-label', 'alt', 'value']
+    });
+  }
+
   function detectBase(){
     if (window.CFG_GLPI && window.CFG_GLPI.root_doc) return window.CFG_GLPI.root_doc;
     const m = (location.pathname || '').match(/^(.*)\/plugins\/schoolmanager\//);
     return m ? m[1] : '';
   }
 
+  function getLocaleCode(){
+    return (window.SCHOOLMANAGER_CONFIG && window.SCHOOLMANAGER_CONFIG.locale) || (window.CFG_GLPI && window.CFG_GLPI.current_language) || document.documentElement.lang || 'default';
+  }
+
+  function initDict(j){
+    if (!j || !j.map) return;
+    dict = j.map;
+    keys = Object.keys(dict).filter(function(k){ return k && k.trim().length >= 2; }).sort(function(a, b){ return b.length - a.length; });
+    if (keys.length > 0) {
+      try {
+        var pattern = '(^|[^\\p{L}\\p{N}_])(' + keys.map(escapeRegExp).join('|') + ')(?=[^\\p{L}\\p{N}_]|$)';
+        masterRegex = new RegExp(pattern, 'gu');
+      } catch(e) {
+        masterRegex = null;
+      }
+    }
+    run();
+    if (document.title && !shouldSkip(document.querySelector('title'))) {
+      const nt = translateText(document.title);
+      if (nt !== document.title) document.title = nt;
+    }
+    setupObserver();
+  }
+
   function load(){
-    fetch(detectBase() + '/plugins/schoolmanager/front/i18n.php?v=' + Date.now(), {credentials: 'same-origin'})
+    if (isSpanish()) return;
+
+    var locKey = 'sm_i18n_v286_' + getLocaleCode();
+    try {
+      var cached = sessionStorage.getItem(locKey);
+      if (cached) {
+        var parsed = JSON.parse(cached);
+        if (parsed && parsed.map) {
+          initDict(parsed);
+          return;
+        }
+      }
+    } catch(e) {}
+
+    fetch(detectBase() + '/plugins/schoolmanager/front/i18n.php?v=286', {credentials: 'same-origin'})
       .then(function(r){ return r.json(); })
       .then(function(j){
         if (!j || !j.map) return;
-        dict = j.map;
-        keys = Object.keys(dict).sort(function(a, b){ return b.length - a.length; });
-        run();
-        if (document.title && !shouldSkip(document.querySelector('title'))) {
-          const nt = translateText(document.title);
-          if (nt !== document.title) document.title = nt;
-        }
-
-        // Only observe added child elements, NEVER characterData to avoid recursive loop
-        const mo = new MutationObserver(function(mutations){
-          if (running) return;
-          for (let m = 0; m < mutations.length; m++) {
-            const added = mutations[m].addedNodes;
-            if (added && added.length > 0) {
-              for (let n = 0; n < added.length; n++) {
-                walk(added[n]);
-              }
-            }
-          }
-        });
-        mo.observe(document.body, {
-          subtree: true,
-          childList: true,
-          attributes: true,
-          attributeFilter: ['placeholder', 'title', 'aria-label', 'alt', 'value']
-        });
+        try { sessionStorage.setItem(locKey, JSON.stringify(j)); } catch(e) {}
+        initDict(j);
       }).catch(function(){});
   }
 

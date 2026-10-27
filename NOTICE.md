@@ -10,7 +10,7 @@ This project is an unofficial GLPI plugin designed for schools and educational c
 
 Created by:
 
-- Pablo Burgos
+- Pablo Burgos <pabloburgostena@faltax.app>
 - Alejandro Galán
 
 ## GLPI

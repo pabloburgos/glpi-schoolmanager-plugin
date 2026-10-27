@@ -159,6 +159,11 @@ Laden Sie Ihren Browser mit `Strg + F5` neu.
 | [CREDITS.md](CREDITS.md) | Autoren und Danksagung. |
 | [CHANGELOG.md](CHANGELOG.md) | Versionsverlauf. |
 
+## Autoren
+
+- **Pablo Burgos** (<pabloburgostena@faltax.app>)
+- **Alejandro Galán**
+
 ## Lizenz
 
 School Manager steht unter der GNU General Public License v3.0 oder höher.

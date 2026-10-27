@@ -62,7 +62,40 @@
     new MutationObserver(render).observe(select,{childList:true,subtree:true,attributes:true,attributeFilter:['selected','disabled','label']});
     render();
   }
+  let scanRaf = null;
+  function scheduleScan(){
+    if (scanRaf) return;
+    scanRaf = requestAnimationFrame(function(){
+      scanRaf = null;
+      scan();
+    });
+  }
   function scan(){ document.querySelectorAll('select').forEach(enhance); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan); else scan();
-  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});
+  
+  const mo = new MutationObserver(function(mutations){
+    let hasSelect = false;
+    for(let i = 0; i < mutations.length; i++){
+      const added = mutations[i].addedNodes;
+      for(let j = 0; j < added.length; j++){
+        const node = added[j];
+        if(node.nodeType === 1){
+          if(node.classList && node.classList.contains('pc-combo')) continue;
+          if(node.tagName === 'SELECT' || (node.querySelector && node.querySelector('select'))){
+            hasSelect = true;
+            break;
+          }
+        }
+      }
+      if(hasSelect) break;
+    }
+    if(hasSelect) scheduleScan();
+  });
+  if(document.body){
+    mo.observe(document.body, {childList: true, subtree: true});
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      mo.observe(document.body, {childList: true, subtree: true});
+    });
+  }
 })();
