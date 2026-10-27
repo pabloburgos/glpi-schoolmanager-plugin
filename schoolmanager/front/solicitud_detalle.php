@@ -578,9 +578,9 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
   <section class="pcd-hero">
     <div class="pcd-brand"><img class="pcd-logo" src="<?= pcd_h($logoUrl) ?>" alt="Logo"><div><div class="pcd-kicker">GLPI SCHOOL MANAGER</div><h1>Detalle de solicitud</h1><p class="pcd-sub">Vista sencilla con estado, respuestas y solución.</p></div></div>
     <div class="pcd-actions">
-      <a class="pcd-btn primary" href="<?= pcd_h($newUrl) ?>"><?= pcd_icon('plus') ?><span>Crear incidencia</span></a>
-      <a class="pcd-btn" href="<?= pcd_h($listUrl) ?>"><?= pcd_icon('list') ?><span>Mis solicitudes</span></a>
-      <?php if ($ticket): ?><a class="pcd-btn" href="<?= pcd_h($nativeUrl) ?>"><?= pcd_icon('external') ?><span>Vista nativa GLPI</span></a><?php endif; ?>
+      <a class="pcd-btn primary" href="<?= pcd_h($newUrl) ?>"><?= pcd_icon('plus') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) ?></span></a>
+      <a class="pcd-btn" href="<?= pcd_h($listUrl) ?>"><?= pcd_icon('list') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) ?></span></a>
+      <?php if ($ticket): ?><a class="pcd-btn" href="<?= pcd_h($nativeUrl) ?>"><?= pcd_icon('external') ?><span><?= pcd_h(plugin_schoolmanager_tr('native_tickets_list', 'Vista nativa GLPI')) ?></span></a><?php endif; ?>
     </div>
   </section>
 

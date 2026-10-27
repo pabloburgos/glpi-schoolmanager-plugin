@@ -10,9 +10,11 @@ window.SCHOOLMANAGER_CONFIG = {"locale":"es_ES","menuTitle":"School Manager","ap
   function applyVars(){
     document.documentElement.setAttribute('data-sm-theme', t.palette || 'teal-red');
     document.documentElement.setAttribute('data-sm-dark', t.dark ? '1' : '0');
+    document.documentElement.setAttribute('data-sm-density', t.density || 'comfortable');
     if (document.body) {
       document.body.setAttribute('data-sm-theme', t.palette || 'teal-red');
       document.body.setAttribute('data-sm-dark', t.dark ? '1' : '0');
+      document.body.setAttribute('data-sm-density', t.density || 'comfortable');
     }
     Object.keys(vars).forEach(function(k){
       if(vars[k]) {
@@ -35,8 +37,19 @@ window.SCHOOLMANAGER_CONFIG = {"locale":"es_ES","menuTitle":"School Manager","ap
   }
   function refreshMenu(){
     var title = cfg.menuTitle || cfg.appName || 'School Manager';
-    document.querySelectorAll('a[href*="/plugins/schoolmanager/"]').forEach(function(a){
-      var span = a.querySelector('.text-wrap, span:not(.badge)');
+    var navLinks = document.querySelectorAll(
+      'aside.navbar a[href*="/plugins/schoolmanager/"], ' +
+      'header.navbar a[href*="/plugins/schoolmanager/"], ' +
+      '#navigation-menu a[href*="/plugins/schoolmanager/"], ' +
+      '.navbar-vertical a[href*="/plugins/schoolmanager/"], ' +
+      '.glpi-sidebar a[href*="/plugins/schoolmanager/"], ' +
+      '.sidebar a[href*="/plugins/schoolmanager/"]'
+    );
+    navLinks.forEach(function(a){
+      if (a.closest('.schoolmanager-configured, .sm-home, .pc-wrap, .pc-requests, .pc-form, .gsm-wrap, .stp, .av, .al-wrap, .ticdesk, .pcd, .smset, .smdoc, .pe-wrap')) {
+        return;
+      }
+      var span = a.querySelector('.text-wrap, .nav-link-title');
       if (span) { span.textContent = title; }
       if (a.hasAttribute('title')) { a.setAttribute('title', title); }
     });

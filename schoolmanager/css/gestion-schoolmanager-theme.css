@@ -24,40 +24,60 @@
 /* Lightweight preloader overlay */
 .sm-preloader {
   position: fixed;
-  inset: 0;
-  z-index: 999999;
-  background: var(--sm-bg, #f3f7fb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.28s ease, visibility 0.28s ease;
-}
-.sm-preloader.sm-preloader-hidden {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  z-index: 9999999;
+  background: transparent;
+  pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  pointer-events: none;
+  transition: opacity 0.15s ease;
 }
-.sm-preloader-inner {
+.sm-preloader.sm-preloader-active {
+  opacity: 1;
+  visibility: visible;
+}
+.sm-preloader-bar {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, var(--sm-accent, #B6252B), var(--sm-secondary, #075D61));
+  box-shadow: 0 0 10px var(--sm-accent, #B6252B);
+  transition: width 0.35s ease;
+}
+.sm-preloader-corner {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 9999999;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 14px;
-}
-.sm-preloader-spinner {
-  width: 44px;
-  height: 44px;
-  border: 3.5px solid color-mix(in srgb, var(--sm-primary, #07384D) 20%, transparent);
-  border-top-color: var(--sm-primary, #07384D);
-  border-right-color: var(--sm-accent, #B6252B);
-  border-radius: 50%;
-  animation: smSpin 0.75s linear infinite;
-}
-.sm-preloader-text {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-  font-size: 14px;
+  gap: 8px;
+  background: var(--sm-card, #ffffff);
+  border: 1px solid var(--sm-border, #d7e6ec);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(7, 56, 77, 0.12);
+  font-size: 12px;
   font-weight: 800;
   color: var(--sm-primary, #07384D);
-  letter-spacing: -0.01em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+}
+.sm-preloader.sm-preloader-active .sm-preloader-corner {
+  opacity: 1;
+  transform: translateY(0);
+}
+.sm-preloader-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid color-mix(in srgb, var(--sm-primary, #07384D) 25%, transparent);
+  border-top-color: var(--sm-accent, #B6252B);
+  border-radius: 50%;
+  animation: smSpin 0.65s linear infinite;
 }
 @keyframes smSpin {
   to { transform: rotate(360deg); }
@@ -138,6 +158,62 @@
 }
 :is(.chip, .stp-chip, .smc-chip, .gsm-chip, .sid-chip, .pcd-chip, .smdoc-chip, .pcda-open-chip).active strong {
   color: #ffffff !important;
+}
+
+/* Layout Density Modifiers (Compact / Comfortable / Large) */
+html[data-sm-density="compact"], body[data-sm-density="compact"] {
+  --sm-density-pad: 12px;
+  --sm-density-gap: 10px;
+  --sm-density-font: 13.5px;
+}
+html[data-sm-density="compact"] :is(.sm-card, .pc-card, .gsm-card, .stp-metric, .stp-control, .sid-card, .al-tablebox, .ticdesk .panel, .pcd-card, .pcd-hero, .sm-hero, .pc-hero) {
+  padding: 12px 16px !important;
+  border-radius: 16px !important;
+}
+html[data-sm-density="compact"] :is(.sm-btn, .pc-btn, .stp-btn, .sid-btn, .al-btn, .av-btn, .pcd-btn, .gsm-btn) {
+  min-height: 38px !important;
+  padding: 6px 14px !important;
+  font-size: 13px !important;
+  border-radius: 12px !important;
+}
+html[data-sm-density="compact"] :is(.sm-grid, .pc-grid, .stp-grid, .sid-grid, .al-tools) {
+  gap: 10px !important;
+}
+
+html[data-sm-density="large"], body[data-sm-density="large"] {
+  --sm-density-pad: 26px;
+  --sm-density-gap: 22px;
+  --sm-density-font: 16px;
+}
+html[data-sm-density="large"] :is(.sm-card, .pc-card, .gsm-card, .stp-metric, .stp-control, .sid-card, .al-tablebox, .ticdesk .panel, .pcd-card, .pcd-hero, .sm-hero, .pc-hero) {
+  padding: 26px 30px !important;
+  border-radius: 26px !important;
+}
+html[data-sm-density="large"] :is(.sm-btn, .pc-btn, .stp-btn, .sid-btn, .al-btn, .av-btn, .pcd-btn, .gsm-btn) {
+  min-height: 52px !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  border-radius: 18px !important;
+}
+
+/* Internationalization Robustness & Word Wrapping for Long Translations (German, Polish, Portuguese, Dutch) */
+:is(.sm-card, .pc-card, .gsm-card, .stp-item, .av-item, .pcd-card, .sid-card, .al-tablebox) {
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+:is(.sm-btn, .pc-btn, .stp-btn, .sid-btn, .al-btn, .av-btn, .pcd-btn, .gsm-btn) span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:is(.sm-hero, .pc-hero, .stp-top, .sid-top, .al-head, .gsm-hero, .pcd-hero) {
+  flex-wrap: wrap !important;
+}
+:is(.sm-title, .pc-title, .stp-title, .sid-brand, .al-head, .gsm-brand) h1,
+:is(.sm-title, .pc-title, .stp-title, .sid-brand, .al-head, .gsm-brand) h2 {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Fondos generales de todas las pantallas del plugin */

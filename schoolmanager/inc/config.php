@@ -36,6 +36,7 @@ function plugin_schoolmanager_normalize_config(array $cfg): array {
         $cfg['credits'] = [];
     }
     $cfg['credits']['authors'] = trim((string)($cfg['credits']['authors'] ?? 'Pablo Burgos y Alejandro Galán')) ?: 'Pablo Burgos y Alejandro Galán';
+    $cfg['credits']['email'] = trim((string)($cfg['credits']['email'] ?? 'pabloburgostena@faltax.app')) ?: 'pabloburgostena@faltax.app';
     $cfg['credits']['license'] = plugin_schoolmanager_normalize_license_label((string)($cfg['credits']['license'] ?? 'GPLv3+'));
     $licenseUrl = trim((string)($cfg['credits']['license_url'] ?? ''));
     if ($licenseUrl === '' || stripos($licenseUrl, 'creativecommons.org') !== false) {
@@ -94,6 +95,7 @@ function plugin_schoolmanager_default_config(): array {
         ],
         'credits' => [
             'authors' => 'Pablo Burgos y Alejandro Galán',
+            'email' => 'pabloburgostena@faltax.app',
             'license' => 'GPLv3+',
             'license_url' => 'https://www.gnu.org/licenses/gpl-3.0.html',
             'show_footer_credit' => false,
@@ -230,9 +232,10 @@ function plugin_schoolmanager_credit_html(): string {
     $cfg = plugin_schoolmanager_config();
     $credits = $cfg['credits'] ?? [];
     $authors = htmlspecialchars((string)($credits['authors'] ?? 'Pablo Burgos y Alejandro Galán'), ENT_QUOTES, 'UTF-8');
+    $email = htmlspecialchars((string)($credits['email'] ?? 'pabloburgostena@faltax.app'), ENT_QUOTES, 'UTF-8');
     $license = htmlspecialchars(plugin_schoolmanager_normalize_license_label((string)($credits['license'] ?? 'GPLv3+')), ENT_QUOTES, 'UTF-8');
     $url = htmlspecialchars((string)($credits['license_url'] ?? 'https://www.gnu.org/licenses/gpl-3.0.html'), ENT_QUOTES, 'UTF-8');
-    return '<div class="schoolmanager-credit">' . plugin_schoolmanager_tr('credits_by', 'Created by') . ' <strong>' . $authors . '</strong> · <a href="' . $url . '" target="_blank" rel="noopener">' . $license . '</a></div>';
+    return '<div class="schoolmanager-credit">' . plugin_schoolmanager_tr('credits_by', 'Created by') . ' <strong>' . $authors . '</strong> (<a href="mailto:' . $email . '">' . $email . '</a>) · <a href="' . $url . '" target="_blank" rel="noopener">' . $license . '</a></div>';
 }
 
 function plugin_schoolmanager_save_config(array $cfg): bool {
@@ -270,7 +273,7 @@ return " . var_export($cfg, true) . ";
 }
 
 function plugin_schoolmanager_builtin_locales(): array {
-    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT'];
+    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT', 'pt_PT', 'ca_ES', 'gl_ES', 'nl_NL', 'pl_PL'];
 }
 
 function plugin_schoolmanager_available_locales(bool $includeDetails = false): array {
@@ -282,11 +285,13 @@ function plugin_schoolmanager_available_locales(bool $includeDetails = false): a
         'fr_FR' => 'Français',
         'de_DE' => 'Deutsch',
         'it_IT' => 'Italiano',
-        'en_US' => 'English (US)',
         'pt_PT' => 'Português',
-        'pt_BR' => 'Português (Brasil)',
         'ca_ES' => 'Català',
         'gl_ES' => 'Galego',
+        'nl_NL' => 'Nederlands',
+        'pl_PL' => 'Polski',
+        'en_US' => 'English (US)',
+        'pt_BR' => 'Português (Brasil)',
         'eu_ES' => 'Euskara',
     ];
 
@@ -772,9 +777,11 @@ function plugin_schoolmanager_write_runtime_config_js(?array $cfg = null): void 
   function applyVars(){
     document.documentElement.setAttribute('data-sm-theme', t.palette || 'teal-red');
     document.documentElement.setAttribute('data-sm-dark', t.dark ? '1' : '0');
+    document.documentElement.setAttribute('data-sm-density', t.density || 'comfortable');
     if (document.body) {
       document.body.setAttribute('data-sm-theme', t.palette || 'teal-red');
       document.body.setAttribute('data-sm-dark', t.dark ? '1' : '0');
+      document.body.setAttribute('data-sm-density', t.density || 'comfortable');
     }
     Object.keys(vars).forEach(function(k){
       if(vars[k]) {
@@ -797,8 +804,19 @@ function plugin_schoolmanager_write_runtime_config_js(?array $cfg = null): void 
   }
   function refreshMenu(){
     var title = cfg.menuTitle || cfg.appName || 'School Manager';
-    document.querySelectorAll('a[href*="/plugins/schoolmanager/"]').forEach(function(a){
-      var span = a.querySelector('.text-wrap, span:not(.badge)');
+    var navLinks = document.querySelectorAll(
+      'aside.navbar a[href*="/plugins/schoolmanager/"], ' +
+      'header.navbar a[href*="/plugins/schoolmanager/"], ' +
+      '#navigation-menu a[href*="/plugins/schoolmanager/"], ' +
+      '.navbar-vertical a[href*="/plugins/schoolmanager/"], ' +
+      '.glpi-sidebar a[href*="/plugins/schoolmanager/"], ' +
+      '.sidebar a[href*="/plugins/schoolmanager/"]'
+    );
+    navLinks.forEach(function(a){
+      if (a.closest('.schoolmanager-configured, .sm-home, .pc-wrap, .pc-requests, .pc-form, .gsm-wrap, .stp, .av, .al-wrap, .ticdesk, .pcd, .smset, .smdoc, .pe-wrap')) {
+        return;
+      }
+      var span = a.querySelector('.text-wrap, .nav-link-title');
       if (span) { span.textContent = title; }
       if (a.hasAttribute('title')) { a.setAttribute('title', title); }
     });

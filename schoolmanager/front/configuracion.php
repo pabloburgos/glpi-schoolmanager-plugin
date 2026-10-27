@@ -575,7 +575,8 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
               <option value="<?= smcfg_h($lcode) ?>" <?= ($cfg['locale']??'')===$lcode?'selected':'' ?>><?= smcfg_h($linfo['name']) ?> (<?= smcfg_h($lcode) ?>)<?= $linfo['is_custom'] ? ' [' . smcfg_h(smcfg_tr('custom', 'Custom')) . ']' : '' ?></option>
             <?php endforeach; ?>
           </select>
-          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English, Spanish, French, German, Italian.')) ?></small>
+          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English (UK), Español, Français, Deutsch, Italiano, Português, Català, Galego, Nederlands, Polski.')) ?></small>
+          <small class="sm-help" style="display:block;margin-top:5px;color:var(--navy);font-weight:800">🤖 <?= smcfg_h(smcfg_tr('ai_translation_notice', 'Additional language translations were generated with AI assistance. Found an issue? Report it at:')) ?> <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="color:var(--red);text-decoration:underline">GitHub Issues</a></small>
         </label>
       </div>
 
@@ -601,7 +602,17 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   <section class="sm-panel" id="tab-i18n">
     <div class="sm-card">
       <h2>🌐 <?= smcfg_h(smcfg_tr('language_center_title', 'Language Center & Visual Translation Editor')) ?></h2>
-      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'GLPI School Manager natively supports English (primary base), Spanish, French, German, and Italian. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload it here, or edit any language directly from this screen.')) ?></p>
+      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'GLPI School Manager natively includes 10 languages: English (primary base), Spanish, French, German, Italian, Portuguese, Catalan, Galician, Dutch, and Polish. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload it here, or edit any language directly from this screen.')) ?></p>
+
+      <!-- AI Disclaimer and GitHub Issues Callout -->
+      <div class="sm-alert" style="background:#eef8fc;border:1.5px solid #bce1f1;color:#07384d;margin-top:14px;border-radius:18px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px">
+        <span style="font-size:26px;line-height:1;flex-shrink:0">🤖</span>
+        <div style="font-size:14px;line-height:1.55">
+          <strong style="display:block;font-size:15px;margin-bottom:3px;color:#07384d"><?= smcfg_h(smcfg_tr('ai_disclaimer_title', 'AI-Generated Translations Notice & Community Contributions')) ?></strong>
+          <?= smcfg_h(smcfg_tr('ai_disclaimer_desc', 'Language packs for Portuguese, Catalan, Galician, Dutch, Polish, German, and Italian have been generated and structured with AI assistance. If you notice any awkward phrasing, grammar issues, or missing terminology, you can edit them directly in the Visual Editor below or submit an issue/PR at our GitHub repository:')) ?>
+          <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;color:#b6252b;font-weight:950;text-decoration:underline">https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues</a>
+        </div>
+      </div>
     </div>
 
     <div class="sm-grid">
@@ -736,15 +747,15 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
               <td><?= (int)$linfo['keys_count'] ?> / <?= count($canonicalKeys) ?></td>
               <td><span class="sm-pill"><?= smcfg_h(strtoupper($linfo['format'])) ?></span></td>
               <td>
-                <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end">
-                  <a class="sm-btn small light" href="<?= smcfg_h($_SERVER['PHP_SELF']) ?>?tab=i18n&edit_locale=<?= smcfg_h($lcode) ?>#sm-language-editor-box">✏️ <?= smcfg_h(smcfg_tr('edit', 'Edit')) ?></a>
-                  <a class="sm-btn small light" href="<?= smcfg_h($_SERVER['PHP_SELF']) ?>?action=download_locale&code=<?= smcfg_h($lcode) ?>">⬇</a>
+                <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:nowrap">
+                  <a class="sm-btn small light" href="<?= smcfg_h($_SERVER['PHP_SELF']) ?>?tab=i18n&edit_locale=<?= smcfg_h($lcode) ?>#sm-language-editor-box" style="white-space:nowrap">✏️ <?= smcfg_h(smcfg_tr('edit', 'Edit')) ?></a>
+                  <a class="sm-btn small light" href="<?= smcfg_h($_SERVER['PHP_SELF']) ?>?action=download_locale&code=<?= smcfg_h($lcode) ?>" title="<?= smcfg_h(smcfg_tr('download', 'Download')) ?>">⬇</a>
                   <?php if($linfo['is_custom']): ?>
-                    <form method="post" onsubmit="return confirm('<?= smcfg_h(smcfg_tr('confirm_delete_locale', 'Delete this custom language?')) ?>');" style="margin:0">
+                    <form method="post" onsubmit="return confirm('<?= smcfg_h(smcfg_tr('confirm_delete_locale', 'Delete this custom language?')) ?>');" style="margin:0;display:inline-flex">
                       <?php smcfg_token(); ?>
                       <input type="hidden" name="action" value="delete_custom_locale">
                       <input type="hidden" name="locale_code" value="<?= smcfg_h($lcode) ?>">
-                      <button class="sm-btn small red" type="submit">🗑</button>
+                      <button class="sm-btn small red" type="submit" title="<?= smcfg_h(smcfg_tr('delete', 'Delete')) ?>" style="min-width:36px;padding:6px 10px">🗑</button>
                     </form>
                   <?php endif; ?>
                 </div>

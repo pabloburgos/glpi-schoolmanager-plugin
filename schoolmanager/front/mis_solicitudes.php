@@ -968,32 +968,32 @@ foreach ($tickets as $t) {
 </style>
 <div class="pc-requests"><div class="pc-wrap">
   <section class="pc-hero">
-    <div class="pc-brand"><img class="pc-logo" src="<?= pc_h($logoUrl) ?>" alt="Logo del centro" onerror="this.onerror=null;this.src='<?= pc_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><div class="pc-kicker">GLPI SCHOOL MANAGER</div><h1>Mis solicitudes</h1><p>Consulta el estado, respuestas y resolución de tus incidencias.</p></div></div>
+    <div class="pc-brand"><img class="pc-logo" src="<?= pc_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= pc_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><div class="pc-kicker"><?= pc_h(plugin_schoolmanager_tr('plugin_name', 'School Manager')) ?></div><h1><?= pc_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) ?></h1><p><?= pc_h(plugin_schoolmanager_tr('my_requests_desc', 'Consulta el estado, respuestas y resolución de tus incidencias.')) ?></p></div></div>
     <div class="pc-actions">
-      <a class="pc-btn pc-btn-home" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="Inicio"><span class="pc-svgicon pc-i-home" aria-hidden="true"></span><span>Inicio</span></a>
-      <a class="pc-btn primary" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/nueva_incidencia.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><span class="pc-svgicon pc-i-plus" aria-hidden="true"></span><span>Crear incidencia</span></a>
-      <a class="pc-btn pc-btn-native" href="<?= pc_h($root) ?>/front/ticket.php"><span class="pc-svgicon pc-i-list" aria-hidden="true"></span><span>Lista nativa GLPI</span></a>
+      <a class="pc-btn pc-btn-home" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg><span><?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
+      <a class="pc-btn primary" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/nueva_incidencia.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg><span><?= pc_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) ?></span></a>
+      <a class="pc-btn pc-btn-native" href="<?= pc_h($root) ?>/front/ticket.php"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span><?= pc_h(plugin_schoolmanager_tr('native_tickets_list', 'Lista nativa GLPI')) ?></span></a>
     </div>
   </section>
-  <section class="pc-stats"><div class="pc-stat"><b><?= $total ?></b><span>solicitudes</span></div><div class="pc-stat"><b><?= $open ?></b><span>abiertas</span></div><div class="pc-stat"><b><?= $answered ?></b><span>respondidas</span></div><div class="pc-stat"><b><?= $waiting ?></b><span>esperando info</span></div><div class="pc-stat"><b><?= $solved ?></b><span>resueltas</span></div></section>
-  <section class="pc-tools"><label class="pc-search"><span class="pc-svgicon pc-i-search" aria-hidden="true"></span><input id="pcSearch" type="search" placeholder="Buscar por título, aula, categoría, respuesta..."></label><div class="pc-filters"><button class="pc-filter active" data-filter="all">Todas</button><button class="pc-filter" data-filter="open">Abiertas</button><button class="pc-filter" data-filter="answered">Respondidas</button><button class="pc-filter" data-filter="wait">Esperando info</button><button class="pc-filter" data-filter="done">Resueltas</button></div></section>
+  <section class="pc-stats"><div class="pc-stat"><b><?= $total ?></b><span><?= pc_h(plugin_schoolmanager_tr('requests', 'solicitudes')) ?></span></div><div class="pc-stat"><b><?= $open ?></b><span><?= pc_h(plugin_schoolmanager_tr('open', 'abiertas')) ?></span></div><div class="pc-stat"><b><?= $answered ?></b><span><?= pc_h(plugin_schoolmanager_tr('answered', 'respondidas')) ?></span></div><div class="pc-stat"><b><?= $waiting ?></b><span><?= pc_h(plugin_schoolmanager_tr('waiting_info', 'esperando info')) ?></span></div><div class="pc-stat"><b><?= $solved ?></b><span><?= pc_h(plugin_schoolmanager_tr('solved', 'resueltas')) ?></span></div></section>
+  <section class="pc-tools"><label class="pc-search"><span class="pc-svgicon pc-i-search" aria-hidden="true"></span><input id="pcSearch" type="search" placeholder="<?= pc_h(plugin_schoolmanager_tr('search_requests_placeholder', 'Buscar por título, aula, categoría, respuesta...')) ?>"></label><div class="pc-filters"><button class="pc-filter active" data-filter="all"><?= pc_h(plugin_schoolmanager_tr('all', 'Todas')) ?></button><button class="pc-filter" data-filter="open"><?= pc_h(plugin_schoolmanager_tr('open', 'Abiertas')) ?></button><button class="pc-filter" data-filter="answered"><?= pc_h(plugin_schoolmanager_tr('answered', 'Respondidas')) ?></button><button class="pc-filter" data-filter="wait"><?= pc_h(plugin_schoolmanager_tr('waiting_info', 'Esperando info')) ?></button><button class="pc-filter" data-filter="done"><?= pc_h(plugin_schoolmanager_tr('solved', 'Resueltas')) ?></button></div></section>
   <section class="pc-list" id="pcList">
-    <?php if (!empty($loadError ?? '')): ?><div class="pc-empty">No se pudieron cargar las solicitudes: <?= pc_h($loadError) ?></div><?php endif; ?>
-    <?php if (!$tickets && empty($loadError ?? '')): ?><div class="pc-empty">Aún no tienes solicitudes. Puedes crear una incidencia guiada desde Gestion School Manager.</div><?php endif; ?>
+    <?php if (!empty($loadError ?? '')): ?><div class="pc-empty"><?= pc_h(plugin_schoolmanager_tr('load_error', 'No se pudieron cargar las solicitudes:')) ?> <?= pc_h($loadError) ?></div><?php endif; ?>
+    <?php if (!$tickets && empty($loadError ?? '')): ?><div class="pc-empty"><?= pc_h(plugin_schoolmanager_tr('no_requests_msg', 'Aún no tienes solicitudes. Puedes crear una incidencia guiada desde School Manager.')) ?></div><?php endif; ?>
     <?php foreach ($tickets as $t): [$glpiLabel,$glpiClass]=pc_status_label($t['status']); [$label,$class,$filter,$hint]=pc_ticket_public_state($t); $native=$root . '/front/ticket.form.php?id=' . (int)$t['id']; $detail=$root . '/plugins/schoolmanager/front/solicitud_detalle.php?id=' . (int)$t['id'] . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION); $hasPublicAnswer=trim((string)($t['last_answer'] ?? '')) !== ''; $answerClass=$hasPublicAnswer?($filter==='done'?'solution':'answered'):'empty'; $answerLabel=$hasPublicAnswer?($filter==='done'?'Solución / cierre':'Respuesta TIC'):'Sin respuesta todavía'; $search=strtolower(($t['name']??'').' '.($t['location_name']??'').' '.($t['category_name']??'').' '.($t['last_answer']??'').' '.implode(' ', (array)($t['used_material'] ?? [])).' '.$label.' '.$glpiLabel); ?>
       <article class="pc-ticket state-<?= pc_h($class) ?>" data-filter="<?= pc_h($filter) ?>" data-search="<?= pc_h($search) ?>">
         <div><div class="pc-title"><span class="pc-id">#<?= (int)$t['id'] ?></span><h2><?= pc_h($t['name']) ?></h2><span class="pc-status <?= pc_h($class) ?>"><span class="pc-status-dot"></span><?= pc_h($label) ?></span><span class="pc-state-caption"><?= pc_h($hint) ?></span></div>
-          <div class="pc-meta"><span class="pc-pill">Fecha: <?= pc_h($t['date']) ?></span><span class="pc-pill">Actualizado: <?= pc_h($t['date_mod']) ?></span><span class="pc-pill">Prioridad: <?= pc_h(pc_priority_label($t['priority'])) ?></span><?php if ($t['location_name']): ?><span class="pc-pill">Ubicación: <?= pc_h($t['location_name']) ?></span><?php endif; ?><?php if ($t['category_name']): ?><span class="pc-pill">Categoría: <?= pc_h($t['category_name']) ?></span><?php endif; ?><span class="pc-pill pc-pill-answers">Respuestas públicas: <?= (int)$t['followups_count'] ?></span><span class="pc-pill">Estado GLPI: <?= pc_h($glpiLabel) ?></span></div>
+          <div class="pc-meta"><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('date', 'Fecha')) ?>: <?= pc_h($t['date']) ?></span><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('updated', 'Actualizado')) ?>: <?= pc_h($t['date_mod']) ?></span><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('priority', 'Prioridad')) ?>: <?= pc_h(pc_priority_label($t['priority'])) ?></span><?php if ($t['location_name']): ?><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('location', 'Ubicación')) ?>: <?= pc_h($t['location_name']) ?></span><?php endif; ?><?php if ($t['category_name']): ?><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('category', 'Categoría')) ?>: <?= pc_h($t['category_name']) ?></span><?php endif; ?><span class="pc-pill pc-pill-answers"><?= pc_h(plugin_schoolmanager_tr('public_answers', 'Respuestas públicas')) ?>: <?= (int)$t['followups_count'] ?></span><span class="pc-pill"><?= pc_h(plugin_schoolmanager_tr('glpi_status', 'Estado GLPI')) ?>: <?= pc_h($glpiLabel) ?></span></div>
           <?php if ($filter === 'done'): ?>
             <div class="pc-resolved-cards">
-              <div class="pc-resolved-card"><b>Respuesta / solución</b><span><?= !empty($t['solution_text']) ? pc_h(mb_strimwidth($t['solution_text'],0,260,'...','UTF-8')) : 'Incidencia resuelta.' ?></span></div>
-              <div class="pc-resolved-card material"><b>Material utilizado</b><?php if (!empty($t['used_material'])): ?><div class="pc-material-pills"><?php foreach ((array)$t['used_material'] as $mat): ?><span class="pc-material-pill"><?= pc_h($mat) ?></span><?php endforeach; ?></div><?php else: ?><span>No se ha usado material.</span><?php endif; ?></div>
+              <div class="pc-resolved-card"><b><?= pc_h(plugin_schoolmanager_tr('solution', 'Respuesta / solución')) ?></b><span><?= !empty($t['solution_text']) ? pc_h(mb_strimwidth($t['solution_text'],0,260,'...','UTF-8')) : pc_h(plugin_schoolmanager_tr('incident_solved', 'Incidencia resuelta.')) ?></span></div>
+              <div class="pc-resolved-card material"><b><?= pc_h(plugin_schoolmanager_tr('used_material', 'Material utilizado')) ?></b><?php if (!empty($t['used_material'])): ?><div class="pc-material-pills"><?php foreach ((array)$t['used_material'] as $mat): ?><span class="pc-material-pill"><?= pc_h($mat) ?></span><?php endforeach; ?></div><?php else: ?><span><?= pc_h(plugin_schoolmanager_tr('no_material_used', 'No se ha usado material.')) ?></span><?php endif; ?></div>
             </div>
           <?php else: ?>
-            <div class="pc-answer <?= pc_h($answerClass) ?>"><span class="pc-answer-tag"><?= pc_h($answerLabel) ?></span><span><?= $t['last_answer'] ? pc_h(mb_strimwidth($t['last_answer'],0,260,'...','UTF-8')) : 'Todavía no hay respuesta pública. Cuando el equipo TIC responda aparecerá aquí.' ?></span></div>
+            <div class="pc-answer <?= pc_h($answerClass) ?>"><span class="pc-answer-tag"><?= pc_h($answerLabel) ?></span><span><?= $t['last_answer'] ? pc_h(mb_strimwidth($t['last_answer'],0,260,'...','UTF-8')) : pc_h(plugin_schoolmanager_tr('no_public_reply_yet', 'Todavía no hay respuesta pública. Cuando el equipo TIC responda aparecerá aquí.')) ?></span></div>
           <?php endif; ?>
         </div>
-        <div class="pc-ticket-actions"><a class="pc-mini primary" href="<?= pc_h($detail) ?>"><span class="pc-svgicon pc-i-eye" aria-hidden="true"></span><span>Ver detalle</span></a><a class="pc-mini" href="<?= pc_h($native) ?>"><span class="pc-svgicon pc-i-external" aria-hidden="true"></span><span>Vista nativa</span></a></div>
+        <div class="pc-ticket-actions"><a class="pc-mini primary" href="<?= pc_h($detail) ?>"><span class="pc-svgicon pc-i-eye" aria-hidden="true"></span><span><?= pc_h(plugin_schoolmanager_tr('view_details', 'Ver detalle')) ?></span></a><a class="pc-mini" href="<?= pc_h($native) ?>"><span class="pc-svgicon pc-i-external" aria-hidden="true"></span><span><?= pc_h(plugin_schoolmanager_tr('native_view', 'Vista nativa')) ?></span></a></div>
       </article>
     <?php endforeach; ?>
   </section>
@@ -1050,15 +1050,94 @@ foreach ($tickets as $t) {
 }
 .av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
 .pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon{
+.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon,
+.pc-requests .pc-btn-home .pc-svgicon,.pc-requests .pc-mini .pc-svgicon{
   background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
 }
 .av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
 .pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before{
+.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before,
+.pc-requests .pc-btn-home .pc-svgicon:before,.pc-requests .pc-mini .pc-svgicon:before{
   display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
 }
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:20px;height:20px;display:block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;}
+.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon,.pc-requests .pc-btn-home .pc-svgicon{color:#fff!important;}
+.pc-btn-svg{width:18px;height:18px;display:inline-block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;vertical-align:middle;}
+
+/* High-specificity bulletproof button contrast */
+.pc-requests .pc-actions a.pc-btn.pc-btn-home,
+.pc-requests a.pc-btn.pc-btn-home {
+  background: linear-gradient(135deg, #b6252b 0%, #8b1e1e 100%) !important;
+  border: 1px solid #7c1b1b !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(182, 37, 43, 0.28) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.pc-requests .pc-actions a.pc-btn.pc-btn-home:hover,
+.pc-requests a.pc-btn.pc-btn-home:hover {
+  background: linear-gradient(135deg, #cc2c33 0%, #a02222 100%) !important;
+  color: #ffffff !important;
+}
+.pc-requests .pc-actions a.pc-btn.pc-btn-home *,
+.pc-requests a.pc-btn.pc-btn-home * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.pc-requests .pc-actions a.pc-btn.primary,
+.pc-requests a.pc-btn.primary {
+  background: linear-gradient(135deg, #07384D 0%, #075D61 100%) !important;
+  border: 1px solid #07384D !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(7, 56, 77, 0.24) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.pc-requests .pc-actions a.pc-btn.primary:hover,
+.pc-requests a.pc-btn.primary:hover {
+  background: linear-gradient(135deg, #094a66 0%, #09757a 100%) !important;
+  color: #ffffff !important;
+}
+.pc-requests .pc-actions a.pc-btn.primary *,
+.pc-requests a.pc-btn.primary * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.pc-requests .pc-actions a.pc-btn.pc-btn-native,
+.pc-requests a.pc-btn.pc-btn-native {
+  background: #ffffff !important;
+  border: 1.5px solid #d7e6ec !important;
+  color: #07384D !important;
+  box-shadow: 0 4px 12px rgba(7, 56, 77, 0.06) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.pc-requests .pc-actions a.pc-btn.pc-btn-native:hover,
+.pc-requests a.pc-btn.pc-btn-native:hover {
+  background: #f4fafc !important;
+  border-color: #07384D !important;
+  color: #07384D !important;
+}
+.pc-requests .pc-actions a.pc-btn.pc-btn-native *,
+.pc-requests a.pc-btn.pc-btn-native * {
+  color: #07384D !important;
+  stroke: #07384D !important;
+}
+
+.pc-requests .pc-ticket-actions .pc-mini {
+  background: #ffffff !important;
+  border: 1.5px solid #d7e6ec !important;
+  color: #07384D !important;
+}
+.pc-requests .pc-ticket-actions .pc-mini.primary {
+  background: linear-gradient(135deg, #07384D, #075D61) !important;
+  border-color: #07384D !important;
+  color: #ffffff !important;
+}
+.pc-requests .pc-ticket-actions .pc-mini.primary * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
 </style>
 
