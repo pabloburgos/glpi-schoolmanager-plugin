@@ -81,7 +81,7 @@ function plugin_schoolmanager_default_config(): array {
         'schema' => 6,
         'setup_complete' => false,
         'configured_at' => null,
-        'locale' => 'es_ES',
+        'locale' => 'auto',
         'brand' => [
             'title' => 'School Manager',
             'menu_title' => 'School Manager',
@@ -269,29 +269,275 @@ return " . var_export($cfg, true) . ";
     return true;
 }
 
+function plugin_schoolmanager_builtin_locales(): array {
+    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT'];
+}
+
+function plugin_schoolmanager_available_locales(bool $includeDetails = false): array {
+    $localesDir = __DIR__ . '/../locales';
+    $builtins = plugin_schoolmanager_builtin_locales();
+    $knownNames = [
+        'en_GB' => 'English (UK)',
+        'es_ES' => 'Español',
+        'fr_FR' => 'Français',
+        'de_DE' => 'Deutsch',
+        'it_IT' => 'Italiano',
+        'en_US' => 'English (US)',
+        'pt_PT' => 'Português',
+        'pt_BR' => 'Português (Brasil)',
+        'ca_ES' => 'Català',
+        'gl_ES' => 'Galego',
+        'eu_ES' => 'Euskara',
+    ];
+
+    $found = [];
+    if (is_dir($localesDir)) {
+        $files = scandir($localesDir) ?: [];
+        foreach ($files as $f) {
+            if ($f === 'template.php' || preg_match('/_map\.json$/', $f) || !preg_match('/^([a-z]{2}(?:_[A-Z]{2})?)\.(php|json)$/', $f, $m)) {
+                continue;
+            }
+            $code = $m[1];
+            $ext = $m[2];
+            $filePath = $localesDir . '/' . $f;
+
+            if (isset($found[$code]) && $ext === 'json') {
+                continue;
+            }
+
+            $name = $knownNames[$code] ?? $code;
+            $keysCount = 0;
+
+            if ($ext === 'php') {
+                $content = @include $filePath;
+                if (is_array($content)) {
+                    if (!empty($content['_language_name']) && is_string($content['_language_name'])) {
+                        $name = trim($content['_language_name']);
+                    }
+                    $keysCount = count(array_filter(array_keys($content), static fn($k) => $k !== '_language_name' && !str_starts_with((string)$k, '_')));
+                }
+            } elseif ($ext === 'json') {
+                $raw = @file_get_contents($filePath);
+                $content = is_string($raw) ? json_decode($raw, true) : null;
+                if (is_array($content)) {
+                    if (!empty($content['_language_name']) && is_string($content['_language_name'])) {
+                        $name = trim($content['_language_name']);
+                    }
+                    $keysCount = count(array_filter(array_keys($content), static fn($k) => $k !== '_language_name' && !str_starts_with((string)$k, '_')));
+                }
+            }
+
+            $isBuiltin = in_array($code, $builtins, true);
+            $found[$code] = [
+                'code' => $code,
+                'name' => $name,
+                'is_builtin' => $isBuiltin,
+                'is_custom' => !$isBuiltin,
+                'file' => $f,
+                'format' => $ext,
+                'keys_count' => $keysCount,
+                'mtime' => filemtime($filePath),
+            ];
+        }
+    }
+
+    $ordered = [];
+    foreach ($builtins as $bCode) {
+        if (isset($found[$bCode])) {
+            $ordered[$bCode] = $found[$bCode];
+            unset($found[$bCode]);
+        }
+    }
+    uasort($found, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
+    foreach ($found as $k => $v) {
+        $ordered[$k] = $v;
+    }
+
+    if ($includeDetails) {
+        return $ordered;
+    }
+
+    $simple = [];
+    foreach ($ordered as $code => $info) {
+        $simple[$code] = $info['name'];
+    }
+    return $simple;
+}
+
 function plugin_schoolmanager_locale(): string {
     $cfg = plugin_schoolmanager_config();
     $locale = (string)($cfg['locale'] ?? 'auto');
-    if ($locale === 'auto') {
-        $glpi = $_SESSION['glpilanguage'] ?? $_SESSION['glpilocale'] ?? '';
-        $locale = (stripos((string)$glpi, 'en') === 0) ? 'en_GB' : 'es_ES';
+    if ($locale === 'auto' || $locale === '') {
+        $glpi = (string)($_SESSION['glpilanguage'] ?? $_SESSION['glpilocale'] ?? '');
+        $glpi = trim($glpi);
+        $available = plugin_schoolmanager_available_locales(true);
+        $availableCodes = array_keys($available);
+        if (in_array($glpi, $availableCodes, true)) {
+            return $glpi;
+        }
+        $prefix2 = substr($glpi, 0, 2);
+        if ($prefix2 !== '') {
+            foreach ($availableCodes as $code) {
+                if (str_starts_with($code, $prefix2)) {
+                    return $code;
+                }
+            }
+        }
+        return 'en_GB';
     }
-    return str_starts_with($locale, 'en') ? 'en_GB' : 'es_ES';
+
+    $filePhp = __DIR__ . '/../locales/' . $locale . '.php';
+    $fileJson = __DIR__ . '/../locales/' . $locale . '.json';
+    if (is_file($filePhp) || is_file($fileJson)) {
+        return $locale;
+    }
+    return 'en_GB';
 }
 
 function plugin_schoolmanager_tr(string $key, ?string $fallback = null): string {
     static $dicts = [];
     $locale = plugin_schoolmanager_locale();
-    if (!isset($dicts[$locale])) {
-        $file = __DIR__ . '/../locales/' . $locale . '.php';
-        $dicts[$locale] = is_file($file) ? (include $file) : [];
+
+    $load = static function(string $loc) use (&$dicts): array {
+        if (!isset($dicts[$loc])) {
+            $file = __DIR__ . '/../locales/' . $loc . '.php';
+            if (is_file($file)) {
+                $tmp = include $file;
+                $dicts[$loc] = is_array($tmp) ? $tmp : [];
+            } else {
+                $json = __DIR__ . '/../locales/' . $loc . '.json';
+                if (is_file($json)) {
+                    $raw = @file_get_contents($json);
+                    $tmp = is_string($raw) ? json_decode($raw, true) : null;
+                    $dicts[$loc] = is_array($tmp) ? $tmp : [];
+                } else {
+                    $dicts[$loc] = [];
+                }
+            }
+        }
+        return $dicts[$loc];
+    };
+
+    $current = $load($locale);
+    if (isset($current[$key]) && is_string($current[$key]) && $current[$key] !== '') {
+        return $current[$key];
     }
-    return (string)($dicts[$locale][$key] ?? $fallback ?? $key);
+
+    if ($locale !== 'en_GB') {
+        $en = $load('en_GB');
+        if (isset($en[$key]) && is_string($en[$key]) && $en[$key] !== '') {
+            return $en[$key];
+        }
+    }
+
+    if ($locale !== 'es_ES') {
+        $es = $load('es_ES');
+        if (isset($es[$key]) && is_string($es[$key]) && $es[$key] !== '') {
+            return $es[$key];
+        }
+    }
+
+    return (string)($fallback ?? $key);
 }
 
 function plugin_schoolmanager_label(array $item, string $base, ?string $fallback = null): string {
-    $suffix = plugin_schoolmanager_locale() === 'en_GB' ? '_en' : '_es';
-    return (string)($item[$base . $suffix] ?? $item[$base] ?? $fallback ?? '');
+    $locale = plugin_schoolmanager_locale();
+    $lang = strtolower(substr($locale, 0, 2));
+
+    if (isset($item[$base . '_' . $locale]) && trim((string)$item[$base . '_' . $locale]) !== '') {
+        return (string)$item[$base . '_' . $locale];
+    }
+    if (isset($item[$base . '_' . $lang]) && trim((string)$item[$base . '_' . $lang]) !== '') {
+        return (string)$item[$base . '_' . $lang];
+    }
+    if (isset($item[$base . '_en']) && trim((string)$item[$base . '_en']) !== '') {
+        return (string)$item[$base . '_en'];
+    }
+    if (isset($item[$base . '_es']) && trim((string)$item[$base . '_es']) !== '') {
+        return (string)$item[$base . '_es'];
+    }
+    return (string)($item[$base] ?? $fallback ?? '');
+}
+
+function plugin_schoolmanager_save_locale_file(string $code, array $keys, ?string $name = null, ?string &$error = null): bool {
+    $code = trim($code);
+    if (!preg_match('/^[a-z]{2}(?:_[A-Z]{2})?$/', $code)) {
+        $error = 'Invalid locale code format. Expected e.g. pt_PT, ca_ES, or nl.';
+        return false;
+    }
+    $localesDir = __DIR__ . '/../locales';
+    if (!is_dir($localesDir)) {
+        @mkdir($localesDir, 0775, true);
+    }
+    if (!is_writable($localesDir)) {
+        $error = 'Locales directory is not writable.';
+        return false;
+    }
+
+    $cleanKeys = [];
+    if (!empty($name)) {
+        $cleanKeys['_language_name'] = trim($name);
+    } elseif (isset($keys['_language_name']) && trim((string)$keys['_language_name']) !== '') {
+        $cleanKeys['_language_name'] = trim((string)$keys['_language_name']);
+    }
+
+    foreach ($keys as $k => $v) {
+        $k = trim((string)$k);
+        if ($k === '' || $k === '_language_name') { continue; }
+        $cleanKeys[$k] = (string)$v;
+    }
+
+    $export = var_export($cleanKeys, true);
+    $content = "<?php\n/**\n * GLPI School Manager - Locale Dictionary: {$code}\n */\nreturn {$export};\n";
+
+    $targetFile = $localesDir . '/' . $code . '.php';
+    $tmpFile = $targetFile . '.tmp';
+    if (@file_put_contents($tmpFile, $content, LOCK_EX) === false) {
+        $error = 'Failed to write temporary locale file.';
+        return false;
+    }
+
+    if (function_exists('opcache_invalidate')) {
+        @opcache_invalidate($tmpFile, true);
+    }
+
+    if (!@rename($tmpFile, $targetFile)) {
+        @unlink($tmpFile);
+        $error = 'Failed to save locale file.';
+        return false;
+    }
+    @chmod($targetFile, 0664);
+    if (function_exists('opcache_invalidate')) {
+        @opcache_invalidate($targetFile, true);
+    }
+    return true;
+}
+
+function plugin_schoolmanager_delete_custom_locale(string $code, ?string &$error = null): bool {
+    $code = trim($code);
+    if (in_array($code, plugin_schoolmanager_builtin_locales(), true)) {
+        $error = 'Cannot delete built-in official locales.';
+        return false;
+    }
+    $targetFile = __DIR__ . '/../locales/' . $code . '.php';
+    $targetJson = __DIR__ . '/../locales/' . $code . '.json';
+    $deleted = false;
+    if (is_file($targetFile)) {
+        if (@unlink($targetFile)) {
+            $deleted = true;
+            if (function_exists('opcache_invalidate')) { @opcache_invalidate($targetFile, true); }
+        }
+    }
+    if (is_file($targetJson)) {
+        if (@unlink($targetJson)) {
+            $deleted = true;
+        }
+    }
+    if (!$deleted) {
+        $error = 'Locale file does not exist or could not be removed.';
+        return false;
+    }
+    return true;
 }
 
 function plugin_schoolmanager_clean_brand_name(?string $value, string $fallback = 'School Manager'): string {
@@ -603,650 +849,108 @@ function plugin_schoolmanager_base_translation_pairs(): array {
 }
 
 function plugin_schoolmanager_translation_map_for_locale(?string $locale = null): array {
+    static $cache = [];
     $locale = $locale ?: plugin_schoolmanager_locale();
-    $pairs = plugin_schoolmanager_base_translation_pairs();
-
-    // Final safety layer: avoid mixed ES/EN fragments caused by runtime partial replacements.
-    // These are intentionally locale-specific, so English fixes are not inverted back into Spanish.
-    $englishCleanup = [
-        'GLPI SCHOOL MANAGER' => 'School Manager',
-        'GLPI School Manager' => 'School Manager',
-        'Gestión Escolar GLPI' => 'School Manager',
-        'Datos de la ticket' => 'Ticket details',
-        'Datos de la incidencia' => 'Ticket details',
-        'Category de ticket' => 'Ticket category',
-        'Categoría de ticket' => 'Ticket category',
-        'Categoría de incidencia' => 'Ticket category',
-        'CATEGORY PADRE' => 'PARENT CATEGORY',
-        'Categoría padre' => 'Parent category',
-        'Problema concreto' => 'Specific issue',
-        'PROBLEMA CONCRETO' => 'SPECIFIC ISSUE',
-        'Elige un bloque y después el problema' => 'Choose a block and then the issue',
-        'Elige un bloque de la izquierda para ver sus problemas.' => 'Choose a block on the left to view its issues.',
-        'El formulario se adapta automáticamente.' => 'The form adapts automatically.',
-        'Selecciona una categoría' => 'Select a category',
-        'Selecciona una categoría para adaptar el formulario.' => 'Select a category to adapt the form.',
-        'Buscar problema...' => 'Search issue...',
-        'Search problem...' => 'Search issue...',
-        'Limpiar' => 'Clear',
-        'Título *' => 'Title *',
-        'Ubicación *' => 'Location *',
-        'Sin ubicación seleccionada' => 'No location selected',
-        'Selecciona el aula desde el plano o desde la lista' => 'Select the classroom from the map or the list',
-        'Elegir ubicación' => 'Choose location',
-        'Activo afectado del aula' => 'Affected classroom asset',
-        'Asset afectado del aula' => 'Affected classroom asset',
-        'No especificar activo concreto' => 'Do not specify a specific asset',
-        'No especificar asset concreto' => 'Do not specify a specific asset',
-        'Otro activo no listado / personalizado' => 'Other unlisted / custom asset',
-        'Ej: portátil del profesor, cable HDMI, ratón, monitor sin etiqueta...' => 'Example: teacher laptop, HDMI cable, mouse, unlabelled monitor...',
-        'Activos cargados desde GLPI para esta ubicación. La lista se filtrará según la categoría seleccionada. Si falta alguno, usa la opción personalizada.' => 'Assets loaded from GLPI for this location. The list will be filtered according to the selected category. If one is missing, use the custom option.',
-        'Al abrir desde Detalle del aula se cargarán aquí sus activos de GLPI.' => 'When opened from classroom details, its GLPI assets will be loaded here.',
-        'Describe el problema con el máximo detalle posible.' => 'Describe the problem in as much detail as possible.',
-        'Detalle técnico opcional' => 'Optional technical detail',
-        'Description *' => 'Description *',
-        'Descripción *' => 'Description *',
-        'Explica qué ocurre, desde cuándo, equipo afectado, pasos probados...' => 'Explain what happens, since when, affected device and steps already tried...',
-        'Explica qué ocurre, desde cuándo, equipo afectado, pasos probados…' => 'Explain what happens, since when, affected device and steps already tried...',
-        'Urgencia *' => 'Urgency *',
-        'Impacto *' => 'Impact *',
-        'Prioridad *' => 'Priority *',
-        'Media' => 'Medium',
-        'Alta' => 'High',
-        'Baja' => 'Low',
-        'Muy alta' => 'Very high',
-        'Prioridad inteligente sugerida:' => 'Smart suggested priority:',
-        'Puedes cambiarla antes de enviar.' => 'You can change it before sending.',
-        'Hardware' => 'Hardware',
-        'Software' => 'Software',
-        'Red y comunicaciones' => 'Network and communications',
-        'Network y comunicaciones' => 'Network and communications',
-        'Cuentas y accesos' => 'Accounts and access',
-        'Solicitudes' => 'Requests',
-        'Mantenimiento preventivo' => 'Preventive maintenance',
-        'Contraseña' => 'Password',
-        'Cuenta bloqueada' => 'Blocked account',
-        'Alta de usuario' => 'User onboarding',
-        'Baja de usuario' => 'User offboarding',
-        'Permisos' => 'Permissions',
-        'Acceso a plataforma educativa' => 'Educational platform access',
-        'Mis solicitudes' => 'My requests',
-        'Consulta el estado, respuestas y resolución de tus incidencias.' => 'Check the status, replies and resolution of your tickets.',
-        'solicitudes' => 'requests',
-        'abiertas' => 'open',
-        'respondidas' => 'answered',
-        'esperando info' => 'waiting for info',
-        'resueltas' => 'resolved',
-        'Ver detalle' => 'View details',
-        'Vista nativa' => 'Native view',
-        'Vista nativa GLPI' => 'Native GLPI view',
-        'Lista nativa GLPI' => 'Native GLPI list',
-        'Ticket finalizado o con solución publicada' => 'Ticket finished or with a published solution',
-        'GLPI status: Resuelto' => 'GLPI status: Resolved',
-        'Estado GLPI: Resuelto' => 'GLPI status: Resolved',
-        'Respondido' => 'Answered',
-        'Resuelto' => 'Resolved',
-        'Avisos' => 'Notices',
-        'Alertas importantes del soporte TIC.' => 'Important IT support alerts.',
-        'Actualizaciones importantes de tus solicitudes.' => 'Important updates about your requests.',
-        'Request resuelta. Revisa la solución y confirma si está correcto.' => 'Request resolved. Review the solution and confirm whether it is correct.',
-        'Solicitud resuelta. Revisa la solución y confirma si está correcto.' => 'Request resolved. Review the solution and confirm whether it is correct.',
-        'Edificio' => 'Building',
-        'Aula' => 'Classroom',
-        'Planta' => 'Floor',
-        'Inicio' => 'Home',
-        'Crear incidencia' => 'Create ticket',
-        'Crear ticket' => 'Create ticket',
-        'Cancelar' => 'Cancel',
-        'Volver' => 'Back',
-        'Crear incidencia guiada' => 'Guided ticket creation',
-        'Nueva incidencia guiada' => 'New guided ticket',
-        'Incidencia general' => 'General issue',
-        'Otro' => 'Other',
-    ];
-
-    $spanishCleanup = [
-        'School Manager' => 'School Manager',
-        'GLPI SCHOOL MANAGER' => 'School Manager',
-        'GLPI School Manager' => 'School Manager',
-        'Datos de la ticket' => 'Datos de la incidencia',
-        'Ticket details' => 'Datos de la incidencia',
-        'Category de ticket' => 'Categoría de incidencia',
-        'Ticket category' => 'Categoría de incidencia',
-        'PARENT CATEGORY' => 'CATEGORÍA PADRE',
-        'Parent category' => 'Categoría padre',
-        'SPECIFIC ISSUE' => 'PROBLEMA CONCRETO',
-        'Specific issue' => 'Problema concreto',
-        'Choose a block and then the issue' => 'Elige un bloque y después el problema',
-        'Choose a block on the left to view its issues.' => 'Elige un bloque de la izquierda para ver sus problemas.',
-        'The form adapts automatically.' => 'El formulario se adapta automáticamente.',
-        'Select a category' => 'Selecciona una categoría',
-        'Select a category to adapt the form.' => 'Selecciona una categoría para adaptar el formulario.',
-        'Search issue...' => 'Buscar problema...',
-        'Search problem...' => 'Buscar problema...',
-        'Clear' => 'Limpiar',
-        'Title *' => 'Título *',
-        'Location *' => 'Ubicación *',
-        'No location selected' => 'Sin ubicación seleccionada',
-        'Select the classroom from the map or the list' => 'Selecciona el aula desde el plano o desde la lista',
-        'Choose location' => 'Elegir ubicación',
-        'Affected classroom asset' => 'Activo afectado del aula',
-        'Asset afectado del aula' => 'Activo afectado del aula',
-        'Do not specify a specific asset' => 'No especificar activo concreto',
-        'No especificar asset concreto' => 'No especificar activo concreto',
-        'Other unlisted / custom asset' => 'Otro activo no listado / personalizado',
-        'Describe the problem in as much detail as possible.' => 'Describe el problema con el máximo detalle posible.',
-        'Optional technical detail' => 'Detalle técnico opcional',
-        'Description *' => 'Descripción *',
-        'Explain what happens, since when, affected device and steps already tried...' => 'Explica qué ocurre, desde cuándo, equipo afectado, pasos probados...',
-        'Urgency *' => 'Urgencia *',
-        'Impact *' => 'Impacto *',
-        'Priority *' => 'Prioridad *',
-        'Medium' => 'Media',
-        'High' => 'Alta',
-        'Low' => 'Baja',
-        'Very high' => 'Muy alta',
-        'Network y comunicaciones' => 'Red y comunicaciones',
-        'Network and communications' => 'Red y comunicaciones',
-        'Accounts and access' => 'Cuentas y accesos',
-        'Requests' => 'Solicitudes',
-        'Preventive maintenance' => 'Mantenimiento preventivo',
-        'Password' => 'Contraseña',
-        'Blocked account' => 'Cuenta bloqueada',
-        'My requests' => 'Mis solicitudes',
-        'Check the status, replies and resolution of your tickets.' => 'Consulta el estado, respuestas y resolución de tus incidencias.',
-        'requests' => 'solicitudes',
-        'open' => 'abiertas',
-        'answered' => 'respondidas',
-        'waiting for info' => 'esperando info',
-        'resolved' => 'resueltas',
-        'View details' => 'Ver detalle',
-        'Native view' => 'Vista nativa',
-        'Native GLPI view' => 'Vista nativa GLPI',
-        'Native GLPI list' => 'Lista nativa GLPI',
-        'Ticket finished or with a published solution' => 'Ticket finalizado o con solución publicada',
-        'GLPI status: Resolved' => 'Estado GLPI: Resuelto',
-        'Notices' => 'Avisos',
-        'Important IT support alerts.' => 'Alertas importantes del soporte TIC.',
-        'Important updates about your requests.' => 'Actualizaciones importantes de tus solicitudes.',
-        'Request resolved. Review the solution and confirm whether it is correct.' => 'Solicitud resuelta. Revisa la solución y confirma si está correcto.',
-        'Request resuelta. Revisa la solución y confirma si está correcto.' => 'Solicitud resuelta. Revisa la solución y confirma si está correcto.',
-        'Building' => 'Edificio',
-        'Classroom' => 'Aula',
-        'Floor' => 'Planta',
-        'Home' => 'Inicio',
-        'Create ticket' => 'Crear incidencia',
-        'Cancel' => 'Cancelar',
-        'Back' => 'Volver',
-        'Guided ticket creation' => 'Crear incidencia guiada',
-        'New guided ticket' => 'Nueva incidencia guiada',
-        'General issue' => 'Incidencia general',
-        'Other' => 'Otro',
-    ];
-
-
-    // v100 final translation polish: fix remaining mixed ES/EN labels in tickets, assets and stock pages.
-    $englishCleanup = array_merge($englishCleanup, [
-        'Detalle de solicitud' => 'Request details',
-        'Vista sencilla con estado, respuestas y solución.' => 'Simple view with status, replies and resolution.',
-        'Description enviada' => 'Submitted description',
-        'Descripción enviada' => 'Submitted description',
-        'Tipo detectado' => 'Detected type',
-        'Tipo detectado:' => 'Detected type:',
-        'Detalle técnico' => 'Technical detail',
-        'Detalle técnico:' => 'Technical detail:',
-        'Número de ordenador/equipo' => 'Computer/equipment number',
-        'Número de ordenador/equipo:' => 'Computer/equipment number:',
-        'Number de ordenador/equipo' => 'Computer/equipment number',
-        'Number de ordenador/equipo:' => 'Computer/equipment number:',
-        'Descripción del problema' => 'Problem description',
-        'Problem description' => 'Problem description',
-        'Gestión' => 'Management',
-        'Technician asignado:' => 'Assigned technician:',
-        'Técnico asignado:' => 'Assigned technician:',
-        'Sin asignar' => 'Unassigned',
-        'Status actual' => 'Current status',
-        'Estado actual' => 'Current status',
-        'El equipo TIC ha propuesto una solución.' => 'The IT team has proposed a solution.',
-        'En curso / revisión' => 'In progress / review',
-        'En espera si falta información' => 'Waiting if more information is needed',
-        'Resolved o cerrada' => 'Resolved or closed',
-        'Resuelto o cerrada' => 'Resolved or closed',
-        'Chat de seguimiento' => 'Follow-up chat',
-        'Profesor · solicitud inicial' => 'Teacher · initial request',
-        'Teacher · request inicial' => 'Teacher · initial request',
-        'Solución propuesta' => 'Proposed solution',
-        'Ticket ya resuelta' => 'Ticket already resolved',
-        'Incidencia ya resuelta' => 'Ticket already resolved',
-        'Esta ticket está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.' => 'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.',
-        'Esta incidencia está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.' => 'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.',
-        'Respuesta / solución' => 'Reply / solution',
-        'Material usado' => 'Used material',
-        'Salida:' => 'Out:',
-        'Técnico:' => 'Technician:',
-        'Creada' => 'Created',
-        'Última actualización' => 'Last update',
-        'Origen' => 'Origin',
-        'Formulario / Helpdesk' => 'Form / Helpdesk',
-        'Prioridad' => 'Priority',
-        'Categoría' => 'Category',
-        'Categoría GLPI:' => 'GLPI category:',
-        'Category GLPI:' => 'GLPI category:',
-        'Ubicación' => 'Location',
-        'ID ubicación GLPI' => 'GLPI location ID',
-        'MODIFICAR ACTIVO' => 'EDIT ASSET',
-        'Modificar activo' => 'Edit asset',
-        'Back a gestión' => 'Back to management',
-        'Volver a gestión' => 'Back to management',
-        'Edita ubicación, datos de inventario, estado, fabricante, tipo y modelo.' => 'Edit location, inventory data, status, manufacturer, type and model.',
-        'Datos editables' => 'Editable details',
-        'Los cambios se guardan directamente sobre el activo de GLPI.' => 'Changes are saved directly to the GLPI asset.',
-        'Nombre *' => 'Name *',
-        'Name *' => 'Name *',
-        'Número de serie' => 'Serial number',
-        'Number de serie' => 'Serial number',
-        'Número de inventario' => 'Inventory number',
-        'Number de inventario' => 'Inventory number',
-        'Estado' => 'Status',
-        'Fabricante' => 'Manufacturer',
-        'Tipo' => 'Type',
-        'Modelo' => 'Model',
-        'Comentarios' => 'Comments',
-        'Observaciones, puesto, uso previsto, aula, periféricos asociados...' => 'Notes, position, intended use, classroom and associated peripherals...',
-        'Observaciones, puesto, uso previsto, aula, periféricos asociados…' => 'Notes, position, intended use, classroom and associated peripherals...',
-        'Guardar cambios' => 'Save changes',
-        'Guardando...' => 'Saving...',
-        'Resumen rápido' => 'Quick summary',
-        'Información útil para revisar antes de guardar.' => 'Useful information to review before saving.',
-        'Ubicación actual' => 'Current location',
-        'Inventario' => 'Inventory',
-        'Sin dato' => 'No data',
-        'Abrir ficha nativa' => 'Open native record',
-        'Open ficha nativa' => 'Open native record',
-        'Crear otro ordenador' => 'Create another computer',
-        'Crear otro monitor' => 'Create another monitor',
-        'Crear otro impresora' => 'Create another printer',
-        'Abrir plano de clases' => 'Open classroom map',
-        'Aplicar ubicación al activo' => 'Apply location to asset',
-        'Selecciona desde plano o lista' => 'Select from map or list',
-        'Tipo de asset' => 'Asset type',
-        'Tipo de activo' => 'Asset type',
-        'Elige qué parte del inventario quieres modificar.' => 'Choose which part of the inventory you want to edit.',
-        'Filtra por nombre, inventario, número de serie, comentario o aula.' => 'Filter by name, inventory number, serial number, comment or classroom.',
-        'Ordenar' => 'Sort',
-        'All las classrooms' => 'All classrooms',
-        'Todas las classrooms' => 'All classrooms',
-        'Todas las aulas' => 'All classrooms',
-        'Por nombre' => 'By name',
-        'Sin ubicación' => 'No location',
-        'Resultados' => 'Results',
-        'Modificar' => 'Edit',
-        'High guiada' => 'Guided creation',
-        'Alta guiada' => 'Guided creation',
-        'Classroom list' => 'Classroom list',
-        'Lista de aulas' => 'Classroom list',
-        'Gestión de activos' => 'Asset management',
-        'Inventory ordenado por tipo, aula y ficha nativa de GLPI.' => 'Inventory organized by type, classroom and native GLPI record.',
-        'Inventario ordenado por tipo, aula y ficha nativa de GLPI.' => 'Inventory organized by type, classroom and native GLPI record.',
-        'Dispositivo de red' => 'Network device',
-        'Ordenador' => 'Computer',
-        'Impresora' => 'Printer',
-        'Periférico' => 'Peripheral',
-        'Todas las categorías' => 'All categories',
-        'All las categorias' => 'All categories',
-        'All las categorías' => 'All categories',
-        'Categoria' => 'Category',
-        'Sin categoría' => 'No category',
-        'Stock bajo' => 'Low stock',
-        'Name claro para el equipo TIC.' => 'Clear name for the IT team.',
-        'Nombre claro para el equipo TIC.' => 'Clear name for the IT team.',
-        'Referencia / modelo' => 'Reference / model',
-        'Nivel mínimo de aviso' => 'Minimum warning level',
-        'Notas internas' => 'Internal notes',
-        'Input suma. Output resta. Ajuste deja el numero exacto.' => 'Input adds stock. Output subtracts delivered units. Adjustment sets the exact number.',
-        'Input suma material nuevo. Output descuenta unidades entregadas. View / edit abre ajustes mas finos.' => 'Input adds new material. Output subtracts delivered units. View / edit opens detailed adjustments.',
-        'Aplicar ajuste' => 'Apply adjustment',
-        'Motivo' => 'Reason',
-        'Archivo' => 'Archive',
-    ]);
-
-    $spanishCleanup = array_merge($spanishCleanup, [
-        'Submitted description' => 'Descripción enviada',
-        'Detected type' => 'Tipo detectado',
-        'Detected type:' => 'Tipo detectado:',
-        'Technical detail' => 'Detalle técnico',
-        'Technical detail:' => 'Detalle técnico:',
-        'Computer/equipment number' => 'Número de ordenador/equipo',
-        'Computer/equipment number:' => 'Número de ordenador/equipo:',
-        'Management' => 'Gestión',
-        'Assigned technician:' => 'Técnico asignado:',
-        'Unassigned' => 'Sin asignar',
-        'Current status' => 'Estado actual',
-        'The IT team has proposed a solution.' => 'El equipo TIC ha propuesto una solución.',
-        'In progress / review' => 'En curso / revisión',
-        'Waiting if more information is needed' => 'En espera si falta información',
-        'Resolved or closed' => 'Resuelta o cerrada',
-        'Follow-up chat' => 'Chat de seguimiento',
-        'Teacher · initial request' => 'Profesor · solicitud inicial',
-        'Proposed solution' => 'Solución propuesta',
-        'Ticket already resolved' => 'Incidencia ya resuelta',
-        'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.' => 'Esta incidencia está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.',
-        'Created' => 'Creada',
-        'Last update' => 'Última actualización',
-        'Origin' => 'Origen',
-        'Form / Helpdesk' => 'Formulario / Helpdesk',
-        'EDIT ASSET' => 'MODIFICAR ACTIVO',
-        'Edit asset' => 'Modificar activo',
-        'Back to management' => 'Volver a gestión',
-        'Edit location, inventory data, status, manufacturer, type and model.' => 'Edita ubicación, datos de inventario, estado, fabricante, tipo y modelo.',
-        'Editable details' => 'Datos editables',
-        'Changes are saved directly to the GLPI asset.' => 'Los cambios se guardan directamente sobre el activo de GLPI.',
-        'Serial number' => 'Número de serie',
-        'Inventory number' => 'Número de inventario',
-        'Status' => 'Estado',
-        'Manufacturer' => 'Fabricante',
-        'Type' => 'Tipo',
-        'Model' => 'Modelo',
-        'Comments' => 'Comentarios',
-        'Notes, position, intended use, classroom and associated peripherals...' => 'Observaciones, puesto, uso previsto, aula, periféricos asociados...',
-        'Quick summary' => 'Resumen rápido',
-        'Useful information to review before saving.' => 'Información útil para revisar antes de guardar.',
-        'Current location' => 'Ubicación actual',
-        'No data' => 'Sin dato',
-        'Open native record' => 'Abrir ficha nativa',
-        'Create another computer' => 'Crear otro ordenador',
-        'Create another monitor' => 'Crear otro monitor',
-        'Open classroom map' => 'Abrir plano de clases',
-        'Apply location to asset' => 'Aplicar ubicación al activo',
-        'Select from map or list' => 'Selecciona desde plano o lista',
-        'Asset type' => 'Tipo de activo',
-        'Choose which part of the inventory you want to edit.' => 'Elige qué parte del inventario quieres modificar.',
-        'Filter by name, inventory number, serial number, comment or classroom.' => 'Filtra por nombre, inventario, número de serie, comentario o aula.',
-        'Sort' => 'Ordenar',
-        'All classrooms' => 'Todas las aulas',
-        'By name' => 'Por nombre',
-        'No location' => 'Sin ubicación',
-        'Results' => 'Resultados',
-        'Guided creation' => 'Alta guiada',
-        'Asset management' => 'Gestión de activos',
-        'Inventory organized by type, classroom and native GLPI record.' => 'Inventario ordenado por tipo, aula y ficha nativa de GLPI.',
-        'Network device' => 'Dispositivo de red',
-        'All categories' => 'Todas las categorías',
-        'No category' => 'Sin categoría',
-        'Low stock' => 'Stock bajo',
-        'Clear name for the IT team.' => 'Nombre claro para el equipo TIC.',
-        'Reference / model' => 'Referencia / modelo',
-        'Minimum warning level' => 'Nivel mínimo de aviso',
-        'Internal notes' => 'Notas internas',
-        'Input adds stock. Output subtracts delivered units. Adjustment sets the exact number.' => 'Entrada suma stock. Salida resta unidades entregadas. Ajuste deja el número exacto.',
-        'Apply adjustment' => 'Aplicar ajuste',
-        'Reason' => 'Motivo',
-    ]);
-
-
-
-    // v1.0.0 final polish: extra page-level translations collected from real UI screenshots.
-    $englishCleanup = array_merge($englishCleanup, [
-        'SCHOOL MANAGER' => 'SCHOOL MANAGER',
-        'Gestion School Manager · Centro TIC' => 'School Manager · IT center',
-        'GESTION SCHOOL MANAGER · CENTRO TIC' => 'SCHOOL MANAGER · IT CENTER',
-        'Centro TIC' => 'IT center',
-        'IT stock' => 'IT stock',
-        'Control rapido de repuestos y consumibles sin menus raros ni pantalla cargada.' => 'Fast stock control for consumables, cartridges and spare parts without cluttered screens.',
-        'Control rápido de repuestos y consumibles sin menús raros ni pantalla cargada.' => 'Fast stock control for consumables, cartridges and spare parts without cluttered screens.',
-        'artículos' => 'items',
-        'artículo' => 'item',
-        'en vista' => 'in view',
-        'disponibles' => 'available',
-        'histórico' => 'historical',
-        'historico' => 'historical',
-        'mínimo' => 'minimum',
-        'minimo' => 'minimum',
-        'mínimo aviso' => 'minimum warning',
-        'minimo aviso' => 'minimum warning',
-        'Toner, tinta y repuestos de impresora.' => 'Toner, ink and printer supplies.',
-        'Tóner, tinta y repuestos de impresora.' => 'Toner, ink and printer supplies.',
-        'Cartuchos' => 'Cartridges',
-        'Consumibles' => 'Consumables',
-        'Cables, ratones, teclados, adaptadores...' => 'Cables, mice, keyboards, adapters...',
-        'Ej: HDMI, raton, toner, aula...' => 'Example: HDMI, mouse, toner, classroom...',
-        'Ej: HDMI, ratón, tóner, aula...' => 'Example: HDMI, mouse, toner, classroom...',
-        'All las categorias' => 'All categories',
-        'All las categorías' => 'All categories',
-        'Entrada' => 'Input',
-        'Salida' => 'Output',
-        'In' => 'Input',
-        'Out' => 'Output',
-        'Input suma material nuevo. Output descuenta unidades entregadas. View / edit abre ajustes mas finos.' => 'Input adds new material. Output subtracts delivered units. View / edit opens detailed settings.',
-        'Input suma material nuevo. Output descuenta unidades entregadas. View / edit abre ajustes más finos.' => 'Input adds new material. Output subtracts delivered units. View / edit opens detailed settings.',
-        'In suma material nuevo. Out descuenta unidades entregadas. View / edit abre ajustes mas finos.' => 'Input adds new material. Output subtracts delivered units. View / edit opens detailed settings.',
-        'In suma material nuevo. Out descuenta unidades entregadas. View / edit abre ajustes más finos.' => 'Input adds new material. Output subtracts delivered units. View / edit opens detailed settings.',
-        'Como usarlo' => 'How to use it',
-        'Cómo usarlo' => 'How to use it',
-        'Usa nombres claros: Ratones USB, Cable HDMI 2m, Toner HP...' => 'Use clear names: USB mice, 2m HDMI cable, HP toner...',
-        'Usa nombres claros: Ratones USB, Cable HDMI 2m, Tóner HP...' => 'Use clear names: USB mice, 2m HDMI cable, HP toner...',
-        'El minimo sirve para que el articulo aparezca como stock bajo.' => 'The minimum value is used to show the item as low stock.',
-        'El mínimo sirve para que el artículo aparezca como stock bajo.' => 'The minimum value is used to show the item as low stock.',
-        'Para cambios grandes usa View / edit y ajuste exacto.' => 'For large changes, use View / edit and exact adjustment.',
-        'Acciones rapidas' => 'Quick actions',
-        'Acciones rápidas' => 'Quick actions',
-        'Status del stock' => 'Stock status',
-        'Zonas calientes' => 'Hot zones',
-        'Sin tickets open por aula.' => 'No open tickets by classroom.',
-        'Categorys activas' => 'Active categories',
-        'Categorías activas' => 'Active categories',
-        'No categorys activas.' => 'No active categories.',
-        'No categorías activas.' => 'No active categories.',
-        'Mesa TIC' => 'IT desk',
-        'Filtra, asigna y gestiona tickets desde una vista rápida.' => 'Filter, assign and manage tickets from a quick view.',
-        'Filtra, asigna y gestiona incidencias desde una vista rápida.' => 'Filter, assign and manage tickets from a quick view.',
-        'Atajos útiles para trabajar como equipo TIC.' => 'Useful shortcuts for the IT team.',
-        'Compacto' => 'Compact',
-        'Abiertos' => 'Open',
-        'Críticos' => 'Critical',
-        'En espera' => 'Waiting',
-        'Resolveds' => 'Resolved',
-        'No hay tickets que coincidan con la búsqueda.' => 'No tickets match the search.',
-        'No hay tickets in this view.' => 'No tickets in this view.',
-        'No hay tickets en esta vista.' => 'No tickets in this view.',
-        'Assets GLPI' => 'GLPI assets',
-        'Plano classrooms' => 'Classroom map',
-        'Reglas TIC' => 'IT rules',
-        'Stock TIC' => 'IT stock',
-        'Ficha del aula' => 'Classroom details',
-        'Location registrada en GLPI.' => 'Location registered in GLPI.',
-        'Ubicación registrada en GLPI.' => 'Location registered in GLPI.',
-        'Inventario vinculado' => 'Linked inventory',
-        'Inventory vinculado' => 'Linked inventory',
-        'Acciones' => 'Actions',
-        'Ver en el plano' => 'View on map',
-        'Assets del aula' => 'Classroom assets',
-        'Activos del aula' => 'Classroom assets',
-        'Back a lista de classrooms' => 'Back to classroom list',
-        'Volver a lista de aulas' => 'Back to classroom list',
-        'Open GLPI nativo' => 'Open native GLPI',
-        'Abrir GLPI nativo' => 'Open native GLPI',
-        'Volver a Gestión School Manager' => 'Back to School Manager',
-        'Activos destacados' => 'Featured assets',
-        'Computer · ID 2 · abrir asset' => 'Computer · ID 2 · open asset',
-        'abrir asset' => 'open asset',
-        'abrir activo' => 'open asset',
-        'Estos datos se leen desde GLPI usando la ubicación seleccionada. Si falta algo, revisa la ubicación asignada en el activo.' => 'These data are read from GLPI using the selected location. If something is missing, check the location assigned to the asset.',
-        'Tipo de asset' => 'Asset type',
-        'Tipo de activo' => 'Asset type',
-        'Elige qué parte del inventario quieres modificar.' => 'Choose which part of the inventory you want to edit.',
-        'Filtra por nombre, inventario, número de serie, comentario o aula.' => 'Filter by name, inventory number, serial number, comment or classroom.',
-        'Ordenar' => 'Sort',
-        'Todas las aulas' => 'All classrooms',
-        'All las classrooms' => 'All classrooms',
-        'Por nombre' => 'By name',
-        'Sin ubicación' => 'No location',
-        'Resultados' => 'Results',
-        'Gestión de activos' => 'Asset management',
-        'Inventario ordenado por tipo, aula y ficha nativa de GLPI.' => 'Inventory organized by type, classroom and native GLPI record.',
-        'Alta guiada' => 'Guided creation',
-        'High guiada' => 'Guided creation',
-        'Dispositivo de red' => 'Network device',
-        'Modificar activo' => 'Edit asset',
-        'MODIFICAR ACTIVO' => 'EDIT ASSET',
-        'Back a gestión' => 'Back to management',
-        'Volver a gestión' => 'Back to management',
-        'Open ficha nativa' => 'Open native record',
-        'Abrir ficha nativa' => 'Open native record',
-        'Crear otro ordenador' => 'Create another computer',
-        'Crear ordenador' => 'Create computer',
-        'Comentarios' => 'Comments',
-        'Observaciones, puesto, uso previsto, aula, periféricos asociados...' => 'Notes, position, intended use, classroom and associated peripherals...',
-        'Observaciones, puesto, uso previsto, aula, perifericos asociados...' => 'Notes, position, intended use, classroom and associated peripherals...',
-        'Número de serie / etiqueta del fabricante' => 'Serial number / manufacturer label',
-        'Número de inventario' => 'Inventory number',
-        'Número de serie' => 'Serial number',
-        'Código interno / etiqueta de inventario' => 'Internal code / inventory tag',
-        'Fabricante' => 'Manufacturer',
-        'Estado' => 'Status',
-        'Tipo' => 'Type',
-        'Modelo' => 'Model',
-        'Creada' => 'Created',
-        'Última actualización' => 'Last update',
-        'Vista sencilla con estado, respuestas y solución.' => 'Simple view with status, replies and solution.',
-        'Status actual' => 'Current status',
-        'Estado actual' => 'Current status',
-        'El equipo TIC ha propuesto una solución.' => 'The IT team has proposed a solution.',
-        'En curso / revisión' => 'In progress / review',
-        'En espera si falta información' => 'Waiting if more information is needed',
-        'Resolved o cerrada' => 'Resolved or closed',
-        'Resuelta o cerrada' => 'Resolved or closed',
-        'Description enviada' => 'Submitted description',
-        'Descripción enviada' => 'Submitted description',
-        'Tipo detectado' => 'Detected type',
-        'Detalle técnico' => 'Technical detail',
-        'Number de ordenador/equipo' => 'Computer/equipment number',
-        'Número de ordenador/equipo' => 'Computer/equipment number',
-        'Problem description' => 'Problem description',
-        'Gestión' => 'Management',
-        'Technician asignado:' => 'Assigned technician:',
-        'Técnico asignado:' => 'Assigned technician:',
-        'Sin asignar' => 'Unassigned',
-        'Respuesta / solución' => 'Reply / solution',
-        'Material usado' => 'Used material',
-        'Solución propuesta' => 'Proposed solution',
-        'Chat de seguimiento' => 'Follow-up chat',
-        'Teacher · request inicial' => 'Teacher · initial request',
-        'Profesor · solicitud inicial' => 'Teacher · initial request',
-        'Ticket ya resuelta' => 'Ticket already resolved',
-        'Incidencia ya resuelta' => 'Ticket already resolved',
-        'Esta ticket está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.' => 'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.',
-        'Esta incidencia está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.' => 'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.',
-        'Category GLPI' => 'GLPI category',
-        'Categoría GLPI' => 'GLPI category',
-        'Location ID' => 'Location ID',
-        'Formulario / Helpdesk' => 'Form / Helpdesk',
-        'Prioridad' => 'Priority',
-        'Categoría' => 'Category',
-        'Ubicación' => 'Location',
-    ]);
-
-
-
-    // v1.0.0 final polish: inverse fixes so Spanish pages never keep English fragments.
-    $spanishCleanup = array_merge($spanishCleanup, [
-        'School Manager · IT center' => 'School Manager · Centro TIC',
-        'IT center' => 'Centro TIC',
-        'Fast stock control for consumables, cartridges and spare parts without cluttered screens.' => 'Control rápido de repuestos y consumibles sin menús raros ni pantalla cargada.',
-        'items' => 'artículos',
-        'item' => 'artículo',
-        'in view' => 'en vista',
-        'historical' => 'histórico',
-        'minimum warning' => 'mínimo aviso',
-        'Toner, ink and printer supplies.' => 'Tóner, tinta y repuestos de impresora.',
-        'Example: HDMI, mouse, toner, classroom...' => 'Ej: HDMI, ratón, tóner, aula...',
-        'Input adds new material. Output subtracts delivered units. View / edit opens detailed settings.' => 'Entrada suma material nuevo. Salida descuenta unidades entregadas. Ver / editar abre ajustes más finos.',
-        'How to use it' => 'Cómo usarlo',
-        'Use clear names: USB mice, 2m HDMI cable, HP toner...' => 'Usa nombres claros: Ratones USB, Cable HDMI 2m, Tóner HP...',
-        'The minimum value is used to show the item as low stock.' => 'El mínimo sirve para que el artículo aparezca como stock bajo.',
-        'For large changes, use View / edit and exact adjustment.' => 'Para cambios grandes usa Ver / editar y ajuste exacto.',
-        'IT desk' => 'Mesa TIC',
-        'Filter, assign and manage tickets from a quick view.' => 'Filtra, asigna y gestiona incidencias desde una vista rápida.',
-        'Useful shortcuts for the IT team.' => 'Atajos útiles para trabajar como equipo TIC.',
-        'Compact' => 'Compacto',
-        'Open' => 'Abiertos',
-        'Critical' => 'Críticos',
-        'Waiting' => 'En espera',
-        'No tickets match the search.' => 'No hay tickets que coincidan con la búsqueda.',
-        'No tickets in this view.' => 'No hay tickets en esta vista.',
-        'GLPI assets' => 'Activos GLPI',
-        'Classroom map' => 'Plano de aulas',
-        'IT rules' => 'Reglas TIC',
-        'IT stock' => 'Stock TIC',
-        'Classroom details' => 'Ficha del aula',
-        'Location registered in GLPI.' => 'Ubicación registrada en GLPI.',
-        'Linked inventory' => 'Inventario vinculado',
-        'Actions' => 'Acciones',
-        'View on map' => 'Ver en el plano',
-        'Classroom assets' => 'Activos del aula',
-        'Back to classroom list' => 'Volver a lista de aulas',
-        'Open native GLPI' => 'Abrir GLPI nativo',
-        'Back to School Manager' => 'Volver a School Manager',
-        'Featured assets' => 'Activos destacados',
-        'open asset' => 'abrir activo',
-        'These data are read from GLPI using the selected location. If something is missing, check the location assigned to the asset.' => 'Estos datos se leen desde GLPI usando la ubicación seleccionada. Si falta algo, revisa la ubicación asignada en el activo.',
-        'Asset type' => 'Tipo de activo',
-        'Choose which part of the inventory you want to edit.' => 'Elige qué parte del inventario quieres modificar.',
-        'Filter by name, inventory number, serial number, comment or classroom.' => 'Filtra por nombre, inventario, número de serie, comentario o aula.',
-        'Sort' => 'Ordenar',
-        'All classrooms' => 'Todas las aulas',
-        'By name' => 'Por nombre',
-        'No location' => 'Sin ubicación',
-        'Results' => 'Resultados',
-        'Asset management' => 'Gestión de activos',
-        'Inventory organized by type, classroom and native GLPI record.' => 'Inventario ordenado por tipo, aula y ficha nativa de GLPI.',
-        'Guided creation' => 'Alta guiada',
-        'Network device' => 'Dispositivo de red',
-        'Edit asset' => 'Modificar activo',
-        'EDIT ASSET' => 'MODIFICAR ACTIVO',
-        'Back to management' => 'Volver a gestión',
-        'Open native record' => 'Abrir ficha nativa',
-        'Create another computer' => 'Crear otro ordenador',
-        'Create computer' => 'Crear ordenador',
-        'Serial number / manufacturer label' => 'Número de serie / etiqueta del fabricante',
-        'Internal code / inventory tag' => 'Código interno / etiqueta de inventario',
-        'Manufacturer' => 'Fabricante',
-        'Type' => 'Tipo',
-        'Model' => 'Modelo',
-        'Simple view with status, replies and solution.' => 'Vista sencilla con estado, respuestas y solución.',
-        'Current status' => 'Estado actual',
-        'The IT team has proposed a solution.' => 'El equipo TIC ha propuesto una solución.',
-        'In progress / review' => 'En curso / revisión',
-        'Waiting if more information is needed' => 'En espera si falta información',
-        'Resolved or closed' => 'Resuelta o cerrada',
-        'Submitted description' => 'Descripción enviada',
-        'Detected type' => 'Tipo detectado',
-        'Technical detail' => 'Detalle técnico',
-        'Computer/equipment number' => 'Número de ordenador/equipo',
-        'Management' => 'Gestión',
-        'Assigned technician:' => 'Técnico asignado:',
-        'Unassigned' => 'Sin asignar',
-        'Reply / solution' => 'Respuesta / solución',
-        'Used material' => 'Material usado',
-        'Proposed solution' => 'Solución propuesta',
-        'Follow-up chat' => 'Chat de seguimiento',
-        'Teacher · initial request' => 'Profesor · solicitud inicial',
-        'Ticket already resolved' => 'Incidencia ya resuelta',
-        'This ticket is archived for the IT team. No more replies, reassignment or resolution actions can be added.' => 'Esta incidencia está archivada para el equipo TIC. No se pueden añadir más respuestas, reasignarla ni volver a marcarla como resuelta.',
-        'GLPI category' => 'Categoría GLPI',
-        'Form / Helpdesk' => 'Formulario / Helpdesk',
-    ]);
-
-    if (str_starts_with($locale, 'en')) {
-        $pairs = array_merge($pairs, $englishCleanup);
-        uksort($pairs, static fn($a, $b) => strlen((string)$b) <=> strlen((string)$a));
-        return $pairs;
+    if (isset($cache[$locale])) {
+        return $cache[$locale];
     }
-    $reverse = [];
-    foreach ($pairs as $es => $en) { $reverse[$en] = $es; }
-    $reverse = array_merge($reverse, $spanishCleanup);
-    uksort($reverse, static fn($a, $b) => strlen((string)$b) <=> strlen((string)$a));
-    return $reverse;
+
+    $pairs = [];
+    $localesDir = __DIR__ . '/../locales';
+
+    $esFile = $localesDir . '/es_ES.php';
+    $enFile = $localesDir . '/en_GB.php';
+    $targetFile = $localesDir . '/' . $locale . '.php';
+
+    $esDict = is_file($esFile) ? (include $esFile) : [];
+    $enDict = is_file($enFile) ? (include $enFile) : [];
+    $targetDict = is_file($targetFile) ? (include $targetFile) : [];
+
+    // Check runtime JSON phrase map (e.g. es_en_map.json, es_fr_map.json, es_de_map.json, es_it_map.json)
+    $prefix = substr($locale, 0, 2);
+    $mapFile = $localesDir . '/es_' . $prefix . '_map.json';
+    if (!is_file($mapFile) && is_file($localesDir . '/es_' . $locale . '_map.json')) {
+        $mapFile = $localesDir . '/es_' . $locale . '_map.json';
+    }
+
+    $jsonMap = [];
+    if (is_file($mapFile)) {
+        $raw = @file_get_contents($mapFile);
+        $tmp = is_string($raw) ? json_decode($raw, true) : null;
+        if (is_array($tmp)) { $jsonMap = $tmp; }
+    }
+
+    if (str_starts_with($locale, 'es')) {
+        // Target is Spanish: map English phrases -> Spanish
+        $enMapFile = $localesDir . '/es_en_map.json';
+        if (is_file($enMapFile)) {
+            $raw = @file_get_contents($enMapFile);
+            $tmp = is_string($raw) ? json_decode($raw, true) : null;
+            if (is_array($tmp)) {
+                foreach ($tmp as $es => $en) {
+                    if (is_string($es) && is_string($en) && trim($es) !== '' && trim($en) !== '') {
+                        $pairs[trim($en)] = trim($es);
+                    }
+                }
+            }
+        }
+        foreach ($enDict as $k => $enVal) {
+            if (isset($esDict[$k]) && is_string($enVal) && is_string($esDict[$k]) && trim($enVal) !== '' && trim($esDict[$k]) !== '') {
+                $pairs[trim($enVal)] = trim($esDict[$k]);
+            }
+        }
+    } elseif (str_starts_with($locale, 'en')) {
+        // Target is English: map Spanish phrases -> English
+        foreach ($esDict as $k => $esVal) {
+            if (isset($enDict[$k]) && is_string($esVal) && is_string($enDict[$k]) && trim($esVal) !== '' && trim($enDict[$k]) !== '') {
+                $pairs[trim($esVal)] = trim($enDict[$k]);
+            }
+        }
+        foreach ($jsonMap as $from => $to) {
+            if (is_string($from) && is_string($to) && trim($from) !== '' && trim($to) !== '') {
+                $pairs[trim($from)] = trim($to);
+            }
+        }
+    } else {
+        // Target is French, German, Italian, or custom:
+        // Map Spanish phrases -> Target
+        foreach ($esDict as $k => $esVal) {
+            if (isset($targetDict[$k]) && is_string($esVal) && is_string($targetDict[$k]) && trim($esVal) !== '' && trim($targetDict[$k]) !== '') {
+                $pairs[trim($esVal)] = trim($targetDict[$k]);
+            }
+        }
+        foreach ($jsonMap as $from => $to) {
+            if (is_string($from) && is_string($to) && trim($from) !== '' && trim($to) !== '') {
+                $pairs[trim($from)] = trim($to);
+            }
+        }
+        // Also map English phrases -> Target
+        foreach ($enDict as $k => $enVal) {
+            if (isset($targetDict[$k]) && is_string($enVal) && is_string($targetDict[$k]) && trim($enVal) !== '' && trim($targetDict[$k]) !== '') {
+                $pairs[trim($enVal)] = trim($targetDict[$k]);
+            }
+        }
+        $enMapFile = $localesDir . '/es_en_map.json';
+        if (is_file($enMapFile)) {
+            $raw = @file_get_contents($enMapFile);
+            $enMap = is_string($raw) ? json_decode($raw, true) : null;
+            if (is_array($enMap)) {
+                foreach ($enMap as $esPhrase => $enPhrase) {
+                    if (isset($jsonMap[$esPhrase]) && is_string($enPhrase) && is_string($jsonMap[$esPhrase])) {
+                        $enP = trim($enPhrase);
+                        $targetP = trim($jsonMap[$esPhrase]);
+                        if ($enP !== '' && $targetP !== '') {
+                            $pairs[$enP] = $targetP;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    uksort($pairs, static fn($a, $b) => strlen((string)$b) <=> strlen((string)$a));
+    $cache[$locale] = $pairs;
+    return $pairs;
 }
 
 function plugin_schoolmanager_translate_fragment(string $text, ?array $map = null): string {
@@ -1262,7 +966,14 @@ function plugin_schoolmanager_translate_fragment(string $text, ?array $map = nul
     $out = $text;
     foreach ($map as $from => $to) {
         if (strlen($from) < 3) { continue; }
-        if (strpos($out, $from) !== false) { $out = str_replace($from, $to, $out); }
+        if (preg_match('/^\w+$/u', $from)) {
+            $pattern = '/\b' . preg_quote($from, '/') . '\b/u';
+            $out = preg_replace($pattern, $to, $out);
+        } else {
+            if (strpos($out, $from) !== false) {
+                $out = str_replace($from, $to, $out);
+            }
+        }
     }
     return $out;
 }

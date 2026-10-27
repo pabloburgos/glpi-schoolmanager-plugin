@@ -9,8 +9,13 @@
 </p>
 
 <p align="center">
-  <a href="README_ES.md">Spanish</a> ·
+  <b>English</b> ·
+  <a href="README_ES.md">Español</a> ·
+  <a href="README_FR.md">Français</a> ·
+  <a href="README_DE.md">Deutsch</a> ·
+  <a href="README_IT.md">Italiano</a> ·
   <a href="#overview">Overview</a> ·
+  <a href="#languages">Languages</a> ·
   <a href="#requirements">Requirements</a> ·
   <a href="#installation">Installation</a> ·
   <a href="#screenshots">Screenshots</a> ·
@@ -19,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-0f172a?style=for-the-badge">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.1.0-0f172a?style=for-the-badge">
   <img alt="GLPI" src="https://img.shields.io/badge/GLPI-10%20%2F%2011-1f6feb?style=for-the-badge">
   <img alt="PHP" src="https://img.shields.io/badge/PHP-8.x-777bb4?style=for-the-badge">
   <img alt="License" src="https://img.shields.io/badge/license-GPLv3%2B-c1121f?style=for-the-badge">
@@ -49,6 +54,28 @@ School Manager adds a simplified operational layer on top of GLPI for schools an
 | Classrooms and maps | Buildings, floors, classrooms, map resources and direct links to GLPI locations. |
 | Asset management | Simplified views for computers, monitors, printers, peripherals and network devices. |
 | Configuration | Branding, logo, modules, language, buildings, rooms and maps from GLPI. |
+
+<a id="languages"></a>
+
+## Languages & Internationalization (i18n)
+
+GLPI School Manager provides native, out-of-the-box multilingual support with **English (`en_GB`)** as the primary base language:
+
+| Language | Code | Status | Coverage |
+|---|---|---|---|
+| 🇬🇧 **English** | `en_GB` | Built-in (Base & Template) | 100% |
+| 🇪🇸 **Español** | `es_ES` | Built-in | 100% |
+| 🇫🇷 **Français** | `fr_FR` | Built-in | 100% |
+| 🇩🇪 **Deutsch** | `de_DE` | Built-in | 100% |
+| 🇮🇹 **Italiano** | `it_IT` | Built-in | 100% |
+
+### In-Browser Language Center & Visual Editor
+
+No developer tools or terminal commands required! From **GLPI > Tools > School Manager > Settings > 🌐 Languages**, administrators can:
+- **Automatic Language Detection**: Detects the active GLPI session language and switches smoothly, with automatic fallback to English.
+- **In-Browser String Editor**: Edit and translate any string directly from the browser with real-time search and save changes instantly.
+- **Official English Template (`template.php`)**: Download the canonical 183-key template (`schoolmanager/locales/template.php`) with ready-to-use AI translation prompts.
+- **Custom Language Packs**: Upload `.php` or `.json` translation files (e.g. `pt_PT`, `ca_ES`, `nl_NL`). The plugin dynamically discovers new files and registers them in the settings combobox immediately.
 
 <a id="requirements"></a>
 

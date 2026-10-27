@@ -1,5 +1,5 @@
 name: 🌍 Translation issue
-description: Report mixed, missing or incorrect text
+description: Report mixed, missing or incorrect text in any language
 title: "[Translation]: "
 labels: ["translation", "needs triage"]
 body:
@@ -8,9 +8,12 @@ body:
     attributes:
       label: Language
       options:
-        - Spanish
-        - English
-        - Other
+        - English (en_GB)
+        - Spanish (es_ES)
+        - French (fr_FR)
+        - German (de_DE)
+        - Italian (it_IT)
+        - Custom language
     validations:
       required: true
 
@@ -18,7 +21,7 @@ body:
     id: page
     attributes:
       label: Page or module
-      placeholder: "Example: IT stock, Request details, Configuration"
+      placeholder: "Example: IT stock, Request details, Configuration, Classroom map"
     validations:
       required: true
 
@@ -26,7 +29,7 @@ body:
     id: current
     attributes:
       label: Current text
-      placeholder: "Text currently shown"
+      placeholder: "Text currently shown in the UI"
     validations:
       required: true
 
@@ -34,7 +37,7 @@ body:
     id: expected
     attributes:
       label: Expected text
-      placeholder: "Correct text"
+      placeholder: "Correct translation"
     validations:
       required: true
 

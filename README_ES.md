@@ -10,7 +10,12 @@
 
 <p align="center">
   <a href="README.md">English</a> ·
+  <b>Español</b> ·
+  <a href="README_FR.md">Français</a> ·
+  <a href="README_DE.md">Deutsch</a> ·
+  <a href="README_IT.md">Italiano</a> ·
   <a href="#descripcion">Descripción</a> ·
+  <a href="#idiomas">Idiomas</a> ·
   <a href="#requisitos">Requisitos</a> ·
   <a href="#instalacion">Instalación</a> ·
   <a href="#capturas">Capturas</a> ·
@@ -19,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img alt="Versión" src="https://img.shields.io/badge/versión-1.0.0-0f172a?style=for-the-badge">
+  <img alt="Versión" src="https://img.shields.io/badge/versión-1.1.0-0f172a?style=for-the-badge">
   <img alt="GLPI" src="https://img.shields.io/badge/GLPI-10%20%2F%2011-1f6feb?style=for-the-badge">
   <img alt="PHP" src="https://img.shields.io/badge/PHP-8.x-777bb4?style=for-the-badge">
   <img alt="Licencia" src="https://img.shields.io/badge/licencia-GPLv3%2B-c1121f?style=for-the-badge">
@@ -49,6 +54,28 @@ School Manager añade una capa de gestión más clara sobre GLPI para colegios e
 | Aulas y planos | Edificios, plantas, aulas, recursos de mapas y enlaces directos a ubicaciones GLPI. |
 | Gestión de activos | Vistas simplificadas para ordenadores, monitores, impresoras, periféricos y red. |
 | Configuración | Marca, logo, módulos, idioma, edificios, aulas y planos desde GLPI. |
+
+<a id="idiomas"></a>
+
+## Idiomas e Internacionalización (i18n)
+
+GLPI School Manager ofrece soporte multilingüe nativo con el **Inglés (`en_GB`)** como base principal de traducción y plantilla:
+
+| Idioma | Código | Estado | Cobertura |
+|---|---|---|---|
+| 🇬🇧 **English** | `en_GB` | Nativo (Base principal y plantilla) | 100% |
+| 🇪🇸 **Español** | `es_ES` | Nativo | 100% |
+| 🇫🇷 **Français** | `fr_FR` | Nativo | 100% |
+| 🇩🇪 **Deutsch** | `de_DE` | Nativo | 100% |
+| 🇮🇹 **Italiano** | `it_IT` | Nativo | 100% |
+
+### Centro de Idiomas y Editor Visual Integrado en GLPI
+
+¡Sin tocar código ni usar la terminal! Desde **GLPI > Herramientas > School Manager > Configuración > 🌐 Idiomas**, los administradores pueden:
+- **Detección Automática**: Detecta el idioma de la sesión de GLPI del usuario y se adapta al instante con fallback seguro al inglés.
+- **Editor Visual en el Navegador**: Modifica o traduce cualquier texto directamente en la pantalla con buscador en vivo y guardado inmediato en el archivo `.php`.
+- **Descarga de Plantilla Oficial (`template.php`)**: Descarga la plantilla estándar en inglés con 183 claves y un prompt optimizado para traducir con IA (ChatGPT, Claude, Gemini).
+- **Subida de Archivos de Idioma**: Sube archivos `.php` o `.json` personalizados (ej: `pt_PT`, `ca_ES`, `nl_NL`). El plugin detecta el nuevo idioma y lo añade automáticamente al selector sin necesidad de reiniciar GLPI.
 
 <a id="requisitos"></a>
 

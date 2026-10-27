@@ -1,6 +1,27 @@
 # Changelog
 
-## UI and licensing hotfix *(same plugin version: 1.0.0)*
+## [1.1.0] - 2026-10-27
+
+### Added
+
+- **Official Multilingual Support**: Native support for **French (`fr_FR`)**, **German (`de_DE`)**, and **Italian (`it_IT`)**, joining English and Spanish.
+- **English as Primary Base Language**: Set English (`en_GB`) as the canonical base language for templates, fallbacks, and UI references.
+- **In-Browser Language Center & Visual Editor**: Complete translation management interface inside GLPI settings (`front/configuracion.php`):
+  - In-browser string editor with live search, English reference column, and one-click saving.
+  - Direct download button for the official English translation template (`template.php`).
+  - File uploader supporting `.php` and `.json` custom language packs.
+  - Registered languages table showing key counts, status, and management actions.
+- **Dynamic Locale Discovery**: The plugin automatically detects any `.php` or `.json` dictionary in `schoolmanager/locales/` and populates the settings selector automatically.
+- **AI Translation Guide**: Ready-to-copy AI prompt in the template and settings UI to generate new language packs in seconds via LLMs (ChatGPT, Claude, Gemini).
+- **GitHub Multilingual Documentation**: Added localized READMEs (`README_FR.md`, `README_DE.md`, `README_IT.md`), language request issue template, and updated contribution guides.
+
+### Improved
+
+- **Modular Runtime Translation Architecture**: Consolidated phrase mappings into dedicated JSON phrase maps (`es_en_map.json`, `es_fr_map.json`, `es_de_map.json`, `es_it_map.json`), removing ~640 lines of hardcoded arrays from `inc/config.php`.
+- **Cascade Fallback Resolution**: Robust fallback hierarchy (`active locale` -> `en_GB` -> `es_ES` -> `key`) ensuring no blank or untranslated UI element occurs.
+- **Multi-language Entity Labels**: Added support for language-specific suffixes (`_en`, `_es`, `_fr`, `_de`, `_it`) for buildings, floors, and rooms.
+
+---
 
 ### Fixed
 

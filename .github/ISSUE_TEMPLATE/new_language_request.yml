@@ -1,0 +1,37 @@
+name: 🌐 New language request or submission
+description: Request or submit a new language translation pack for GLPI School Manager
+title: "[i18n]: Add support for [Language Name]"
+labels: ["translation", "enhancement"]
+body:
+  - type: input
+    id: language_name
+    attributes:
+      label: Language Name
+      placeholder: "Example: Portuguese, Catalan, Dutch"
+    validations:
+      required: true
+
+  - type: input
+    id: locale_code
+    attributes:
+      label: Locale Code
+      placeholder: "Example: pt_PT, ca_ES, nl_NL"
+    validations:
+      required: true
+
+  - type: textarea
+    id: file_content
+    attributes:
+      label: Translation Content (PHP or JSON)
+      description: "Paste your completed translation based on template.php here, or link to your fork/PR."
+      placeholder: "<?php return [ ... ];"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Verification
+      options:
+        - label: "I tested this translation in GLPI School Manager"
+        - label: "All 183 keys from template.php are preserved"
