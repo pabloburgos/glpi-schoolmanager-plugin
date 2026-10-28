@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '_language_name' => 'Español',
   'plugin_name' => 'School Manager',
   'menu_home' => 'Inicio',
@@ -121,6 +121,7 @@ return array (
   'home_files_desc' => 'Editor interno avanzado de archivos.',
   'home_versions_desc' => 'Documentación y notas de versión del plugin.',
   'home_credits_desc' => 'Créditos y licencia GPLv3+.',
+  'mode_superadmin' => 'Modo Super-Admin',
   'mode_it_admin' => 'Modo Admin TIC',
   'mode_it_technician' => 'Modo Técnico TIC',
   'mode_teacher' => 'Modo profesor',
@@ -462,4 +463,4 @@ return array (
   'no_location' => 'Sin ubicación',
   'no_category' => 'Sin categoría',
   'no_notices_pending' => 'No hay avisos pendientes.',
-);
+];

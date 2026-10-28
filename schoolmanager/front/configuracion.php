@@ -485,6 +485,8 @@ if ($editLocale !== 'new') {
     $editLangName = $editDict['_language_name'] ?? ($availableLocalesList[$editLocale]['name'] ?? $editLocale);
 }
 
+$root = $CFG_GLPI['root_doc'] ?? '';
+
 Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP_SELF'], 'tools', 'PluginSchoolmanagerMapa');
 ?>
 <style>

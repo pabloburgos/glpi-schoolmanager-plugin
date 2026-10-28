@@ -37,6 +37,14 @@
       node = node.parentElement;
     }
     if (!node || node.nodeType !== 1) return false;
+    // CRITICAL: NEVER touch GLPI core navigation, navbar, sidebar, header or top menu
+    if (node.closest && node.closest('header, nav, aside, .navbar, #header, .page-header, .glpi-header, .glpi-sidebar, #navigation-menu, .navigation-header')) {
+      return true;
+    }
+    // Must be inside a School Manager container
+    if (node.closest && !node.closest('.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd, .pcda, .stp-wrap, .sid-wrap, .gsm-wrap, .ticdesk, .al-wrap, .av, .smdoc, .smv-wrap, .pe-wrap, .pcas-wrap, .pc-form, .pc-requests, .pc-selector, .schoolmanager-credit, #smHomeRoot, .pc-alerts, .pc-card, .gsm-card')) {
+      return true;
+    }
     if (node.getAttribute && node.getAttribute('translate') === 'no') return true;
     if (node.classList && (node.classList.contains('sm-no-translate') || node.classList.contains('notranslate'))) return true;
     if (node.closest && node.closest('[translate="no"], .sm-no-translate, .notranslate')) return true;
@@ -114,10 +122,11 @@
   }
 
   function run(){
-    if (running || !dict || !document.body) return;
+    if (running || !dict) return;
     running = true;
     try {
-      walk(document.body);
+      var roots = document.querySelectorAll('.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd, .pcda, .stp-wrap, .sid-wrap, .gsm-wrap, .ticdesk, .al-wrap, .av, .smdoc, .smv-wrap, .pe-wrap, .pcas-wrap, .pc-form, .pc-requests, .pc-selector, .schoolmanager-credit, #smHomeRoot');
+      roots.forEach(function(r){ walk(r); });
     } finally {
       running = false;
     }

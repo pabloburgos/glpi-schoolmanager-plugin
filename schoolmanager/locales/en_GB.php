@@ -1,6 +1,6 @@
 <?php
-return array (
-  '_language_name' => 'English',
+return [
+  '_language_name' => 'English (UK)',
   'plugin_name' => 'School Manager',
   'menu_home' => 'Home',
   'menu_create_ticket' => 'Guided ticket creation',
@@ -121,6 +121,7 @@ return array (
   'home_files_desc' => 'Advanced internal file editor.',
   'home_versions_desc' => 'Plugin documentation and version notes.',
   'home_credits_desc' => 'Credits and GPLv3+ license.',
+  'mode_superadmin' => 'Super-Admin mode',
   'mode_it_admin' => 'IT admin mode',
   'mode_it_technician' => 'IT technician mode',
   'mode_teacher' => 'Teacher mode',
@@ -462,4 +463,4 @@ return array (
   'no_location' => 'No location',
   'no_category' => 'No category',
   'no_notices_pending' => 'No pending notices.',
-);
+];

@@ -15,66 +15,18 @@ echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@
 .av{--teal:#0b4f6c;--teal2:#07384d;--red:#9f1f24;--red2:#b72c31;--line:#d9e7ef;--muted:#627386;--ink:#102638;min-height:calc(100vh - 76px);padding:clamp(10px,1.4vw,22px);background:linear-gradient(135deg,#f6f9fc,#eef6fb);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
 .av-wrap{max-width:1300px;margin:0 auto;display:grid;gap:14px}.av-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#fffdfa;border:1px solid var(--line);border-radius:28px;padding:18px 24px;box-shadow:0 18px 42px rgba(7,56,77,.08)}
 .av-brand{display:flex;gap:18px;align-items:center;min-width:0}.av-logo{height:76px;max-width:230px;object-fit:contain;mix-blend-mode:multiply;background:transparent;border:0;box-shadow:none}.av h1{margin:0;color:var(--teal2);font-size:clamp(38px,4.2vw,58px);letter-spacing:-.05em;line-height:.92}.av-sub{color:var(--muted);font-weight:900;font-size:clamp(14px,1.25vw,18px);line-height:1.15}.av-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-.av-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;border:1px solid var(--line);border-radius:18px;padding:0 20px;text-decoration:none!important;color:var(--teal2)!important;font-weight:950;background:#fff;box-shadow:0 12px 28px rgba(7,56,77,.07);transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,background .22s ease,border-color .22s ease,color .22s ease}.av-btn:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.04) 30%,rgba(255,255,255,.18) 48%,rgba(255,255,255,.04) 66%,transparent 100%);transform:translateX(-135%);transition:transform .55s ease;pointer-events:none}.av-btn:hover{transform:translateY(-4px);box-shadow:0 22px 44px rgba(7,56,77,.14);border-color:#a9c2cf;background:#f8fbfd}.av-btn:hover:before{transform:translateX(135%)}.av-btn i,.av-btn svg{position:relative;z-index:1;font-size:18px;line-height:1}.av-btn span{position:relative;z-index:1}.av-btn.primary{background:linear-gradient(135deg,var(--teal) 0%,#0b6379 100%);border-color:#0a526a;color:#fff!important;box-shadow:0 18px 38px rgba(7,56,77,.18)}.av-btn.primary:hover{background:linear-gradient(135deg,#0b5f7a 0%,#117a80 100%);box-shadow:0 24px 46px rgba(7,56,77,.24)}.av-btn.home{background:linear-gradient(135deg,var(--red) 0%,var(--red2) 100%);border-color:#922020;color:#fff!important;box-shadow:0 18px 38px rgba(165,31,36,.22)}.av-btn.home:hover{box-shadow:0 24px 46px rgba(165,31,36,.28);background:linear-gradient(135deg,#a32323 0%,#c23636 100%)}
+.av-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;height:46px;border:1px solid var(--line);border-radius:14px;padding:0 18px;text-decoration:none!important;color:var(--teal2)!important;font-weight:900;font-size:14px;background:#fff;box-shadow:0 8px 20px rgba(7,56,77,.06);transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
+.av-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(7,56,77,.12);border-color:#a9c2cf;background:#f8fbfd}
+.av-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
+.av-btn.primary{background:linear-gradient(135deg,var(--teal) 0%,#0b6379 100%);border-color:#0a526a;color:#fff!important;box-shadow:0 10px 24px rgba(7,56,77,.18)}
+.av-btn.primary:hover{background:linear-gradient(135deg,#0b5f7a 0%,#117a80 100%);box-shadow:0 16px 32px rgba(7,56,77,.24)}
+.av-btn.home{background:linear-gradient(135deg,#b6252b 0%,#931b20 100%)!important;border:1px solid #8b1e1e!important;color:#fff!important;box-shadow:0 10px 24px rgba(182,37,43,.22)!important}
+.av-btn.home:hover{background:linear-gradient(135deg,#c42a31 0%,#a12025 100%)!important;box-shadow:0 16px 32px rgba(182,37,43,.30)!important;transform:translateY(-2px)!important}
+.av-btn.home svg{stroke:#fff!important}
+.av-btn.home span{color:#fff!important;font-weight:950!important}
 .av-list{display:grid;gap:12px}.av-item{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:24px;padding:18px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;box-shadow:0 14px 36px rgba(7,56,77,.07);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background .22s ease}.av-item:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(7,56,77,.12);border-color:#b8d4df}.av-ico{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font-size:26px;background:#e8f7f5;color:var(--teal2);box-shadow:inset 0 0 0 1px rgba(7,56,77,.05)}.av-item h2{margin:0;color:var(--teal2);font-size:clamp(20px,2vw,26px);letter-spacing:-.025em}.av-item p{margin:5px 0;color:var(--muted);font-weight:900}.av-meta{color:#3f5964!important}.av-pill{border-radius:999px;padding:7px 10px;font-weight:950}.av-item.wait{background:#fbf7ff;border-color:#d7c2f4}.av-item.done{background:#f1fff5;border-color:#a9dfb8}.av-item.high{background:#fff5f5;border-color:#efb6b6}.av-item.reply{background:#fffaf0;border-color:#efd58b}.av-item.info{background:#f4fbfd;border-color:#b7dce9}.av-item.wait .av-ico{background:#f2eaff;color:#5c3796}.av-item.done .av-ico{background:#e4f8eb;color:#176a31}.av-item.high .av-ico{background:#ffe1e1;color:#a42020}.av-item.reply .av-ico{background:#fff3ca;color:#806000}.av-item.info .av-ico{background:#e8f7f5;color:#07384d}.av-empty{background:#fff;border:1px dashed var(--line);border-radius:22px;padding:28px;text-align:center;color:var(--muted);font-weight:900;box-shadow:0 12px 28px rgba(7,56,77,.05)}
 @media(max-width:860px){.av-hero{align-items:flex-start;flex-direction:column}.av-actions{width:100%;justify-content:flex-start}.av-item{grid-template-columns:auto 1fr}.av-item .av-btn{grid-column:1/-1;width:100%}.av-logo{height:62px}.av h1{font-size:42px}}
 @media(max-width:560px){.av{padding:8px}.av-hero{border-radius:22px;padding:16px}.av-brand{align-items:flex-start;gap:12px}.av-logo{height:50px;max-width:160px}.av-item{grid-template-columns:1fr;padding:15px}.av-ico{width:50px;height:50px}.av-btn{width:100%}}
-</style>
-
-
-<style id="schoolmanager-v251-avisos-buttons">
-.av .av-btn.home{background:linear-gradient(135deg,#8b1e1e 0%,#a92323 58%,#b72c31 100%)!important;border-color:#7c1b1b!important;color:#fff!important;box-shadow:0 18px 38px rgba(139,30,30,.24)!important;}
-.av .av-btn.home:hover{background:linear-gradient(135deg,#9f2424 0%,#bd3131 100%)!important;transform:translateY(-4px)!important;box-shadow:0 26px 46px rgba(139,30,30,.30)!important;}
-.av .av-btn.home i{font-size:19px!important;line-height:1!important;}
-.av .av-btn.primary i{font-size:18px!important;line-height:1!important;}
-
-/* v252: botones menos redondos, rectangulares con bordes redondeados */
-.pc-requests .pc-btn-home,
-.pc-requests .pc-btn-primary,
-.pc-requests .pc-btn-secondary,
-.pc-requests .pc-btn-detail,
-.pc-requests .pc-btn-native,
-.pc-requests .pc-card-actions .pc-btn,
-.pc-requests .pc-hero-actions .pc-btn,
-.pc-form .pc-head-actions .pc-header-home-clean,
-.pc-form .pc-btn-location,
-.pc-form .pc-btn-cancel,
-.pc-form .pc-btn-create,
-.pc-alerts .pc-btn-back,
-.pc-alerts .pc-btn-detail{border-radius:18px!important;}
-
-.pc-requests .pc-btn-home,
-.pc-form .pc-head-actions .pc-header-home-clean,
-.pc-form .pc-btn-location,
-.pc-form .pc-btn-cancel,
-.pc-form .pc-btn-create,
-.pc-alerts .pc-btn-back,
-.pc-alerts .pc-btn-detail{padding-left:22px!important;padding-right:22px!important;}
-
-.pc-requests .pc-btn-home .pc-home-badge,
-.pc-form .pc-head-actions .pc-header-home-clean .pc-home-badge{border-radius:10px!important;width:24px!important;height:24px!important;background:rgba(255,255,255,.12)!important;border:0!important;box-shadow:none!important;}
-
-.pc-requests .pc-btn-home .pc-home-badge svg,
-.pc-form .pc-head-actions .pc-header-home-clean .pc-home-badge svg{width:15px!important;height:15px!important;}
-
-.pc-requests .pc-btn-home:hover,
-.pc-form .pc-head-actions .pc-header-home-clean:hover,
-.pc-form .pc-btn-location:hover,
-.pc-form .pc-btn-cancel:hover,
-.pc-form .pc-btn-create:hover,
-.pc-alerts .pc-btn-back:hover,
-.pc-alerts .pc-btn-detail:hover{transform:translateY(-4px)!important;}
-
-@media(max-width:760px){
-  .pc-requests .pc-btn-home,
-  .pc-form .pc-head-actions .pc-header-home-clean,
-  .pc-form .pc-btn-location,
-  .pc-form .pc-btn-cancel,
-  .pc-form .pc-btn-create,
-  .pc-alerts .pc-btn-back,
-  .pc-alerts .pc-btn-detail{border-radius:16px!important;}
-}
-
 </style>
 
 <style id="pc-local-icons-hotfix">
@@ -117,7 +69,7 @@ echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@
 .pc-i-construction,.gsm-i-construction{--pc-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.35%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2021h18%22%2F%3E%3Cpath%20d%3D%22M5%2021V8l7-4%207%204v13%22%2F%3E%3Cpath%20d%3D%22M9%2021v-6h6v6%22%2F%3E%3C%2Fsvg%3E")!important;}
 .pc-i-arrow-left,.gsm-i-arrow-left{--pc-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.35%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M19%2012H5%22%2F%3E%3Cpath%20d%3D%22m12%205-7%207%207%207%22%2F%3E%3C%2Fsvg%3E")!important;}
 </style>
-<div class="av"><div class="av-wrap"><section class="av-hero"><div class="av-brand"><img class="av-logo" src="<?= smgr_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smgr_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><h1><?= smgr_h(plugin_schoolmanager_tr('menu_notices', 'Avisos')) ?></h1><div class="av-sub"><?= $isTech?smgr_h(plugin_schoolmanager_tr('notices_tech_sub', 'Alertas importantes del soporte TIC.')):smgr_h(plugin_schoolmanager_tr('notices_user_sub', 'Actualizaciones importantes de tus solicitudes.')) ?></div></div></div><div class="av-actions"><a class="av-btn home red pc-btn-home" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3.75 10.5 12 4.25l8.25 6.25"/><path d="M6.75 9.75v9.5h10.5v-9.5"/><path d="M10 19.25V14.5a2 2 0 0 1 4 0v4.75"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a></div></section>
+<div class="av"><div class="av-wrap"><section class="av-hero"><div class="av-brand"><img class="av-logo" src="<?= smgr_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smgr_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><h1><?= smgr_h(plugin_schoolmanager_tr('menu_notices', 'Avisos')) ?></h1><div class="av-sub"><?= $isTech?smgr_h(plugin_schoolmanager_tr('notices_tech_sub', 'Alertas importantes del soporte TIC.')):smgr_h(plugin_schoolmanager_tr('notices_user_sub', 'Actualizaciones importantes de tus solicitudes.')) ?></div></div></div><div class="av-actions"><a class="av-btn home red pc-btn-home" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= smgr_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:8px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a></div></section>
 <?php if ($loadError): ?><div class="av-empty"><?= smgr_h(plugin_schoolmanager_tr('load_error', 'No se pudieron cargar los avisos:')) ?> <?= smgr_h($loadError) ?></div><?php endif; ?><section class="av-list"><?php if(!$items && !$loadError): ?><div class="av-empty"><?= smgr_h(plugin_schoolmanager_tr('no_notices_pending', 'No hay avisos pendientes.')) ?></div><?php endif; ?><?php foreach($items as $t): [$sl,$sc]=smgr_status_label($t['status']); $ico=$t['notice_type']==='done'?'<span class="pc-svgicon pc-i-check" aria-hidden="true"></span>':($t['notice_type']==='high'?'<span class="pc-svgicon pc-i-alert" aria-hidden="true"></span>':($t['notice_type']==='wait'?'<span class="pc-svgicon pc-i-clock" aria-hidden="true"></span>':'<span class="pc-svgicon pc-i-message" aria-hidden="true"></span>')); ?><article class="av-item <?= smgr_h($t['notice_type'] ?? 'info') ?>"><div class="av-ico"><?= $ico ?></div><div><h2>#<?= (int)$t['id'] ?> · <?= smgr_h($t['name']) ?></h2><p><?= smgr_h($t['notice']) ?></p><p class="av-meta"><?= smgr_h($t['location_name'] ?: plugin_schoolmanager_tr('no_location', 'Sin ubicación')) ?> · <?= smgr_h($t['category_name'] ?: plugin_schoolmanager_tr('no_category', 'Sin categoría')) ?></p></div><a class="av-btn primary" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/solicitud_detalle.php?id=<?= (int)$t['id'] ?>&v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.75"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('view_details', 'Ver detalle')) ?></span></a></article><?php endforeach; ?></section></div></div>
 <?php Html::footer(); ?>
 

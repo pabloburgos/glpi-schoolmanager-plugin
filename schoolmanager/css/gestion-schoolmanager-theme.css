@@ -539,36 +539,36 @@ html[data-sm-density="large"] :is(.sm-btn, .pc-btn, .stp-btn, .sid-btn, .al-btn,
 }
 
 /* Botones */
-button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,.pc-type,
-.pcd-btn,.av-btn,.al-tab,.pc-asset{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,.pc-type,
+.pcd-btn,.av-btn,.al-tab,.pc-asset){
   border-color:var(--sm-border) !important;
   color:var(--sm-navy) !important;
   transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease !important;
 }
-button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
-.pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,.pc-card:hover,.av-item:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
+.pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,.pc-card:hover,.av-item:hover){
   border-color:var(--sm-red) !important;
   box-shadow:0 16px 40px rgba(8,59,84,.13) !important;
   transform:translateY(-1px) !important;
 }
-.pc-btn.primary,.btn.primary,.pc-action.primary,.pcd-btn.primary,.av-btn.primary,.al-btn.primary,
-button[type="submit"],input[type="submit"]{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary,.btn.primary,.pc-action.primary,.pcd-btn.primary,.av-btn.primary,.al-btn.primary,
+button[type="submit"],input[type="submit"]){
   background:linear-gradient(135deg,var(--sm-red),var(--sm-red-2)) !important;
   color:#fff !important;
   border-color:var(--sm-red) !important;
 }
-.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
-button[type="submit"]:hover,input[type="submit"]:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
+button[type="submit"]:hover,input[type="submit"]:hover){
   background:linear-gradient(135deg,#f04a46,var(--sm-red-2)) !important;
 }
 
 /* Inputs */
-input,select,textarea,.pc-input,.pc-search input,.al-search input,.pc-select,.al-select{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input,select,textarea,.pc-input,.pc-search input,.al-search input,.pc-select,.al-select){
   background:#fff !important;
   border-color:var(--sm-border) !important;
   color:var(--sm-ink) !important;
 }
-input:focus,select:focus,textarea:focus,.pc-input:focus{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input:focus,select:focus,textarea:focus,.pc-input:focus){
   border-color:var(--sm-red) !important;
   box-shadow:0 0 0 4px rgba(229,57,53,.13) !important;
   outline:none !important;
@@ -585,7 +585,7 @@ input:focus,select:focus,textarea:focus,.pc-input:focus{
 .success,.pc-message.success,.pcd-msg.success{background:#eaf9f0 !important;border-color:#bfe9ca !important;color:#176a31 !important;}
 
 /* Tablas y listas */
-.al-table th,.pc-table th,table th{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table th,.pc-table th,table th){
   background:var(--sm-navy) !important;
   color:#fff !important;
 }
@@ -704,43 +704,43 @@ input:focus,select:focus,textarea:focus,.pc-input:focus{
 .pc-building.active .mark{background:#e63946 !important;color:#fff !important;}
 
 /* Botones secundarios */
-button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,
-.pc-type,.pcd-btn,.av-btn,.al-tab,.pc-asset,.al-open,.al-map{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,
+.pc-type,.pcd-btn,.av-btn,.al-tab,.pc-asset,.al-open,.al-map){
   border-color:#d9e7ef !important;
   color:#07384d !important;
 }
-button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,
 .pc-pill:hover,.pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,
-.pc-card:hover,.av-item:hover,.al-map:hover{
+.pc-card:hover,.av-item:hover,.al-map:hover){
   border-color:#e63946 !important;
   box-shadow:0 16px 40px rgba(8,59,84,.14) !important;
   transform:translateY(-1px) !important;
 }
-.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
-.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
+.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover){
   background:linear-gradient(135deg,#ff4f5b,#c92828) !important;
   color:#fff !important;
 }
 
 /* Inputs y formularios */
-input,select,textarea,.pc-input,.pc-search input,.al-search,.al-search input,.pc-select,.al-select,
-.pc-dropdown-wrap select,.select2-container .select2-selection{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input,select,textarea,.pc-input,.pc-search input,.al-search,.al-search input,.pc-select,.al-select,
+.pc-dropdown-wrap select,.select2-container .select2-selection){
   background:#ffffff !important;
   border-color:#d9e7ef !important;
   color:#102638 !important;
 }
-input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-select:focus{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-select:focus){
   border-color:#e63946 !important;
   box-shadow:0 0 0 4px rgba(230,57,70,.14) !important;
   outline:none !important;
 }
 
 /* Tablas, lista de clases y selector */
-.al-table th,.pc-table th,table th{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table th,.pc-table th,table th){
   background:linear-gradient(90deg,#07384d,#0b4f6c) !important;
   color:#ffffff !important;
 }
-.al-table tbody tr:hover,.pc-table tbody tr:hover,table tbody tr:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table tbody tr:hover,.pc-table tbody tr:hover,table tbody tr:hover){
   background:#eef4f8 !important;
 }
 .al-open{background:#0b4f6c !important;color:#fff !important;}
@@ -926,9 +926,9 @@ input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-sel
 .pc-tag{background:#f6fafc !important;color:#0b4f6c !important;border-color:#dbe8ef !important;}
 
 /* Botones: azul principal, coral solo en peligro/acciones destacadas */
-.pc-building.active,.pc-floor.active,.pc-tab.active,.al-tab.active,.pc-type.active,.pc-filter.active,.pc-pill.active,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-building.active,.pc-floor.active,.pc-tab.active,.al-tab.active,.pc-type.active,.pc-filter.active,.pc-pill.active,
 .pc-action.primary,.pc-btn.primary,.btn.primary,.pcd-btn.primary,.al-btn.primary,.av-btn.primary,.modeBadge,.activeTab,
-button[type="submit"],input[type="submit"],.pc-submit,.pc-dir:not(.secondary){
+button[type="submit"],input[type="submit"],.pc-submit,.pc-dir:not(.secondary)){
   background:linear-gradient(135deg,#0b4f6c,#06364d) !important;
   border-color:#0b4f6c !important;
   color:#fff !important;
@@ -938,14 +938,14 @@ button[type="submit"],input[type="submit"],.pc-submit,.pc-dir:not(.secondary){
   background:#0b4f6c !important;
   color:#fff !important;
 }
-button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
-.pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,.pc-card:hover,.av-item:hover,.al-map:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
+.pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,.pc-card:hover,.av-item:hover,.al-map:hover){
   border-color:#1b7897 !important;
   box-shadow:0 16px 38px rgba(6,54,77,.12) !important;
   transform:translateY(-1px) !important;
 }
-.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
-.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
+.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover){
   background:linear-gradient(135deg,#1b7897,#06364d) !important;
   color:#fff !important;
 }
@@ -986,7 +986,7 @@ button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hov
 }
 
 /* Tablas/listas */
-.al-table th,.pc-table th,table th{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table th,.pc-table th,table th){
   background:linear-gradient(90deg,#06364d,#0b4f6c) !important;
   color:#fff !important;
 }
@@ -1014,12 +1014,12 @@ button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hov
 }
 
 /* Formularios / selector / plano */
-input,select,textarea,.pc-input,.pc-search input,.al-search,.al-search input,.pc-select,.al-select,.pc-dropdown-wrap select,.select2-container .select2-selection{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input,select,textarea,.pc-input,.pc-search input,.al-search,.al-search input,.pc-select,.al-select,.pc-dropdown-wrap select,.select2-container .select2-selection){
   background:#fff !important;
   border-color:#dbe8ef !important;
   color:#112a3a !important;
 }
-input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-select:focus{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-select:focus){
   border-color:#1b7897 !important;
   box-shadow:0 0 0 4px rgba(27,120,151,.14) !important;
 }
@@ -1035,7 +1035,7 @@ input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-sel
 @media(max-width:680px){
   .pc-home,.pc-app,.pc-form,.pc-selector,.pc-requests,.pcd,.ptic,.av,.al-wrap{padding:8px !important;}
   .pc-hero,.pc-top,.pc-head,.al-head,.pcd-hero,.hero{border-radius:18px !important;padding:12px !important;}
-  .pc-card,.pc-panel,.pc-section,.pcd-card,.panel,.card{border-radius:16px !important;padding:12px !important;}
+  :is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-card,.pc-panel,.pc-section,.pcd-card,.panel,.card){border-radius:16px !important;padding:12px !important;}
   .pc-card{grid-template-columns:1fr !important;gap:10px !important;}
   .pc-ico{width:46px !important;height:46px !important;border-radius:14px !important;}
   .pc-actions,.actions,.pc-status{gap:8px !important;}
@@ -1126,23 +1126,23 @@ input:focus,select:focus,textarea:focus,.pc-input:focus,.al-search:focus,.al-sel
 }
 
 /* Botones bonitos: azul principal, rojo solo para acciones de riesgo/alerta */
-button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,
-.pc-type,.pcd-btn,.av-btn,.al-tab,.pc-asset,.pc-subcat,.pc-parent-card,.pc-cat-card{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button,.btn,.pc-btn,.pc-action,.pc-dir,.al-btn,.pc-filter,.pc-pill,.pc-tab,.pc-floor,.pc-building,
+.pc-type,.pcd-btn,.av-btn,.al-tab,.pc-asset,.pc-subcat,.pc-parent-card,.pc-cat-card){
   border:1px solid var(--sm-line) !important;
   color:var(--sm-navy) !important;
   background:#fff !important;
   box-shadow:none !important;
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease !important;
 }
-button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hover,.pc-filter:hover,.pc-pill:hover,
 .pc-tab:hover,.pc-floor:hover,.pc-building:hover,.pc-type:hover,.pc-asset:hover,.pc-card:hover,.av-item:hover,
-.pc-subcat:hover,.pc-parent-card:hover,.pc-cat-card:hover{
+.pc-subcat:hover,.pc-parent-card:hover,.pc-cat-card:hover){
   border-color:var(--sm-navy-2) !important;
   box-shadow:0 16px 42px rgba(7,56,77,.13) !important;
   transform:translateY(-1px) !important;
 }
-.pc-btn.primary,.btn.primary,.pc-action.primary,.pcd-btn.primary,.av-btn.primary,.al-btn.primary,
-.pc-submit button[type="submit"],button[type="submit"],input[type="submit"],.pc-card.main,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary,.btn.primary,.pc-action.primary,.pcd-btn.primary,.av-btn.primary,.al-btn.primary,
+.pc-submit button[type="submit"],button[type="submit"],input[type="submit"],.pc-card.main),
 .pc-building.active,.pc-floor.active,.pc-tab.active,.al-tab.active,.pc-type.active,.pc-filter.active,.pc-pill.active,
 .pc-subcat.active,.pc-parent-card.active,.pc-cat-card.active{
   background:linear-gradient(135deg,var(--sm-navy),var(--sm-navy-2)) !important;
@@ -1233,20 +1233,20 @@ button:hover,.btn:hover,.pc-btn:hover,.pc-action:hover,.pc-dir:hover,.al-btn:hov
 .pc-submit .pc-btn{min-width:170px !important;justify-content:center !important;}
 
 /* Inputs sin borde rojo hasta validacion real del navegador */
-input,select,textarea,.pc-input,.pc-search input,.al-search input,.pc-select,.al-select,.select2-container .select2-selection{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input,select,textarea,.pc-input,.pc-search input,.al-search input,.pc-select,.al-select,.select2-container .select2-selection){
   border:1px solid var(--sm-line) !important;
   border-radius:14px !important;
   background:#fff !important;
   color:var(--sm-ink) !important;
 }
-input:focus,select:focus,textarea:focus,.pc-input:focus{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input:focus,select:focus,textarea:focus,.pc-input:focus){
   border-color:var(--sm-navy-2) !important;
   box-shadow:0 0 0 4px rgba(11,79,108,.13) !important;
   outline:none !important;
 }
 
 /* Lista, selector y plano: misma personalidad */
-.al-table th,.pc-table th,table th{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table th,.pc-table th,table th){
   background:linear-gradient(90deg,var(--sm-navy),var(--sm-navy-2)) !important;
   color:#fff !important;
 }
@@ -1543,7 +1543,7 @@ input:focus,select:focus,textarea:focus,.pc-input:focus{
   color:var(--sm-v160-navy) !important;
   box-shadow:0 10px 26px rgba(7,56,77,.10) !important;
 }
-.al-table th,.pc-table th,table th{
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.al-table th,.pc-table th,table th){
   background:linear-gradient(90deg,var(--sm-v160-navy),var(--sm-v160-blue)) !important;
   color:#fff !important;
 }
@@ -2044,7 +2044,7 @@ input:focus,select:focus,textarea:focus,.pc-input:focus{
   --sm-btn-soft-text:#07384d;
 }
 
-button,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button,
 .btn,
 .pc-btn,
 .pc-action,
@@ -2059,14 +2059,14 @@ button,
 .gsm-edit button,
 .pc-form button,
 .ptic button,
-input[type="submit"]{
+input[type="submit"]){
   font-weight:950 !important;
   text-shadow:none !important;
   text-decoration:none !important;
 }
 
-.btn.primary,
-.pc-btn.primary,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .btn.primary,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .pc-btn.primary,
 .pc-action.primary,
 .pc-dir.primary,
 .al-btn.primary,
@@ -2631,7 +2631,7 @@ input[type="submit"] *{
 
 /* School Manager v233: navegación Inicio integrada y paleta vintage */
 :root{--schoolmanager-dark:#07384d;--schoolmanager-teal:#075d61;--schoolmanager-green:#0f8f86;--schoolmanager-gold:#efa300;--schoolmanager-cream:#fff8df;--schoolmanager-red:#b6252b;--schoolmanager-line:#d7e4e8;}
-body{background:linear-gradient(135deg,#f7fafb 0%,#eef7f5 58%,#fffaf0 100%)!important;}
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector){background:linear-gradient(135deg,#f7fafb 0%,#eef7f5 58%,#fffaf0 100%)!important;}
 .pc-home-return{display:none!important;}
 
 
@@ -2835,8 +2835,8 @@ html.schoolmanager-page-leaving :where(.pc-home,.pc-form,.pc-requests,.pc-alerts
 .pc279-card:hover,.ticdesk .ticket:hover,.gsm-assets .gsm-row:hover,.pcd .pcd-card:hover,.sid-card:hover{transform:translateY(-2px);box-shadow:0 16px 42px rgba(7,56,77,.10)!important;border-color:#b7d3dd!important}
 .pc279-hero,.ticdesk .hero,.gsm-hero,.pcd-hero,.sid-top{backdrop-filter:saturate(1.1) blur(2px)}
 .pc279-card,.ticdesk .panel,.pcd-card,.sid-card,.gsm-panel{overflow:hidden}
-button,.pc279-card,.pc279-action,.ticdesk .btn,.pcd-btn,.sid-btn,.gsm-btn{touch-action:manipulation}
-input,select,textarea{max-width:100%}
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(button,.pc279-card,.pc279-action,.ticdesk .btn,.pcd-btn,.sid-btn,.gsm-btn){touch-action:manipulation}
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(input,select,textarea){max-width:100%}
 @media(max-width:980px){
   .ticdesk .cockpit,.pc279-layout,.gsm-layout,.pcd-grid,.sid-grid{grid-template-columns:1fr!important}
   .ticdesk .alerts,.pc279-grid,.sid-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
@@ -2887,15 +2887,15 @@ input,select,textarea{max-width:100%}
 .al-wrap .al-tabs,
 .pc-section > h2,
 .pc-panel > h2,
-.panel > h2,
-.card > h2 {
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .panel > h2,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .card > h2 {
   margin-bottom: 22px !important;
 }
 .gsm-panel > small,
 .pc-section > small,
 .pc-panel > small,
-.panel > small,
-.card > small {
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .panel > small,
+:is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) .card > small {
   display: block !important;
   margin-bottom: 18px !important;
 }
