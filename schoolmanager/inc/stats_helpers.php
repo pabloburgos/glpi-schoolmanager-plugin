@@ -169,15 +169,17 @@ function smgr_add_ticket_followup($ticketId, $content, $isPrivate = 0) {
     }
 }
 
-function smgr_is_super_admin_user() {
-    if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
-    try {
-        $profile = (!empty($_SESSION['glpiactiveprofile']) && is_array($_SESSION['glpiactiveprofile'])) ? $_SESSION['glpiactiveprofile'] : [];
-        $name = smgr_norm_profile_name((string)($profile['name'] ?? ''));
-        $id = (int)($profile['id'] ?? 0);
-        return in_array($name, ['super-admin', 'super admin', 'superadmin'], true) || $id === 4;
-    } catch (Throwable $e) {}
-    return false;
+if (!function_exists('smgr_is_super_admin_user')) {
+    function smgr_is_super_admin_user() {
+        if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
+        try {
+            $profile = (!empty($_SESSION['glpiactiveprofile']) && is_array($_SESSION['glpiactiveprofile'])) ? $_SESSION['glpiactiveprofile'] : [];
+            $name = smgr_norm_profile_name((string)($profile['name'] ?? ''));
+            $id = (int)($profile['id'] ?? 0);
+            return in_array($name, ['super-admin', 'super admin', 'superadmin'], true) || $id === 4;
+        } catch (Throwable $e) {}
+        return false;
+    }
 }
 
 function smgr_can_manage_ticket($ticketId, $userId = null) {

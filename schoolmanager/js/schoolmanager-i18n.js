@@ -46,8 +46,8 @@
       return true;
     }
     if (node.getAttribute && node.getAttribute('translate') === 'no') return true;
-    if (node.classList && (node.classList.contains('sm-no-translate') || node.classList.contains('notranslate'))) return true;
-    if (node.closest && node.closest('[translate="no"], .sm-no-translate, .notranslate')) return true;
+    if (node.classList && (node.classList.contains('sm-no-translate') || node.classList.contains('notranslate') || node.classList.contains('sm-editor-table'))) return true;
+    if (node.closest && node.closest('[translate="no"], .sm-no-translate, .notranslate, .sm-editor-table, #tab-i18n, #smLocaleTbody')) return true;
     return false;
   }
 

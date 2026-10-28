@@ -273,7 +273,7 @@ return " . var_export($cfg, true) . ";
 }
 
 function plugin_schoolmanager_builtin_locales(): array {
-    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT', 'pt_PT', 'ca_ES', 'gl_ES', 'nl_NL', 'pl_PL'];
+    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT', 'pt_PT', 'nl_NL', 'pl_PL', 'tr_TR', 'zh_CN'];
 }
 
 function plugin_schoolmanager_available_locales(bool $includeDetails = false): array {
@@ -286,13 +286,13 @@ function plugin_schoolmanager_available_locales(bool $includeDetails = false): a
         'de_DE' => 'Deutsch',
         'it_IT' => 'Italiano',
         'pt_PT' => 'Português',
-        'ca_ES' => 'Català',
-        'gl_ES' => 'Galego',
         'nl_NL' => 'Nederlands',
         'pl_PL' => 'Polski',
+        'tr_TR' => 'Türkçe',
+        'zh_CN' => '简体中文',
         'en_US' => 'English (US)',
         'pt_BR' => 'Português (Brasil)',
-        'eu_ES' => 'Euskara',
+        'ru_RU' => 'Русский',
     ];
 
     $found = [];
@@ -553,8 +553,7 @@ function plugin_schoolmanager_clean_brand_name(?string $value, string $fallback 
 }
 
 function plugin_schoolmanager_app_name(): string {
-    $brand = plugin_schoolmanager_config()['brand'] ?? [];
-    return plugin_schoolmanager_clean_brand_name($brand['title'] ?? ($brand['title_es'] ?? ($brand['title_en'] ?? 'School Manager')));
+    return 'School Manager';
 }
 
 function plugin_schoolmanager_menu_name(): string {
@@ -992,6 +991,11 @@ function plugin_schoolmanager_translation_map_for_locale(?string $locale = null)
         }
     }
 
+    // Protect official plugin name from being altered in ANY language
+    unset($pairs['School Manager'], $pairs['GLPI School Manager'], $pairs['School'], $pairs['Manager']);
+    $pairs['School Manager'] = 'School Manager';
+    $pairs['GLPI School Manager'] = 'GLPI School Manager';
+
     uksort($pairs, static fn($a, $b) => strlen((string)$b) <=> strlen((string)$a));
     $cache[$locale] = $pairs;
     return $pairs;
@@ -1067,6 +1071,11 @@ function plugin_schoolmanager_translate_html_output(string $html): string {
         }, $html) ?? $html;
     }
     $placeholders = [];
+    $html = preg_replace_callback('#<([a-z0-9_-]+)\b[^>]*(?:translate=["\']no["\']|class=["\'][^"\']*\b(?:sm-no-translate|sm-editor-table)\b)[^>]*>.*?</\1>#isu', static function($m) use (&$placeholders) {
+        $key = '%%SMGR_SKIP_' . count($placeholders) . '%%';
+        $placeholders[$key] = $m[0];
+        return $key;
+    }, $html) ?? $html;
     $html = preg_replace_callback('#<(script|style|textarea|pre|code)\b[^>]*>.*?</\1>#is', static function($m) use (&$placeholders) {
         $key = '%%SMGR_SKIP_' . count($placeholders) . '%%';
         $placeholders[$key] = $m[0];
@@ -1088,7 +1097,7 @@ function plugin_schoolmanager_start_translation_buffer(): void {
     if (PHP_SAPI === 'cli') { return; }
     if (!str_contains($_SERVER['REQUEST_URI'] ?? '', '/plugins/schoolmanager/')) { return; }
     $script = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
-    if (in_array($script, ['media.php','i18n.php','assets_aula.php','plan_frame.php'], true)) { return; }
+    if (in_array($script, ['media.php','i18n.php','assets_aula.php','plan_frame.php','configuracion.php','instalacion.php'], true)) { return; }
     if (!empty($GLOBALS['PLUGIN_SCHOOLMANAGER_TRANSLATION_BUFFER_STARTED'])) { return; }
     $GLOBALS['PLUGIN_SCHOOLMANAGER_TRANSLATION_BUFFER_STARTED'] = true;
     ob_start('plugin_schoolmanager_translate_html_output');

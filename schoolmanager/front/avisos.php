@@ -4,7 +4,7 @@ Session::checkLoginUser();
 require_once(__DIR__ . '/../inc/permissions.php');
 require_once(__DIR__ . '/../inc/stats_helpers.php');
 $root=$CFG_GLPI['root_doc'] ?? ''; $logoUrl=function_exists('plugin_schoolmanager_logo_url') ? plugin_schoolmanager_logo_url() : ($root.'/plugins/schoolmanager/logo.svg');
-$isTech = plugin_schoolmanager_user_mode()==='tecnico';
+$isTech = plugin_schoolmanager_is_technician();
 [$tickets,$loadError]=smgr_fetch_tickets(500,!$isTech);
 $items=[]; foreach($tickets as $t){ $st=(int)($t['status']??0); $p=(int)($t['priority']??3); $msg=''; $type='info'; if($st==4){$msg='La solicitud está en espera. Puede que el equipo TIC necesite información o material.';$type='wait';} elseif($st==5){$msg='Solicitud resuelta. Revisa la solución y confirma si está correcto.';$type='done';} elseif($st<5 && $p>=4){$msg='Prioridad alta. Conviene revisarla cuanto antes.';$type='high';} elseif($st<5){$last=smgr_fetch_last_public_followup((int)$t['id']); if($last){$msg='Hay una respuesta reciente del equipo TIC.';$type='reply';}} if($msg){$t['notice']=$msg;$t['notice_type']=$type;$items[]=$t;} }
 Html::header('Avisos', $_SERVER['PHP_SELF'], 'tools', 'PluginSchoolmanagerMapa');

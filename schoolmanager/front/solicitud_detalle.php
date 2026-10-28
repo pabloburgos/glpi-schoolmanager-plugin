@@ -285,7 +285,7 @@ try {
         }
     }
     $requesterIds = array_values(array_unique(array_filter($requesterIds)));
-    $isTech = function_exists('plugin_schoolmanager_user_mode') && plugin_schoolmanager_user_mode() === 'tecnico';
+    $isTech = function_exists('plugin_schoolmanager_is_technician') ? plugin_schoolmanager_is_technician() : (function_exists('plugin_schoolmanager_user_mode') && plugin_schoolmanager_user_mode() === 'tecnico');
     if (!$isRequester && !$isTech) {
         throw new RuntimeException('No tienes permiso para ver esta solicitud.');
     }

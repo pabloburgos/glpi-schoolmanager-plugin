@@ -9,6 +9,10 @@
   const list=document.getElementById('pcModalList'), search=document.getElementById('pcModalSearch'), floorbar=document.getElementById('pcFloorbar'), frame=document.getElementById('pcPlanFrame');
   const choiceName=document.getElementById('pcChoiceName'), choiceMeta=document.getElementById('pcChoiceMeta'), useBtn=document.getElementById('pcUseLocation');
   const hidden=document.getElementById('pcLocationId'), selectedBox=document.getElementById('pcSelectedLocation'), hiddenLabel=document.getElementById('pcLocationLabel'), hiddenCode=document.getElementById('pcLocationCode');
+  const msgNoResults = (modal && modal.dataset.msgNoResults) || 'No hay resultados.';
+  const msgNoChoice = (modal && modal.dataset.msgNoChoice) || 'Ninguna ubicación seleccionada';
+  const msgPrompt = (modal && modal.dataset.msgPrompt) || 'Selecciona un aula desde la lista o el plano.';
+  const msgLocation = (modal && modal.dataset.msgLocation) || 'Ubicación';
   let floors={};
   try { floors=JSON.parse((modal&&modal.dataset.floors)||'{}')||{}; } catch(e) { floors={}; }
   const defaultBuilding=(modal&&modal.dataset.defaultBuilding)||Object.keys(floors)[0]||(rooms[0]&&rooms[0].building)||'';
@@ -51,7 +55,7 @@
   function renderList(){
     const data=filtered(); if(!list) return; list.innerHTML='';
     data.forEach(r=>{const btn=document.createElement('button'); btn.type='button'; btn.className='pc-room'+(selected&&selected.codigo===r.codigo?' active':''); btn.innerHTML=`<span class="pc-avatar">${escapeHtml(String(r.aula||r.codigo||'').slice(0,3))}</span><span><span class="pc-room-name">${escapeHtml(r.aula||r.codigo||'')}</span><span class="pc-room-desc">${escapeHtml(shortDesc(r.descripcion)||'Sin desc.')} · ${escapeHtml(r.planta||r.floor||'')}</span></span><span class="pc-code">${escapeHtml(r.codigo||'')}</span>`; btn.onclick=()=>selectRoom(r,true); btn.ondblclick=()=>{selectRoom(r,true); useSelected();}; list.appendChild(btn)});
-    if(!data.length){list.innerHTML='<div style="padding:24px;text-align:center;font-weight:900;color:#617781">No hay resultados.</div>'}
+    if(!data.length){list.innerHTML='<div style="padding:24px;text-align:center;font-weight:900;color:#617781">'+escapeHtml(msgNoResults)+'</div>'}
   }
   function loadPlan(){ if(!frame || !building || !floor) return; const url=ROOT+'/plugins/schoolmanager/front/plan_frame.php?building='+encodeURIComponent(building)+'&floor='+encodeURIComponent(floor)+'&mode=select&v='+encodeURIComponent(VERSION); if(frame.dataset.src!==url){frame.dataset.src=url; frame.src=url;} }
   function findFromPayload(p){
@@ -73,12 +77,12 @@
     }
     return null;
   }
-  function selectRoom(r, syncFloor){selected=r; if(syncFloor && r.floor && r.floor!==floor){floor=r.floor;} choiceName.textContent=(r.aula||r.codigo||'Ubicación')+' · '+(shortDesc(r.descripcion)||''); choiceMeta.textContent=cleanLocationMeta(r); renderFloors(); renderList();}
+  function selectRoom(r, syncFloor){selected=r; if(syncFloor && r.floor && r.floor!==floor){floor=r.floor;} choiceName.textContent=(r.aula||r.codigo||msgLocation)+' · '+(shortDesc(r.descripcion)||''); choiceMeta.textContent=cleanLocationMeta(r); renderFloors(); renderList();}
   function useSelected(){if(!selected) return; if(hidden) hidden.value=selected.id||''; if(hiddenLabel) hiddenLabel.value=cleanLocationLabel(selected); if(hiddenCode) hiddenCode.value=selected.codigo||''; if(selectedBox) selectedBox.innerHTML='<b>'+escapeHtml(cleanLocationLabel(selected))+'</b><span>'+escapeHtml(cleanLocationMeta(selected))+'</span>'; hidden&&hidden.dispatchEvent(new Event('change',{bubbles:true})); window.dispatchEvent(new CustomEvent('schoolmanager:location-selected',{detail:selected})); close();}
   function renderAll(){renderTabs(); renderFloors(); renderList()}
   function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
   openBtn&&openBtn.addEventListener('click',open); closeBtn&&closeBtn.addEventListener('click',close); useBtn&&useBtn.addEventListener('click',useSelected); search&&search.addEventListener('input',renderList);
-  document.querySelectorAll('.pc-tab').forEach(t=>t.addEventListener('click',()=>{building=t.dataset.building; floor=(floors[building]&&Object.keys(floors[building])[0])||''; selected=null; choiceName.textContent='Ninguna ubicación seleccionada'; choiceMeta.textContent='Selecciona un aula desde la lista o el plano.'; renderAll()}));
+  document.querySelectorAll('.pc-tab').forEach(t=>t.addEventListener('click',()=>{building=t.dataset.building; floor=(floors[building]&&Object.keys(floors[building])[0])||''; selected=null; choiceName.textContent=msgNoChoice; choiceMeta.textContent=msgPrompt; renderAll()}));
   modal&&modal.addEventListener('click',e=>{if(e.target===modal) close()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape' && modal && modal.classList.contains('show')) close();});
   window.addEventListener('message',ev=>{const p=ev.data||{}; if(p.type!=='schoolmanager-plan-click') return; const hit=findFromPayload(p); if(hit){selectRoom(hit,true)}});

@@ -694,7 +694,7 @@ button[type="submit"]:hover,input[type="submit"]:hover){
 .pc-building.active,.pc-floor.active,.pc-tab.active,.al-tab.active,.pc-type.active,.pc-filter.active,
 .pc-card.main,.pc-card.active,.pc-pill.active,.pc-action.primary,.pc-btn.primary,.btn.primary,
 .pcd-btn.primary,.al-btn.primary,.av-btn.primary,.modeBadge,.activeTab,button[type="submit"],input[type="submit"],
-.pc-submit,.pc-dir:not(.secondary){
+.pc-dir:not(.secondary){
   background:linear-gradient(135deg,#e63946,#c92828) !important;
   border-color:#e63946 !important;
   color:#ffffff !important;
@@ -717,7 +717,7 @@ button[type="submit"]:hover,input[type="submit"]:hover){
   transform:translateY(-1px) !important;
 }
 :is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
-.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover){
+.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover){
   background:linear-gradient(135deg,#ff4f5b,#c92828) !important;
   color:#fff !important;
 }
@@ -928,7 +928,7 @@ button[type="submit"]:hover,input[type="submit"]:hover){
 /* Botones: azul principal, coral solo en peligro/acciones destacadas */
 :is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-building.active,.pc-floor.active,.pc-tab.active,.al-tab.active,.pc-type.active,.pc-filter.active,.pc-pill.active,
 .pc-action.primary,.pc-btn.primary,.btn.primary,.pcd-btn.primary,.al-btn.primary,.av-btn.primary,.modeBadge,.activeTab,
-button[type="submit"],input[type="submit"],.pc-submit,.pc-dir:not(.secondary)){
+button[type="submit"],input[type="submit"],.pc-dir:not(.secondary)){
   background:linear-gradient(135deg,#0b4f6c,#06364d) !important;
   border-color:#0b4f6c !important;
   color:#fff !important;
@@ -945,7 +945,7 @@ button[type="submit"],input[type="submit"],.pc-submit,.pc-dir:not(.secondary)){
   transform:translateY(-1px) !important;
 }
 :is(.schoolmanager-configured, .sm-home, .smset, .pc-wrap, .pc-page, .pcd-page, .pcd-wrap, .pcd, .pcda, .pcda-shell, .pc-main, .pc-stock-page, .stp-wrap, .stp, .sid-wrap, .sid, .gsm-wrap, .gsm, .gsm-assets, .gsm-edit, .ticdesk, .al-wrap, .av, .av-wrap, .smdoc, .smdoc-wrap, .smv-wrap, .pe-wrap, .pc-editor, .ad-wrap, .da-wrap, .tr-wrap, .tr, .pcas, .pcas-wrap, .pc-form, .pc-requests, .pc-selector) :is(.pc-btn.primary:hover,.btn.primary:hover,.pc-action.primary:hover,.pcd-btn.primary:hover,.av-btn.primary:hover,
-.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover,.pc-submit:hover){
+.al-btn.primary:hover,button[type="submit"]:hover,input[type="submit"]:hover){
   background:linear-gradient(135deg,#1b7897,#06364d) !important;
   color:#fff !important;
 }
@@ -2906,4 +2906,17 @@ html.schoolmanager-page-leaving :where(.pc-home,.pc-form,.pc-requests,.pc-alerts
 .pc-section > h2 + *,
 .pc-panel > h2 + * {
   margin-top: 0 !important;
+}
+
+/* Unbreakable button text visibility: never truncate submit buttons to "Ca..." or "Creat..." */
+.pc-submit .pc-btn, .pc-form .pc-btn-cancel, .pc-form .pc-btn-create {
+  overflow: visible !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+}
+.pc-submit .pc-btn span, .pc-form .pc-btn-cancel span, .pc-form .pc-btn-create span {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  max-width: none !important;
 }

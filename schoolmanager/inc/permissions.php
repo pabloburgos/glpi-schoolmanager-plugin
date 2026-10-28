@@ -71,10 +71,51 @@ function plugin_schoolmanager_can_view_locations() {
     return Session::getLoginUserID() > 0;
 }
 
+function plugin_schoolmanager_is_superadmin() {
+    if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
+    try {
+        if (isset($_SESSION['glpiactiveprofile']) && is_array($_SESSION['glpiactiveprofile'])) {
+            $p = $_SESSION['glpiactiveprofile'];
+            $id = (int)($p['id'] ?? 0);
+            $name = strtolower(trim((string)($p['name'] ?? '')));
+            $name = strtr($name, ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']);
+            if (in_array($name, ['super-admin', 'super admin', 'superadmin'], true) || $id === 4) {
+                return true;
+            }
+        }
+        if (method_exists('Session', 'haveRight') && Session::haveRight('config', UPDATE)) {
+            return true;
+        }
+    } catch (Throwable $e) {}
+    return false;
+}
+
+if (!function_exists('smgr_is_super_admin_user')) {
+    function smgr_is_super_admin_user() {
+        return plugin_schoolmanager_is_superadmin();
+    }
+}
+
 function plugin_schoolmanager_user_mode() {
+    if (plugin_schoolmanager_is_superadmin()) { return 'superadmin'; }
+    if (function_exists('plugin_schoolmanager_is_admin_tic_user') && plugin_schoolmanager_is_admin_tic_user()) { return 'admin_tic'; }
     if (function_exists('plugin_schoolmanager_is_tic_user') && plugin_schoolmanager_is_tic_user()) { return 'tecnico'; }
     if (plugin_schoolmanager_can_create_asset(null)) { return 'tecnico'; }
     return 'profesor';
+}
+
+function plugin_schoolmanager_is_technician() {
+    $mode = plugin_schoolmanager_user_mode();
+    return in_array($mode, ['superadmin', 'admin_tic', 'tecnico'], true);
+}
+
+function plugin_schoolmanager_can_configure() {
+    if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
+    if (plugin_schoolmanager_is_superadmin()) { return true; }
+    if (function_exists('plugin_schoolmanager_is_admin_tic_user') && plugin_schoolmanager_is_admin_tic_user()) { return true; }
+    if (function_exists('plugin_schoolmanager_is_tic_user') && plugin_schoolmanager_is_tic_user()) { return true; }
+    if (method_exists('Session', 'haveRight') && Session::haveRight('config', UPDATE)) { return true; }
+    return false;
 }
 
 

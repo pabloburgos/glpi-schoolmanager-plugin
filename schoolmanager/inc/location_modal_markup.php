@@ -99,19 +99,26 @@ body.pc-location-modal-open{overflow:hidden!important;}
  .pc-choice b{font-size:16px!important;}
 }
 </style>
-<div class="pc-modal-backdrop" id="pcLocationModal" aria-hidden="true" data-default-building="<?= htmlspecialchars($smgr_modal_default_building, ENT_QUOTES, 'UTF-8') ?>" data-default-floor="<?= htmlspecialchars($smgr_modal_floor_defaults[$smgr_modal_default_building] ?? '', ENT_QUOTES, 'UTF-8') ?>" data-floors="<?= htmlspecialchars(json_encode($smgr_modal_floors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>">
-  <div class="pc-modal" role="dialog" aria-modal="true" aria-label="Selector de ubicación">
-    <div class="pc-modal-head"><h2>Plano de clases</h2><button type="button" class="pc-btn secondary" id="pcCloseSelector">Cerrar</button></div>
+<div class="pc-modal-backdrop" id="pcLocationModal" aria-hidden="true" 
+  data-default-building="<?= htmlspecialchars($smgr_modal_default_building, ENT_QUOTES, 'UTF-8') ?>" 
+  data-default-floor="<?= htmlspecialchars($smgr_modal_floor_defaults[$smgr_modal_default_building] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
+  data-floors="<?= htmlspecialchars(json_encode($smgr_modal_floors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>"
+  data-msg-no-results="<?= htmlspecialchars(plugin_schoolmanager_tr('no_results_found', 'No hay resultados.'), ENT_QUOTES, 'UTF-8') ?>"
+  data-msg-no-choice="<?= htmlspecialchars(plugin_schoolmanager_tr('no_room_selected', 'Ninguna ubicación seleccionada'), ENT_QUOTES, 'UTF-8') ?>"
+  data-msg-prompt="<?= htmlspecialchars(plugin_schoolmanager_tr('select_room_prompt', 'Selecciona un aula desde la lista o el plano.'), ENT_QUOTES, 'UTF-8') ?>"
+  data-msg-location="<?= htmlspecialchars(plugin_schoolmanager_tr('location', 'Ubicación'), ENT_QUOTES, 'UTF-8') ?>">
+  <div class="pc-modal" role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('location_selector_title', 'Plano de clases'), ENT_QUOTES, 'UTF-8') ?>">
+    <div class="pc-modal-head"><h2><?= htmlspecialchars(plugin_schoolmanager_tr('location_selector_title', 'Plano de clases'), ENT_QUOTES, 'UTF-8') ?></h2><button type="button" class="pc-btn secondary" id="pcCloseSelector"><?= htmlspecialchars(plugin_schoolmanager_tr('btn_close', 'Cerrar'), ENT_QUOTES, 'UTF-8') ?></button></div>
     <div class="pc-modal-body">
       <div class="pc-modal-left">
         <div class="pc-tabs" style="grid-template-columns:repeat(<?= max(1, count($smgr_modal_buildings)) ?>,minmax(0,1fr))!important"><?php foreach ($smgr_modal_buildings as $smgr_b): $smgr_bc = strtoupper((string)$smgr_b['code']); ?><button type="button" class="pc-tab <?= $smgr_bc === $smgr_modal_default_building ? 'active' : '' ?>" data-building="<?= htmlspecialchars($smgr_bc, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(plugin_schoolmanager_label($smgr_b, 'name', $smgr_bc), ENT_QUOTES, 'UTF-8') ?></button><?php endforeach; ?></div>
-        <input class="pc-room-search" id="pcModalSearch" placeholder="Buscar aula, descripción, código...">
+        <input class="pc-room-search" id="pcModalSearch" placeholder="<?= htmlspecialchars(plugin_schoolmanager_tr('search_room_placeholder', 'Buscar aula, descripción, código...'), ENT_QUOTES, 'UTF-8') ?>">
         <div class="pc-room-list" id="pcModalList"></div>
       </div>
       <div class="pc-modal-right">
         <div class="pc-floorbar" id="pcFloorbar"></div>
-        <div class="pc-plan"><iframe id="pcPlanFrame" title="Plano seleccionable"></iframe></div>
-        <div class="pc-choice"><div><b id="pcChoiceName">Ninguna ubicación seleccionada</b><span id="pcChoiceMeta">Selecciona un aula desde la lista o el plano.</span></div><button type="button" class="pc-btn primary" id="pcUseLocation">Aplicar ubicación</button></div>
+        <div class="pc-plan"><iframe id="pcPlanFrame" title="<?= htmlspecialchars(plugin_schoolmanager_tr('location_selector_title', 'Plano seleccionable'), ENT_QUOTES, 'UTF-8') ?>"></iframe></div>
+        <div class="pc-choice"><div><b id="pcChoiceName"><?= htmlspecialchars(plugin_schoolmanager_tr('no_room_selected', 'Ninguna ubicación seleccionada'), ENT_QUOTES, 'UTF-8') ?></b><span id="pcChoiceMeta"><?= htmlspecialchars(plugin_schoolmanager_tr('select_room_prompt', 'Selecciona un aula desde la lista o el plano.'), ENT_QUOTES, 'UTF-8') ?></span></div><button type="button" class="pc-btn primary" id="pcUseLocation"><?= htmlspecialchars(plugin_schoolmanager_tr('apply_location', 'Aplicar ubicación'), ENT_QUOTES, 'UTF-8') ?></button></div>
       </div>
     </div>
   </div>

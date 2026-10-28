@@ -70,10 +70,11 @@
   window.addEventListener('load', ready);
 
   // Debounced non-blocking preloader on navigation link clicks:
-  // ONLY shows if request takes longer than 260ms. Fast loads NEVER show an annoying blocker!
+  // ONLY shows if request takes longer than 400ms. Fast loads NEVER show an annoying blocker!
   document.addEventListener('click', function(ev){
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
     if (!a) return;
+    if (a.hasAttribute('data-tab') || a.getAttribute('role') === 'tab' || a.closest('.pc-types') || a.closest('.sm-tabs')) return;
     var href = a.getAttribute('href') || '';
     if (!href || href.charAt(0) === '#' || a.target === '_blank' || a.hasAttribute('download') || /^javascript:/i.test(href)) return;
     try {
@@ -83,7 +84,7 @@
         preloaderTimer = setTimeout(function(){
           html.classList.add('schoolmanager-page-leaving');
           showPreloader();
-        }, 260);
+        }, 400);
       }
     } catch(e) {}
   }, true);

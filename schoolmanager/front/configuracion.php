@@ -1,11 +1,13 @@
 <?php
 include('../../../inc/includes.php');
 require_once(__DIR__ . '/../inc/config.php');
+require_once(__DIR__ . '/../inc/permissions.php');
 require_once(__DIR__ . '/../inc/ui_helpers.php');
 
-if (!class_exists('Session') || !Session::getLoginUserID()) { Html::redirect($CFG_GLPI['root_doc'] . '/index.php'); }
-if (function_exists('Session::checkRight')) {}
-if (method_exists('Session', 'checkRight')) { Session::checkRight('config', UPDATE); }
+if (!class_exists('Session') || !Session::getLoginUserID()) { Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/index.php'); }
+if (!function_exists('plugin_schoolmanager_can_configure') || !plugin_schoolmanager_can_configure()) {
+    plugin_schoolmanager_access_denied_page(smcfg_tr('access_denied_config', 'Configuración de School Manager restringida'), smcfg_tr('access_denied_config_desc', 'Solo los administradores TIC y perfiles autorizados pueden acceder a los ajustes de School Manager.'));
+}
 
 // Process downloads before headers or output
 if (isset($_GET['action'])) {
@@ -500,8 +502,11 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
 .sm-badge-custom{background:#fef3e7;color:#b45309;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:900;border:1px solid #fed7aa}
 .sm-code-snippet{background:#1e293b;color:#f8fafc;padding:14px;border-radius:14px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.5;overflow-x:auto;margin:10px 0}
 .sm-actions-sticky{position:sticky;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:12px 18px;z-index:4;box-shadow:0 14px 36px rgba(7,56,77,.15);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
-.sm-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:var(--navy);color:#fff;padding:14px 20px;border-radius:18px;font-weight:900;display:flex;align-items:center;gap:10px;box-shadow:0 18px 45px rgba(0,0,0,.25);transform:translateY(100px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.sm-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:linear-gradient(135deg,var(--navy),#0b4f6c);color:#fff;padding:14px 22px;border-radius:18px;font-weight:900;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.18);transform:translateY(100px);opacity:0;transition:all .32s cubic-bezier(.16,1,.3,1);pointer-events:none}
 .sm-toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.sm-toast.sm-toast-ok{border-left:5px solid #10b981;box-shadow:0 20px 50px rgba(16,185,129,.25),0 10px 24px rgba(7,56,77,.2)}
+.sm-btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:smSpin .6s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes smSpin{to{transform:rotate(360deg)}}
 @keyframes smFade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
 </style>
 
@@ -513,7 +518,6 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
       <p><?= smcfg_h(smcfg_tr('settings_subtitle', 'Configure branding, modules, classrooms, plans, language and visual theme from GLPI.')) ?></p>
     </div>
     <div class="sm-hero-side">
-      <a class="sm-btn red pc-btn-home" href="<?= smcfg_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1.2.1') ?>" style="margin-right:12px">← <?= smcfg_h(smcfg_tr('menu_home', 'Inicio')) ?></a>
       <img class="sm-logo-preview" src="<?= smcfg_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smcfg_h(plugin_schoolmanager_logo_data_uri()) ?>';">
     </div>
   </section>
@@ -580,7 +584,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
               <option value="<?= smcfg_h($lcode) ?>" <?= ($cfg['locale']??'')===$lcode?'selected':'' ?>><?= smcfg_h($linfo['name']) ?> (<?= smcfg_h($lcode) ?>)<?= $linfo['is_custom'] ? ' [' . smcfg_h(smcfg_tr('custom', 'Custom')) . ']' : '' ?></option>
             <?php endforeach; ?>
           </select>
-          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English (UK), Español, Français, Deutsch, Italiano, Português, Català, Galego, Nederlands, Polski.')) ?></small>
+          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English (UK), Español, Français, Deutsch, Italiano, Português, Nederlands, Polski, Türkçe, 简体中文.')) ?></small>
           <small class="sm-help" style="display:block;margin-top:5px;color:var(--navy);font-weight:800">🤖 <?= smcfg_h(smcfg_tr('ai_translation_notice', 'Additional language translations were generated with AI assistance. Found an issue? Report it at:')) ?> <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="color:var(--red);text-decoration:underline">GitHub Issues</a></small>
         </label>
       </div>
@@ -607,14 +611,14 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   <section class="sm-panel" id="tab-i18n">
     <div class="sm-card">
       <h2>🌐 <?= smcfg_h(smcfg_tr('language_center_title', 'Language Center & Visual Translation Editor')) ?></h2>
-      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'GLPI School Manager natively includes 10 languages: English (primary base), Spanish, French, German, Italian, Portuguese, Catalan, Galician, Dutch, and Polish. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload it here, or edit any language directly from this screen.')) ?></p>
+      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'School Manager natively includes 10 languages: English (primary base), Spanish, French, German, Italian, Portuguese, Dutch, Polish, Turkish, and Simplified Chinese. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload it here, or edit any language directly from this screen.')) ?></p>
 
       <!-- AI Disclaimer and GitHub Issues Callout -->
       <div class="sm-alert" style="background:#eef8fc;border:1.5px solid #bce1f1;color:#07384d;margin-top:14px;border-radius:18px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px">
         <span style="font-size:26px;line-height:1;flex-shrink:0">🤖</span>
         <div style="font-size:14px;line-height:1.55">
           <strong style="display:block;font-size:15px;margin-bottom:3px;color:#07384d"><?= smcfg_h(smcfg_tr('ai_disclaimer_title', 'AI-Generated Translations Notice & Community Contributions')) ?></strong>
-          <?= smcfg_h(smcfg_tr('ai_disclaimer_desc', 'Language packs for Portuguese, Catalan, Galician, Dutch, Polish, German, and Italian have been generated and structured with AI assistance. If you notice any awkward phrasing, grammar issues, or missing terminology, you can edit them directly in the Visual Editor below or submit an issue/PR at our GitHub repository:')) ?>
+          <?= smcfg_h(smcfg_tr('ai_disclaimer_desc', 'Language packs for Portuguese, Dutch, Polish, Turkish, Chinese, German, and Italian have been generated and structured with AI assistance. If you notice any awkward phrasing, grammar issues, or missing terminology, you can edit them directly in the Visual Editor below or submit an issue/PR at our GitHub repository:')) ?>
           <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;color:#b6252b;font-weight:950;text-decoration:underline">https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues</a>
         </div>
       </div>
@@ -1093,7 +1097,17 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
 <script>
 (function(){
   document.querySelectorAll('.sm-table').forEach(tbl=>{ const hs=[...tbl.querySelectorAll('thead th')].map(th=>th.textContent.trim()); tbl.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,i)=>td.setAttribute('data-label',hs[i]||''))); });
-  document.querySelectorAll('form').forEach(f=>{ f.addEventListener('submit',()=>{ const b=f.querySelector('button[type=submit]'); if(b && !b.disabled){ b.dataset.oldText=b.textContent; b.textContent='...'; } }); });
+  document.querySelectorAll('form').forEach(f=>{
+    f.addEventListener('submit', function(){
+      const b=f.querySelector('button[type=submit]');
+      if(b && !b.disabled){
+        b.dataset.oldHtml=b.innerHTML;
+        b.style.minWidth=b.offsetWidth+'px';
+        b.disabled=true;
+        b.innerHTML='<span class="sm-btn-spinner" aria-hidden="true"></span> ' + (b.getAttribute('data-saving') || '<?= smcfg_h(smcfg_tr("saving", "Guardando...")) ?>');
+      }
+    });
+  });
   document.querySelectorAll('.sm-switch input[type=checkbox]').forEach(cb=>{ const update=()=>{ const sm=cb.closest('.sm-switch')?.querySelector('small[data-on]'); if(sm) sm.textContent=cb.checked?sm.dataset.on:sm.dataset.off; }; cb.addEventListener('change',update); update(); });
   const buildings = <?= json_encode($buildings, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>;
   function floorsOf(code){ const b = buildings.find(x => String(x.code) === String(code)); return b && Array.isArray(b.floors) ? b.floors : []; }
@@ -1141,18 +1155,17 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   };
 
   // Toast feedback helper
-  function showToast(msg){
+  function showToast(msg, isOk = true){
     let t = document.getElementById('smToast');
     if(!t){
       t = document.createElement('div');
       t.id = 'smToast';
-      t.className = 'sm-toast';
       document.body.appendChild(t);
     }
-    t.textContent = msg;
-    t.classList.add('show');
+    t.innerHTML = (isOk ? '✅ ' : '⚠️ ') + msg;
+    t.className = 'sm-toast show' + (isOk ? ' sm-toast-ok' : '');
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 3200);
+    t._timer = setTimeout(() => t.classList.remove('show'), 4200);
   }
 
   // Live reactive theme switching preview
