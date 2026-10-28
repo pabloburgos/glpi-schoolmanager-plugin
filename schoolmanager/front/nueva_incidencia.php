@@ -989,7 +989,7 @@ $oldCategoryId = (int)pc_post('itilcategories_id', 0);
 
 <div class="pc-form" id="pcForm" data-rooms='<?= htmlspecialchars($roomsJson, ENT_QUOTES, 'UTF-8') ?>' data-root="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>" data-version="<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>" data-old-category="<?= (int)$oldCategoryId ?>">
   <div class="pc-card">
-    <div class="pc-head"><div class="pc-head-main"><img src="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>" class="pc-logo" alt="Logo" onerror="this.onerror=null;this.src='<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div class="pc-head-copy"><small><?= htmlspecialchars(plugin_schoolmanager_tr('plugin_kicker','GLPI School Manager'), ENT_QUOTES, 'UTF-8') ?></small><h1><?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_ticket', 'Incidencia guiada'), ENT_QUOTES, 'UTF-8') ?></h1><p><?= htmlspecialchars(plugin_schoolmanager_tr('create_ticket_desc', 'Crea tickets de soporte de forma clara, rápida y adaptada al centro educativo.'), ENT_QUOTES, 'UTF-8') ?></p></div></div><div class="pc-head-actions"><a class="pc-header-home pc-header-home-red pc-header-home-clean" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span class="pc-home-label"><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></span></a></div></div>
+    <div class="pc-head"><div class="pc-head-main"><img src="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>" class="pc-logo" alt="Logo" onerror="this.onerror=null;this.src='<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div class="pc-head-copy"><small><?= htmlspecialchars(plugin_schoolmanager_tr('plugin_kicker','GLPI School Manager'), ENT_QUOTES, 'UTF-8') ?></small><h1><?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_ticket', 'Incidencia guiada'), ENT_QUOTES, 'UTF-8') ?></h1><p><?= htmlspecialchars(plugin_schoolmanager_tr('create_ticket_desc', 'Crea tickets de soporte de forma clara, rápida y adaptada al centro educativo.'), ENT_QUOTES, 'UTF-8') ?></p></div></div><div class="pc-head-actions"><a class="pc-header-home pc-header-home-red pc-header-home-clean red pc-btn-home" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span class="pc-home-label"><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></span></a></div></div>
     <?php if ($message): ?><div class="pc-message <?= htmlspecialchars($messageType, ENT_QUOTES, 'UTF-8') ?>"><span class="pc-svgicon pc-i-warning" aria-hidden="true"></span> <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?><br><small>Hemos conservado lo que habías escrito. Revisa el campo marcado y vuelve a enviar.</small></div><?php endif; ?>
     <form method="post" id="ticketGuidedForm" novalidate>
       <?php pc_csrf_token_field(); ?>
@@ -1102,33 +1102,4 @@ $oldCategoryId = (int)pc_post('itilcategories_id', 0);
 
 
 <?php Html::footer(); ?>
-
-
-
-
-<style id="v258-iconos-finales">
-/* v258: icon system final - no solid squares */
-.pc-svgicon,.gsm-svgicon{
-  display:inline-block!important;width:20px!important;height:20px!important;min-width:20px!important;
-  background:transparent!important;color:currentColor!important;border:0!important;box-shadow:none!important;
-  -webkit-mask:none!important;mask:none!important;overflow:visible!important;text-indent:0!important;line-height:1!important;
-  flex:0 0 auto!important;position:relative!important;vertical-align:middle!important;
-}
-.pc-svgicon:before,.gsm-svgicon:before{
-  content:""!important;display:block!important;width:100%!important;height:100%!important;
-  background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
-.pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon{
-  background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
-}
-.av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
-.pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before{
-  display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:20px;height:20px;display:block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;}
-</style>
 

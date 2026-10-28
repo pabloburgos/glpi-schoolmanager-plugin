@@ -116,7 +116,7 @@ $roomsJson = json_encode(array_values(array_filter($aulasAll, static fn($a) => !
 
 <div class="pc-form" id="pcForm" data-rooms='<?= htmlspecialchars($roomsJson, ENT_QUOTES, 'UTF-8') ?>' data-root="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>" data-version="<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>">
   <div class="pc-card">
-    <div class="pc-head pc-head-v253"><div class="pc-head-brand"><img src="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>" class="pc-logo" alt="Logo"><div><small>GLPI SCHOOL MANAGER</small><h1><?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_asset', 'Alta guiada de activos'), ENT_QUOTES, 'UTF-8') ?></h1></div></div><div class="pc-head-actions"><a class="pc-btn pc-btn-home pc-btn-icon" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.75 10.5 12 4.25l8.25 6.25"/><path d="M6.75 9.75v9.5h10.5v-9.5"/><path d="M10 19.25V14.5a2 2 0 0 1 4 0v4.75"/></svg><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></span></a></div></div>
+    <div class="pc-head pc-head-v253"><div class="pc-head-brand"><img src="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>" class="pc-logo" alt="Logo"><div><small>GLPI SCHOOL MANAGER</small><h1><?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_asset', 'Alta guiada de activos'), ENT_QUOTES, 'UTF-8') ?></h1></div></div><div class="pc-head-actions"><a class="pc-btn red pc-btn-home pc-btn-icon" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.75 10.5 12 4.25l8.25 6.25"/><path d="M6.75 9.75v9.5h10.5v-9.5"/><path d="M10 19.25V14.5a2 2 0 0 1 4 0v4.75"/></svg><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></span></a></div></div>
     <?php if ($message): ?><div class="pc-message <?= htmlspecialchars($messageType, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
     <div class="pc-body">
       <div class="pc-types">
@@ -319,44 +319,6 @@ body > .pc-home-floating{display:none!important;}
 .pc-form .pc-head-v253 .pc-logo{height:92px!important;max-width:230px!important;}
 @media(max-width:1260px){.pc-form .pc-types{grid-template-columns:repeat(3,minmax(0,1fr))!important;}.pc-form .pc-head-v253{align-items:flex-start!important;}}
 @media(max-width:860px){.pc-form{padding:8px!important;}.pc-form .pc-head-v253{display:grid!important;gap:18px!important;padding:22px!important;}.pc-form .pc-types{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.pc-form .pc-fields,.pc-form .pc-location{grid-template-columns:1fr!important;}.pc-form .pc-submit{display:grid!important;}.pc-form .pc-submit .pc-btn{width:100%!important;}.pc-form .pc-head-actions .pc-btn-home{width:100%!important;}.pc-form .pc-section{padding:20px!important;}}
-@media(max-width:560px){.pc-form .pc-types{grid-template-columns:1fr!important;}.pc-form .pc-type{min-height:68px!important;}.pc-form .pc-type span.pc-svgicon{width:48px!important;height:48px!important;}.pc-form .pc-head-v253 .pc-logo{height:72px!important;}.pc-form .pc-section h2{font-size:30px!important;}.pc-form .pc-section h2 .pc-svgicon{width:48px!important;height:48px!important;}}
-</style>
-
-
-<?php Html::footer(); ?>
-
-
-
-
-<style id="v258-iconos-finales">
-/* v258: icon system final - no solid squares */
-.pc-svgicon,.gsm-svgicon{
-  display:inline-block!important;width:20px!important;height:20px!important;min-width:20px!important;
-  background:transparent!important;color:currentColor!important;border:0!important;box-shadow:none!important;
-  -webkit-mask:none!important;mask:none!important;overflow:visible!important;text-indent:0!important;line-height:1!important;
-  flex:0 0 auto!important;position:relative!important;vertical-align:middle!important;
-}
-.pc-svgicon:before,.gsm-svgicon:before{
-  content:""!important;display:block!important;width:100%!important;height:100%!important;
-  background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
-.pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon{
-  background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
-}
-.av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
-.pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before{
-  display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:20px;height:20px;display:block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;}
-</style>
-
-
-
-<style id="v258-alta-activos-final">
 .pc-form .pc-types{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:14px!important;align-items:stretch!important;}
 .pc-form .pc-type[href*="Phone"],.pc-form .pc-type[href*="phone"],.pc-form .pc-type[title*="Telefono"],.pc-form .pc-type[title*="Tel"]{display:none!important;}
 .pc-form .pc-location{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:18px!important;align-items:center!important;padding:18px 20px!important;border:1px solid #d4e4eb!important;background:linear-gradient(135deg,#fff,#f8fbfd)!important;border-radius:24px!important;box-shadow:0 16px 42px rgba(8,59,84,.075)!important;}
@@ -367,8 +329,6 @@ body > .pc-home-floating{display:none!important;}
 .pc-form #pcOpenSelector:hover{background:linear-gradient(135deg,#0b5f7a 0%,#117a80 100%)!important;transform:translateY(-4px)!important;box-shadow:0 26px 46px rgba(7,56,77,.24)!important;}
 .pc-form .pc-submit{display:flex!important;justify-content:flex-end!important;gap:14px!important;margin-top:20px!important;padding:18px 22px!important;border:1px solid #d7e6ec!important;border-radius:24px!important;background:#fff!important;box-shadow:0 16px 44px rgba(8,59,84,.075)!important;}
 .pc-form .pc-submit .pc-btn{min-height:58px!important;border-radius:18px!important;padding:0 28px!important;font-size:17px!important;font-weight:950!important;gap:11px!important;position:relative!important;overflow:hidden!important;}
-.pc-form .pc-submit .pc-btn:before,.pc-form #pcOpenSelector:before{content:""!important;position:absolute!important;inset:0!important;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,.20) 48%,rgba(255,255,255,.06) 66%,transparent 100%)!important;transform:translateX(-135%)!important;transition:transform .55s ease!important;pointer-events:none!important;}
-.pc-form .pc-submit .pc-btn:hover:before,.pc-form #pcOpenSelector:hover:before{transform:translateX(135%)!important;}
 .pc-form .pc-btn-cancel{background:#fff!important;color:#07384d!important;border:1px solid #d7e6ec!important;box-shadow:0 10px 26px rgba(7,56,77,.07)!important;}
 .pc-form .pc-btn-cancel:hover{background:#fff8f6!important;color:#8b1e1e!important;border-color:#e1b1b1!important;box-shadow:0 20px 38px rgba(139,30,30,.10)!important;transform:translateY(-4px)!important;}
 .pc-form .pc-btn-create{background:linear-gradient(135deg,#07384d 0%,#0b5f7a 100%)!important;color:#fff!important;border:1px solid #0a526a!important;box-shadow:0 18px 38px rgba(7,56,77,.18)!important;}
@@ -380,4 +340,5 @@ body > .pc-home-floating{display:none!important;}
 @media(max-width:900px){.pc-form .pc-location{grid-template-columns:1fr!important}.pc-form #pcOpenSelector{width:100%!important}.pc-form .pc-submit{display:grid!important}.pc-form .pc-submit .pc-btn{width:100%!important}.pc-form .pc-types{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:560px){.pc-form .pc-types{grid-template-columns:1fr!important}.pc-form .pc-type span.pc-svgicon{width:52px!important;height:52px!important}.pc-form .pc-section h2 .pc-svgicon{width:52px!important;height:52px!important}}
 </style>
+<?php Html::footer(); ?>
 

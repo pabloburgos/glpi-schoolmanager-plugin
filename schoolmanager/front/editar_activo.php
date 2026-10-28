@@ -195,33 +195,5 @@ function pc_token_hidden_edit() {
 <script>document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('pcUseLocation');if(b)b.textContent='Aplicar ubicación al activo';});</script>
 <script>document.getElementById('assetEditForm')?.addEventListener('submit',function(){const b=this.querySelector('button[type=submit]');if(b){b.disabled=true;b.classList.add('is-loading');b.innerHTML='<?= gsm_edit_svg('save') ?> Guardando...';}});</script>
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/js/custom-combobox.js?v=267"></script>
-
 <?php Html::footer(); ?>
-
-
-<style id="v258-iconos-finales">
-/* v258: icon system final - no solid squares */
-.pc-svgicon,.gsm-svgicon{
-  display:inline-block!important;width:20px!important;height:20px!important;min-width:20px!important;
-  background:transparent!important;color:currentColor!important;border:0!important;box-shadow:none!important;
-  -webkit-mask:none!important;mask:none!important;overflow:visible!important;text-indent:0!important;line-height:1!important;
-  flex:0 0 auto!important;position:relative!important;vertical-align:middle!important;
-}
-.pc-svgicon:before,.gsm-svgicon:before{
-  content:""!important;display:block!important;width:100%!important;height:100%!important;
-  background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
-.pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon{
-  background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
-}
-.av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
-.pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before{
-  display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:20px;height:20px;display:block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;}
-</style>
 

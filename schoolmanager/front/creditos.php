@@ -72,7 +72,7 @@ $root = $CFG_GLPI['root_doc'] ?? '';
     </div>
 
     <div class="smc-actions">
-      <a class="smc-btn primary" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . rawurlencode((string)(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time())), ENT_QUOTES, 'UTF-8') ?>">← <?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></a>
+      <a class="smc-btn red pc-btn-home" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . rawurlencode((string)(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time())), ENT_QUOTES, 'UTF-8') ?>">← <?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></a>
       <a class="smc-btn" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/instalacion.php?v=' . rawurlencode((string)(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time())), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(plugin_schoolmanager_tr('menu_config', 'Configuración del plugin'), ENT_QUOTES, 'UTF-8') ?></a>
     </div>
   </section>

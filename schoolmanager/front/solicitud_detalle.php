@@ -104,6 +104,7 @@ function pcd_csrf_field() { static $tok = null; if (method_exists('Session', 'ge
 
 function pcd_icon($name) {
     $icons = [
+        'home' => '<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/>',
         'plus' => '<path d="M12 5v14M5 12h14"/>',
         'list' => '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
         'external' => '<path d="M14 5h5v5"/><path d="M10 14 19 5"/><path d="M19 13v5H5V5h5"/>',
@@ -578,6 +579,7 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
   <section class="pcd-hero">
     <div class="pcd-brand"><img class="pcd-logo" src="<?= pcd_h($logoUrl) ?>" alt="Logo"><div><div class="pcd-kicker">GLPI SCHOOL MANAGER</div><h1>Detalle de solicitud</h1><p class="pcd-sub">Vista sencilla con estado, respuestas y solución.</p></div></div>
     <div class="pcd-actions">
+      <a class="pcd-btn red pc-btn-home" href="<?= pcd_h($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION)) ?>"><?= pcd_icon('home') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
       <a class="pcd-btn primary" href="<?= pcd_h($newUrl) ?>"><?= pcd_icon('plus') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) ?></span></a>
       <a class="pcd-btn" href="<?= pcd_h($listUrl) ?>"><?= pcd_icon('list') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) ?></span></a>
       <?php if ($ticket): ?><a class="pcd-btn" href="<?= pcd_h($nativeUrl) ?>"><?= pcd_icon('external') ?><span><?= pcd_h(plugin_schoolmanager_tr('native_tickets_list', 'Vista nativa GLPI')) ?></span></a><?php endif; ?>

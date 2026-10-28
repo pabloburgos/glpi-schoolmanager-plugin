@@ -168,7 +168,7 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
 <div class="stp"><div class="stp-wrap">
     <header class="stp-top">
         <div class="stp-brand"><img class="stp-logo" src="<?= st_h($logoUrl) ?>" alt="School Manager"><div class="stp-title"><div class="stp-kicker">School Manager · <?= st_h(st_tr('it_center', 'IT Center')) ?></div><h1><?= st_h(st_tr('stock_tic', 'Stock TIC')) ?></h1><p><?= st_h(st_tr('stock_subtitle', 'Fast control for spare parts and consumables without overloaded screens.')) ?></p></div></div>
-        <div class="stp-actions"><a class="stp-btn ghost" href="<?= st_h($root) ?>/plugins/schoolmanager/front/panel_tic.php?v=286"><?= st_svg('chart') ?><?= st_h(st_tr('tic_panel', 'Panel TIC')) ?></a><a class="stp-btn red" href="<?= st_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=286"><?= st_svg('home') ?><?= st_h(st_tr('home', 'Inicio')) ?></a><button class="stp-btn primary" type="button" id="openCreateStock"><?= st_svg('plus') ?><?= st_h(st_tr('new_stock', 'Nuevo stock')) ?></button></div>
+        <div class="stp-actions"><a class="stp-btn ghost" href="<?= st_h($root) ?>/plugins/schoolmanager/front/panel_tic.php?v=286"><?= st_svg('chart') ?><?= st_h(st_tr('tic_panel', 'Panel TIC')) ?></a><a class="stp-btn red pc-btn-home" href="<?= st_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=286"><?= st_svg('home') ?><?= st_h(st_tr('home', 'Inicio')) ?></a><button class="stp-btn primary" type="button" id="openCreateStock"><?= st_svg('plus') ?><?= st_h(st_tr('new_stock', 'Nuevo stock')) ?></button></div>
     </header>
 
     <?php if ($msg !== ''): ?><div class="stp-msg ok"><?= st_h($msg) ?></div><?php endif; ?>

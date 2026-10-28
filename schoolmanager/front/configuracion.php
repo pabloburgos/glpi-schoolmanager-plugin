@@ -510,7 +510,10 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
       <h1><?= smcfg_h(plugin_schoolmanager_app_name()) ?> · <?= smcfg_h(smcfg_tr('settings_heading', 'Settings')) ?></h1>
       <p><?= smcfg_h(smcfg_tr('settings_subtitle', 'Configure branding, modules, classrooms, plans, language and visual theme from GLPI.')) ?></p>
     </div>
-    <div class="sm-hero-side"><img class="sm-logo-preview" src="<?= smcfg_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smcfg_h(plugin_schoolmanager_logo_data_uri()) ?>';"></div>
+    <div class="sm-hero-side">
+      <a class="sm-btn red pc-btn-home" href="<?= smcfg_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1.2.1') ?>" style="margin-right:12px">← <?= smcfg_h(smcfg_tr('menu_home', 'Inicio')) ?></a>
+      <img class="sm-logo-preview" src="<?= smcfg_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smcfg_h(plugin_schoolmanager_logo_data_uri()) ?>';">
+    </div>
   </section>
 
   <?php if(isset($_GET['saved'])): ?>
@@ -594,7 +597,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <span><?= smcfg_h(smcfg_tr('show_logo_header', 'Show logo in headers')) ?><br><small><?= smcfg_h(smcfg_tr('show_logo_help', 'Display the school / center logo on main screens.')) ?></small></span>
       </label>
 
-      <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('save_general_settings', 'Save general settings')) ?></button>
+      <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('save_general_settings', 'Save general settings')) ?></button>
     </form>
   </section>
 
@@ -648,7 +651,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
             <input class="sm-input" type="file" name="locale_file" accept=".php,.json" required>
           </label>
           <p class="sm-help"><?= smcfg_h(smcfg_tr('upload_locale_help', 'Uploaded files are automatically validated and registered into the plugin locales directory.')) ?></p>
-          <button class="sm-btn" type="submit">📤 <?= smcfg_h(smcfg_tr('upload_locale_btn', 'Upload & Register Language')) ?></button>
+          <button class="sm-btn primary" type="submit">📤 <?= smcfg_h(smcfg_tr('upload_locale_btn', 'Upload & Register Language')) ?></button>
         </form>
       </div>
     </div>
@@ -719,7 +722,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
             <span><?= count($canonicalKeys) ?> <?= smcfg_h(smcfg_tr('keys_loaded', 'keys loaded')) ?></span>
             <span class="sm-pill" id="smMatchCount" style="margin-left:8px"><?= count($canonicalKeys) ?> <?= smcfg_h(smcfg_tr('visible', 'visible')) ?></span>
           </div>
-          <button class="sm-btn" type="submit">💾 <?= smcfg_h(smcfg_tr('save_language_changes', 'Save Language Changes')) ?></button>
+          <button class="sm-btn primary" type="submit">💾 <?= smcfg_h(smcfg_tr('save_language_changes', 'Save Language Changes')) ?></button>
         </div>
       </form>
     </div>
@@ -780,7 +783,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
           </label>
         <?php endforeach; ?>
       </div>
-      <button class="sm-btn" type="submit" style="margin-top:16px"><?= smcfg_h(smcfg_tr('save_modules', 'Save modules')) ?></button>
+      <button class="sm-btn primary" type="submit" style="margin-top:16px"><?= smcfg_h(smcfg_tr('save_modules', 'Save modules')) ?></button>
     </form>
   </section>
 
@@ -804,7 +807,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
           <input type="hidden" name="action" value="upload_logo">
           <input class="sm-input" type="file" name="logo_file" accept=".png,.jpg,.jpeg,.webp,.svg" required>
           <p class="sm-help"><?= smcfg_h(smcfg_tr('logo_formats_help', 'Formats: PNG, JPG, WEBP, SVG.')) ?></p>
-          <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('upload_logo_btn', 'Upload logo')) ?></button>
+          <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('upload_logo_btn', 'Upload logo')) ?></button>
         </form>
         <form method="post" style="margin-top:10px">
           <?php smcfg_token(); ?>
@@ -872,7 +875,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         </label>
       </div>
 
-      <button class="sm-btn" type="submit" style="margin-top:12px">🎨 <?= smcfg_h(smcfg_tr('save_theme_btn', 'Save theme settings')) ?></button>
+      <button class="sm-btn primary" type="submit" style="margin-top:12px">🎨 <?= smcfg_h(smcfg_tr('save_theme_btn', 'Save theme settings')) ?></button>
     </form>
   </section>
 
@@ -905,7 +908,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
           </label>
           <input class="sm-input" type="file" name="plan_file" accept=".html,.htm,.svg,.png,.jpg,.jpeg,.webp" required>
           <p class="sm-help"><?= smcfg_h(smcfg_tr('plan_formats_help', 'Supports HTML, SVG, PNG, JPG/JPEG and WEBP.')) ?></p>
-          <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('upload_plan_btn', 'Upload plan')) ?></button>
+          <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('upload_plan_btn', 'Upload plan')) ?></button>
         </form>
       </div>
 
@@ -950,7 +953,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <label class="sm-field"><span><?= smcfg_h(smcfg_tr('code', 'Code')) ?></span><input class="sm-input" name="building_code" placeholder="ED1" required></label>
         <label class="sm-field"><span><?= smcfg_h(smcfg_tr('name', 'Name')) ?></span><input class="sm-input" name="building_name_es" placeholder="Building 1" required></label>
         <label class="sm-switch"><input type="checkbox" name="create_glpi_location" value="1" checked><span><?= smcfg_h(smcfg_tr('create_glpi_loc', 'Create also in GLPI')) ?><br><small><?= smcfg_h(smcfg_tr('create_glpi_loc_root_help', 'Creates a root location for this building.')) ?></small></span></label>
-        <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('add_building_btn', 'Add building')) ?></button>
+        <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('add_building_btn', 'Add building')) ?></button>
       </form>
 
       <form class="sm-card" method="post">
@@ -961,7 +964,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <div class="sm-row"><label class="sm-field"><span><?= smcfg_h(smcfg_tr('code', 'Code')) ?></span><input class="sm-input" name="floor_code" placeholder="P0" required></label><label class="sm-field"><span><?= smcfg_h(smcfg_tr('number', 'Number')) ?></span><input class="sm-input" name="floor_number" placeholder="0"></label></div>
         <label class="sm-field"><span><?= smcfg_h(smcfg_tr('label', 'Label')) ?></span><input class="sm-input" name="floor_label_es" placeholder="Ground floor" required></label>
         <label class="sm-switch"><input type="checkbox" name="create_glpi_location" value="1" checked><span><?= smcfg_h(smcfg_tr('create_glpi_loc', 'Create also in GLPI')) ?><br><small><?= smcfg_h(smcfg_tr('create_glpi_loc_floor_help', 'Creates floor location inside the building.')) ?></small></span></label>
-        <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('add_floor_btn', 'Add floor')) ?></button>
+        <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('add_floor_btn', 'Add floor')) ?></button>
       </form>
 
       <form class="sm-card" method="post">
@@ -973,7 +976,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <label class="sm-field"><span><?= smcfg_h(smcfg_tr('label', 'Label')) ?></span><input class="sm-input" name="room_name_es" placeholder="Room 101" required></label>
         <label class="sm-field"><span><?= smcfg_h(smcfg_tr('existing_glpi_loc_id', 'Existing GLPI location ID (optional)')) ?></span><input class="sm-input" name="room_glpi_id" placeholder="Optional ID"></label>
         <label class="sm-switch"><input type="checkbox" name="create_glpi_location" value="1" checked><span><?= smcfg_h(smcfg_tr('create_glpi_loc', 'Create also in GLPI')) ?><br><small><?= smcfg_h(smcfg_tr('create_glpi_loc_room_help', 'Creates classroom inside floor location.')) ?></small></span></label>
-        <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('add_classroom_btn', 'Add classroom')) ?></button>
+        <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('add_classroom_btn', 'Add classroom')) ?></button>
       </form>
     </div>
 
@@ -1075,7 +1078,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
       <h2>⚡ <?= smcfg_h(smcfg_tr('advanced_json_title', 'Advanced JSON')) ?></h2>
       <p class="sm-help"><?= smcfg_h(smcfg_tr('advanced_json_help', 'For advanced structure import/export only. The previous tabs are safer.')) ?></p>
       <textarea class="sm-textarea" name="structure_json"><?= smcfg_h($structure) ?></textarea>
-      <button class="sm-btn" type="submit"><?= smcfg_h(smcfg_tr('save_json', 'Save JSON')) ?></button>
+      <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('save_json', 'Save JSON')) ?></button>
     </form>
     <div class="sm-card">
       <h2>📜 <?= smcfg_h(smcfg_tr('credits_and_license', 'Credits and license')) ?></h2>

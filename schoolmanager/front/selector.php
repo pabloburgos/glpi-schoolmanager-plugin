@@ -182,7 +182,7 @@ if (false && $building === 'ED2' && in_array($floor, ['P0','P3'], true) && is_ar
       <div class="pc-empty" id="pcEmpty"><?= htmlspecialchars(plugin_schoolmanager_tr('no_results'), ENT_QUOTES, 'UTF-8') ?></div>
       <div class="pc-actions">
         <a class="pc-btn" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/aulas.php?building=' . rawurlencode($building), ENT_QUOTES, 'UTF-8') ?>"><span class="pc-svgicon pc-i-list" aria-hidden="true"></span><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_classrooms'), ENT_QUOTES, 'UTF-8') ?></span></a>
-        <a class="pc-btn" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . rawurlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><span class="pc-svgicon pc-i-home" aria-hidden="true"></span><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home'), ENT_QUOTES, 'UTF-8') ?></span></a>
+        <a class="pc-btn red pc-btn-home" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . rawurlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><span class="pc-svgicon pc-i-home" aria-hidden="true"></span><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home'), ENT_QUOTES, 'UTF-8') ?></span></a>
       </div>
     </aside>
     <main class="pc-main">

@@ -117,62 +117,7 @@ echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@
 .pc-i-construction,.gsm-i-construction{--pc-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.35%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2021h18%22%2F%3E%3Cpath%20d%3D%22M5%2021V8l7-4%207%204v13%22%2F%3E%3Cpath%20d%3D%22M9%2021v-6h6v6%22%2F%3E%3C%2Fsvg%3E")!important;}
 .pc-i-arrow-left,.gsm-i-arrow-left{--pc-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.35%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M19%2012H5%22%2F%3E%3Cpath%20d%3D%22m12%205-7%207%207%207%22%2F%3E%3C%2Fsvg%3E")!important;}
 </style>
-<div class="av"><div class="av-wrap"><section class="av-hero"><div class="av-brand"><img class="av-logo" src="<?= smgr_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smgr_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><h1><?= smgr_h(plugin_schoolmanager_tr('menu_notices', 'Avisos')) ?></h1><div class="av-sub"><?= $isTech?smgr_h(plugin_schoolmanager_tr('notices_tech_sub', 'Alertas importantes del soporte TIC.')):smgr_h(plugin_schoolmanager_tr('notices_user_sub', 'Actualizaciones importantes de tus solicitudes.')) ?></div></div></div><div class="av-actions"><a class="av-btn home" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3.75 10.5 12 4.25l8.25 6.25"/><path d="M6.75 9.75v9.5h10.5v-9.5"/><path d="M10 19.25V14.5a2 2 0 0 1 4 0v4.75"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a></div></section>
+<div class="av"><div class="av-wrap"><section class="av-hero"><div class="av-brand"><img class="av-logo" src="<?= smgr_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smgr_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><h1><?= smgr_h(plugin_schoolmanager_tr('menu_notices', 'Avisos')) ?></h1><div class="av-sub"><?= $isTech?smgr_h(plugin_schoolmanager_tr('notices_tech_sub', 'Alertas importantes del soporte TIC.')):smgr_h(plugin_schoolmanager_tr('notices_user_sub', 'Actualizaciones importantes de tus solicitudes.')) ?></div></div></div><div class="av-actions"><a class="av-btn home red pc-btn-home" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3.75 10.5 12 4.25l8.25 6.25"/><path d="M6.75 9.75v9.5h10.5v-9.5"/><path d="M10 19.25V14.5a2 2 0 0 1 4 0v4.75"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a></div></section>
 <?php if ($loadError): ?><div class="av-empty"><?= smgr_h(plugin_schoolmanager_tr('load_error', 'No se pudieron cargar los avisos:')) ?> <?= smgr_h($loadError) ?></div><?php endif; ?><section class="av-list"><?php if(!$items && !$loadError): ?><div class="av-empty"><?= smgr_h(plugin_schoolmanager_tr('no_notices_pending', 'No hay avisos pendientes.')) ?></div><?php endif; ?><?php foreach($items as $t): [$sl,$sc]=smgr_status_label($t['status']); $ico=$t['notice_type']==='done'?'<span class="pc-svgicon pc-i-check" aria-hidden="true"></span>':($t['notice_type']==='high'?'<span class="pc-svgicon pc-i-alert" aria-hidden="true"></span>':($t['notice_type']==='wait'?'<span class="pc-svgicon pc-i-clock" aria-hidden="true"></span>':'<span class="pc-svgicon pc-i-message" aria-hidden="true"></span>')); ?><article class="av-item <?= smgr_h($t['notice_type'] ?? 'info') ?>"><div class="av-ico"><?= $ico ?></div><div><h2>#<?= (int)$t['id'] ?> · <?= smgr_h($t['name']) ?></h2><p><?= smgr_h($t['notice']) ?></p><p class="av-meta"><?= smgr_h($t['location_name'] ?: plugin_schoolmanager_tr('no_location', 'Sin ubicación')) ?> · <?= smgr_h($t['category_name'] ?: plugin_schoolmanager_tr('no_category', 'Sin categoría')) ?></p></div><a class="av-btn primary" href="<?= smgr_h($root) ?>/plugins/schoolmanager/front/solicitud_detalle.php?id=<?= (int)$t['id'] ?>&v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.75"/></svg><span><?= smgr_h(plugin_schoolmanager_tr('view_details', 'Ver detalle')) ?></span></a></article><?php endforeach; ?></section></div></div>
-<style id="v255-avisos-iconos-unificados">
-.av .av-btn .pc-svgicon{width:18px!important;height:18px!important;background:transparent!important;color:currentColor!important;margin:0!important;}
-.av .av-btn.home .pc-svgicon{background:transparent!important;color:#fff!important;}
-</style>
-
-
 <?php Html::footer(); ?>
-
-
-<style id="v254-home-icon-direct">
-.pc-btn-home .pc-home-badge,.av-btn.home .pc-home-badge{display:none!important}
-.pc-btn-home i,.av-btn.home i{display:inline-block!important;color:#fff!important;font-size:18px!important;line-height:1!important;background:transparent!important;border:0!important;box-shadow:none!important}
-.pc-btn-home,.av-btn.home{border-radius:18px!important;background:linear-gradient(135deg,#8f1d1d 0%,#b72e2e 100%)!important;border-color:#922020!important}
-</style>
-
-
-
-
-<style id="v258-iconos-finales">
-/* v258: icon system final - no solid squares */
-.pc-svgicon,.gsm-svgicon{
-  display:inline-block!important;width:20px!important;height:20px!important;min-width:20px!important;
-  background:transparent!important;color:currentColor!important;border:0!important;box-shadow:none!important;
-  -webkit-mask:none!important;mask:none!important;overflow:visible!important;text-indent:0!important;line-height:1!important;
-  flex:0 0 auto!important;position:relative!important;vertical-align:middle!important;
-}
-.pc-svgicon:before,.gsm-svgicon:before{
-  content:""!important;display:block!important;width:100%!important;height:100%!important;
-  background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
-.pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon{
-  background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
-}
-.av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
-.pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before{
-  display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:20px;height:20px;display:block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;}
-</style>
-
-
-
-<style id="v258-avisos-final">
-.av .av-btn{border-radius:18px!important;gap:10px!important;min-height:54px!important;padding:0 24px!important;position:relative!important;overflow:hidden!important;transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,background .22s ease,border-color .22s ease!important;}
-.av .av-btn:before{content:""!important;position:absolute!important;inset:0!important;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,.20) 48%,rgba(255,255,255,.06) 66%,transparent 100%)!important;transform:translateX(-135%)!important;transition:transform .55s ease!important;pointer-events:none!important;}
-.av .av-btn:hover{transform:translateY(-4px)!important;box-shadow:0 26px 46px rgba(8,59,84,.22)!important;}
-.av .av-btn:hover:before{transform:translateX(135%)!important;}
-.av .av-btn.home{background:linear-gradient(135deg,#8b1e1e 0%,#b72c31 100%)!important;border-color:#7c1b1b!important;color:#fff!important;box-shadow:0 18px 38px rgba(139,30,30,.24)!important;}
-.av .av-btn.home:hover{background:linear-gradient(135deg,#a32323 0%,#c23636 100%)!important;box-shadow:0 26px 46px rgba(139,30,30,.30)!important;}
-.av .av-btn.primary{background:linear-gradient(135deg,#07384d 0%,#0b5f7a 100%)!important;border-color:#0a526a!important;color:#fff!important;}
-.av .av-btn span,.av .av-btn svg{position:relative!important;z-index:1!important;}
-</style>
 

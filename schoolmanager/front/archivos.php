@@ -295,7 +295,7 @@ Html::header('Editor de archivos School Manager', $_SERVER['PHP_SELF'], 'tools',
       <p class="pe-sub">Panel seguro para modificar aulas, IDs de GLPI, paleta visual y archivos internos. Ahora también permite crear backups manuales completos o por secciones cuando quieras.</p>
     </div>
     <div class="pe-actions">
-      <a class="pe-btn red" href="<?= pe_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode($pluginVersion) ?>"><?= pe_svg('home') ?><span><?= pe_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
+      <a class="pe-btn red pc-btn-home" href="<?= pe_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode($pluginVersion) ?>"><?= pe_svg('home') ?><span><?= pe_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
       <a class="pe-btn" href="<?= pe_h($root) ?>/plugins/schoolmanager/front/versiones.php?v=<?= urlencode($pluginVersion) ?>"><?= pe_svg('versions') ?><span>Versiones</span></a>
       <a class="pe-btn dark" href="<?= pe_h($root) ?>/plugins/schoolmanager/front/selector.php?building=<?= urlencode(plugin_schoolmanager_default_building_code()) ?>&floor=<?= urlencode(plugin_schoolmanager_default_floor_code(plugin_schoolmanager_default_building_code())) ?>&v=<?= urlencode($pluginVersion) ?>"><?= pe_svg('map') ?><span>Plano</span></a>
     </div>

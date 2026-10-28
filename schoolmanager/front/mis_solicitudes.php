@@ -970,7 +970,7 @@ foreach ($tickets as $t) {
   <section class="pc-hero">
     <div class="pc-brand"><img class="pc-logo" src="<?= pc_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= pc_h($root) ?>/plugins/schoolmanager/logo.svg?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>';"><div><div class="pc-kicker"><?= pc_h(plugin_schoolmanager_tr('plugin_name', 'School Manager')) ?></div><h1><?= pc_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) ?></h1><p><?= pc_h(plugin_schoolmanager_tr('my_requests_desc', 'Consulta el estado, respuestas y resolución de tus incidencias.')) ?></p></div></div>
     <div class="pc-actions">
-      <a class="pc-btn pc-btn-home" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg><span><?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
+      <a class="pc-btn red pc-btn-home" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg><span><?= pc_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
       <a class="pc-btn primary" href="<?= pc_h($root) ?>/plugins/schoolmanager/front/nueva_incidencia.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg><span><?= pc_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) ?></span></a>
       <a class="pc-btn pc-btn-native" href="<?= pc_h($root) ?>/front/ticket.php"><svg class="pc-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span><?= pc_h(plugin_schoolmanager_tr('native_tickets_list', 'Lista nativa GLPI')) ?></span></a>
     </div>
@@ -1022,122 +1022,5 @@ foreach ($tickets as $t) {
 .pc-requests .pc-btn-home .pc-svgicon{background:transparent!important;color:#fff!important;}
 .pc-requests .pc-actions .pc-btn{border-radius:18px!important;}
 </style>
-
-
 <?php Html::footer(); ?>
-
-
-<style id="v254-home-icon-direct">
-.pc-btn-home .pc-home-badge,.av-btn.home .pc-home-badge{display:none!important}
-.pc-btn-home i,.av-btn.home i{display:inline-block!important;color:#fff!important;font-size:18px!important;line-height:1!important;background:transparent!important;border:0!important;box-shadow:none!important}
-.pc-btn-home,.av-btn.home{border-radius:18px!important;background:linear-gradient(135deg,#8f1d1d 0%,#b72e2e 100%)!important;border-color:#922020!important}
-</style>
-
-
-
-
-<style id="v258-iconos-finales">
-/* v258: icon system final - no solid squares */
-.pc-svgicon,.gsm-svgicon{
-  display:inline-block!important;width:20px!important;height:20px!important;min-width:20px!important;
-  background:transparent!important;color:currentColor!important;border:0!important;box-shadow:none!important;
-  -webkit-mask:none!important;mask:none!important;overflow:visible!important;text-indent:0!important;line-height:1!important;
-  flex:0 0 auto!important;position:relative!important;vertical-align:middle!important;
-}
-.pc-svgicon:before,.gsm-svgicon:before{
-  content:""!important;display:block!important;width:100%!important;height:100%!important;
-  background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn .pc-svgicon,.av .av-btn.home .pc-svgicon,.av .av-btn.primary .pc-svgicon,
-.pc-form .pc-btn .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form .pc-btn-cancel .pc-svgicon,.pc-form .pc-btn-back .pc-svgicon,
-.pc-home .pc-action .pc-svgicon,.pc-home .pc-asset-icon .pc-svgicon,.pc-home .pc-ico.pc-svgicon,
-.pc-requests .pc-btn-home .pc-svgicon,.pc-requests .pc-mini .pc-svgicon{
-  background:transparent!important;-webkit-mask:none!important;mask:none!important;color:currentColor!important;
-}
-.av .av-btn .pc-svgicon:before,.av .av-btn.home .pc-svgicon:before,.av .av-btn.primary .pc-svgicon:before,
-.pc-form .pc-btn .pc-svgicon:before,.pc-form #pcOpenSelector .pc-svgicon:before,.pc-form .pc-btn-create .pc-svgicon:before,.pc-form .pc-btn-cancel .pc-svgicon:before,.pc-form .pc-btn-back .pc-svgicon:before,
-.pc-home .pc-action .pc-svgicon:before,.pc-home .pc-asset-icon .pc-svgicon:before,.pc-home .pc-ico.pc-svgicon:before,
-.pc-requests .pc-btn-home .pc-svgicon:before,.pc-requests .pc-mini .pc-svgicon:before{
-  display:block!important;content:""!important;background:currentColor!important;-webkit-mask:var(--pc-icon) center/contain no-repeat!important;mask:var(--pc-icon) center/contain no-repeat!important;
-}
-.av .av-btn.home .pc-svgicon,.pc-form .pc-btn-home .pc-svgicon,.pc-form .pc-btn-create .pc-svgicon,.pc-form #pcOpenSelector .pc-svgicon,.av .av-btn.primary .pc-svgicon,.pc-requests .pc-btn-home .pc-svgicon{color:#fff!important;}
-.pc-btn-svg{width:18px;height:18px;display:inline-block;stroke:currentColor;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:0 0 auto;position:relative;z-index:1;vertical-align:middle;}
-
-/* High-specificity bulletproof button contrast */
-.pc-requests .pc-actions a.pc-btn.pc-btn-home,
-.pc-requests a.pc-btn.pc-btn-home {
-  background: linear-gradient(135deg, #b6252b 0%, #8b1e1e 100%) !important;
-  border: 1px solid #7c1b1b !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(182, 37, 43, 0.28) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.pc-requests .pc-actions a.pc-btn.pc-btn-home:hover,
-.pc-requests a.pc-btn.pc-btn-home:hover {
-  background: linear-gradient(135deg, #cc2c33 0%, #a02222 100%) !important;
-  color: #ffffff !important;
-}
-.pc-requests .pc-actions a.pc-btn.pc-btn-home *,
-.pc-requests a.pc-btn.pc-btn-home * {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
-}
-
-.pc-requests .pc-actions a.pc-btn.primary,
-.pc-requests a.pc-btn.primary {
-  background: linear-gradient(135deg, #07384D 0%, #075D61 100%) !important;
-  border: 1px solid #07384D !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(7, 56, 77, 0.24) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.pc-requests .pc-actions a.pc-btn.primary:hover,
-.pc-requests a.pc-btn.primary:hover {
-  background: linear-gradient(135deg, #094a66 0%, #09757a 100%) !important;
-  color: #ffffff !important;
-}
-.pc-requests .pc-actions a.pc-btn.primary *,
-.pc-requests a.pc-btn.primary * {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
-}
-
-.pc-requests .pc-actions a.pc-btn.pc-btn-native,
-.pc-requests a.pc-btn.pc-btn-native {
-  background: #ffffff !important;
-  border: 1.5px solid #d7e6ec !important;
-  color: #07384D !important;
-  box-shadow: 0 4px 12px rgba(7, 56, 77, 0.06) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.pc-requests .pc-actions a.pc-btn.pc-btn-native:hover,
-.pc-requests a.pc-btn.pc-btn-native:hover {
-  background: #f4fafc !important;
-  border-color: #07384D !important;
-  color: #07384D !important;
-}
-.pc-requests .pc-actions a.pc-btn.pc-btn-native *,
-.pc-requests a.pc-btn.pc-btn-native * {
-  color: #07384D !important;
-  stroke: #07384D !important;
-}
-
-.pc-requests .pc-ticket-actions .pc-mini {
-  background: #ffffff !important;
-  border: 1.5px solid #d7e6ec !important;
-  color: #07384D !important;
-}
-.pc-requests .pc-ticket-actions .pc-mini.primary {
-  background: linear-gradient(135deg, #07384D, #075D61) !important;
-  border-color: #07384D !important;
-  color: #ffffff !important;
-}
-.pc-requests .pc-ticket-actions .pc-mini.primary * {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
-}
-</style>
 
