@@ -77,7 +77,7 @@ function plugin_init_schoolmanager() {
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS['csrf_compliant']['schoolmanager'] = true;
-    $PLUGIN_HOOKS['config_page']['schoolmanager'] = 'front/instalacion.php';
+    $PLUGIN_HOOKS['config_page']['schoolmanager'] = 'front/install.php';
 
     // Redireccion servidor-side: en interfaz simplificada /Helpdesk no siempre carga JS del plugin.
     plugin_schoolmanager_redirect_profesor_home_if_needed();
@@ -133,11 +133,11 @@ function plugin_version_schoolmanager() {
     return [
         'name'           => function_exists('plugin_schoolmanager_app_name') ? plugin_schoolmanager_app_name() : 'School Manager',
         'version'        => PLUGIN_SCHOOLMANAGER_VERSION,
-        'author'         => 'Pablo Burgos y Alejandro Galán',
+        'author'         => 'Pablo Burgos <pabloburgostena@faltax.app>, Alejandro Galán',
         'license'        => PLUGIN_SCHOOLMANAGER_LICENSE,
         'homepage'       => 'https://github.com/pabloburgos/glpi-schoolmanager-plugin',
         'icon'           => 'icon.png',
-        'config_page'    => 'front/instalacion.php',
+        'config_page'    => 'front/install.php',
         'requirements'   => [
             'glpi' => [
                 'min' => '10.0',

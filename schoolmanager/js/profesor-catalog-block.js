@@ -15,7 +15,7 @@
   }
 
   function pluginHome() {
-    return rootDoc() + '/plugins/schoolmanager/front/formularios.php?v=' + VERSION;
+    return rootDoc() + '/plugins/schoolmanager/front/dashboard.php?v=' + VERSION;
   }
 
   function normalize(s) {

@@ -658,12 +658,12 @@ function smgr_stock_item_url($kind, $itemId) {
 
 function smgr_stock_ticket_detail_url($ticketId) {
     global $CFG_GLPI;
-    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/solicitud_detalle.php?id=' . (int)$ticketId . '&v=' . rawurlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '');
+    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/ticket_detail.php?id=' . (int)$ticketId . '&v=' . rawurlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '');
 }
 
 function smgr_stock_technician_summary_url($userId) {
     global $CFG_GLPI;
-    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/tecnico_resumen.php?id=' . (int)$userId . '&v=' . rawurlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '');
+    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/technician_summary.php?id=' . (int)$userId . '&v=' . rawurlencode(defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '');
 }
 
 function smgr_stock_user_display_name($userId) {

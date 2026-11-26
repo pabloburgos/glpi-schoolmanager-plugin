@@ -15,7 +15,7 @@ if (!function_exists('plugin_schoolmanager_home_button')) {
         }
         global $CFG_GLPI;
         $root = $CFG_GLPI['root_doc'] ?? '';
-        $href = htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time()), ENT_QUOTES, 'UTF-8');
+        $href = htmlspecialchars($root . '/plugins/schoolmanager/front/dashboard.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time()), ENT_QUOTES, 'UTF-8');
         $label = htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8');
         $themeScript = plugin_schoolmanager_theme_attr_script();
         return $themeScript . '<style id="sm-home-toolbar-v2">

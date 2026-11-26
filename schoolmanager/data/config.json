@@ -1,7 +1,7 @@
 {
-  "schema": 5,
+  "schema": 6,
   "setup_complete": false,
-  "locale": "es_ES",
+  "locale": "auto",
   "brand": {
     "title_es": "School Manager",
     "title_en": "School Manager",
@@ -11,18 +11,18 @@
     "menu_title": "School Manager",
     "menu_title_es": "School Manager",
     "menu_title_en": "School Manager",
-    "organization": "Educational center"
+    "organization": "Centro educativo"
   },
   "theme": {
     "palette": "teal-red",
-    "primary": "#07384D",
-    "secondary": "#075D61",
-    "accent": "#B6252B",
+    "primary": "#0F2951",
+    "secondary": "#088E91",
+    "accent": "#F0B010",
     "soft": "#F4FAFC",
-    "background": "#EEF6F9",
+    "background": "#F8FAFC",
     "card": "#FFFFFF",
-    "text": "#07384D",
-    "muted": "#5F7180",
+    "text": "#0F2951",
+    "muted": "#64748B",
     "border": "#D7E6EC",
     "dark": false
   },

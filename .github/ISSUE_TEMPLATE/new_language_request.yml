@@ -7,7 +7,7 @@ body:
     id: language_name
     attributes:
       label: Language Name
-      placeholder: "Example: Portuguese, Catalan, Dutch"
+      placeholder: "Example: Catalan, Basque, Galician"
     validations:
       required: true
 
@@ -15,7 +15,7 @@ body:
     id: locale_code
     attributes:
       label: Locale Code
-      placeholder: "Example: pt_PT, ca_ES, nl_NL"
+      placeholder: "Example: ca_ES, eu_ES, gl_ES"
     validations:
       required: true
 
@@ -34,4 +34,4 @@ body:
       label: Verification
       options:
         - label: "I tested this translation in GLPI School Manager"
-        - label: "All 183 keys from template.php are preserved"
+        - label: "All 495 keys from template.php are preserved"

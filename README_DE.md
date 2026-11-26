@@ -5,7 +5,7 @@
 <h1 align="center">School Manager für GLPI</h1>
 
 <p align="center">
-  GLPI-Plugin für Schulen und Bildungseinrichtungen: geführtes Ticket-System, IT-Lagerbestand, Raumpläne, vereinfachtes Asset-Management und Techniker-Workflows.
+  GLPI-Plugin für Schulen und Bildungseinrichtungen: geführtes Ticket-System, geführte Geräteerfassung, IT-Lagerbestand, interaktive Raumpläne und mobile Techniker-Workflows.
 </p>
 
 <p align="center">
@@ -14,6 +14,7 @@
   <a href="README_FR.md">Français</a> ·
   <b>Deutsch</b> ·
   <a href="README_IT.md">Italiano</a> ·
+  <a href="README_PT.md">Português</a> ·
   <a href="#uebersicht">Übersicht</a> ·
   <a href="#sprachen">Sprachen</a> ·
   <a href="#voraussetzungen">Voraussetzungen</a> ·
@@ -42,24 +43,24 @@
 
 ## Übersicht
 
-School Manager ergänzt GLPI um eine schlanke, zielgruppengerechte Oberfläche für Schulen, Kollegien und Bildungsträger. GLPI dient weiterhin als stabiles Fundament für ITSM und Inventarisierung, während School Manager Lehrkräften, IT-Beauftragten und Technikern benutzerfreundliche Werkzeuge bereitstellt.
+School Manager ergänzt GLPI um eine schlanke, für Desktop und Mobilgeräte optimierte Oberfläche für Schulen, Kollegien und Bildungsträger. GLPI dient weiterhin als stabiles Fundament für ITSM und Inventarisierung, während School Manager Lehrkräften, IT-Beauftragten und Technikern klare Abläufe bereitstellt.
 
 ## Hauptfunktionen
 
 | Bereich | Beschreibung |
 |---|---|
-| Geführte Störungsmeldung | Schritt-für-Schritt-Ticket-Erstellung für Lehrkräfte mit Auswahl von Kategorie, Raum, Dringlichkeit und betroffener Hardware. |
-| IT-Dashboard | Zentrale Arbeitsumgebung für IT-Verantwortliche zur Bearbeitung, Zuweisung und Dokumentation von Anfragen. |
-| Lagerbestand & Verbrauchsmaterial | Verwaltung von Tonern, Kabeln, Ersatzteilen, Warnungen bei Mindestbeständen und direkte Buchung auf Tickets. |
-| Räume & interaktive Pläne | Gebäude, Stockwerke, Klassenzimmer, interaktive Raumpläne und automatische Verknüpfung mit GLPI-Standorten. |
-| Asset-Verwaltung | Übersichtliche Verwaltung von Computern, Bildschirmen, Beamern, Peripheriegeräten und Netzwerktechnik. |
-| Einstellungs-Center | Verwaltung von Branding, Logo, aktiven Modulen, Sprachen und Gebäudestrukturen direkt in GLPI. |
+| Geführte Störungsmeldung (`new_ticket.php`) | Schritt-für-Schritt-Ticket-Erstellung mit mobiler Schritt-Kapsel, Kategorie-, Raum-, Dringlichkeits- und Hardware-Auswahl. |
+| Geführte Asset-Erfassung (`new_asset.php`) | Sofortiger Wechsel zwischen Gerätetypen (Computer, Monitor, Drucker, Netzwerk, Peripherie) mit mobilem Fortschrittsbalken. |
+| IT-Dashboard (`it_panel.php`) | Zentrale Arbeitsumgebung für IT-Verantwortliche zur Bearbeitung, automatischen Zuweisung und Dokumentation von Anfragen. |
+| Lagerbestand & Verbrauchsmaterial (`stock.php`) | Verwaltung von Tonern, Kabeln, Ersatzteilen, Warnungen bei Mindestbeständen und direkte Buchung auf Tickets. |
+| Räume & Pläne (`classrooms.php`, `selector.php`) | Gebäude, Stockwerke, Räume, interaktive Pläne aus `diagrams.net` (`draw.io`) sowie umschaltbarer **Nur-Listen-Modus** ohne Pläne. |
+| Aktivierung & Einstellungen (`install.php`, `settings.php`) | Eigener Installations-/Update-Assistent und zentrales Einstellungs-Center (Logo, Navy-&-Teal-Design, Module, Sprachen und Struktur). |
 
 <a id="sprachen"></a>
 
 ## Sprachen & Internationalisierung (i18n)
 
-GLPI School Manager bietet vollständige native Mehrsprachigkeit mit **Englisch (`en_GB`)** als primärer Basissprache und Vorlagen-Standard:
+GLPI School Manager bietet **6 offizielle integrierte Sprachen** (100 % Abdeckung über 495 Schlüssel) mit **Englisch (`en_GB`)** als primärer Basissprache:
 
 | Sprache | Code | Status | Abdeckung |
 |---|---|---|---|
@@ -68,14 +69,15 @@ GLPI School Manager bietet vollständige native Mehrsprachigkeit mit **Englisch 
 | 🇫🇷 **Français** | `fr_FR` | Nativ | 100% |
 | 🇩🇪 **Deutsch** | `de_DE` | Nativ | 100% |
 | 🇮🇹 **Italiano** | `it_IT` | Nativ | 100% |
+| 🇵🇹 **Português** | `pt_PT` | Nativ | 100% |
 
 ### Integriertes Sprachen-Center & visueller Editor in GLPI
 
 Kein Programmieren oder Terminalzugriff erforderlich! Unter **GLPI > Werkzeuge > School Manager > Einstellungen > 🌐 Sprachen**:
 - **Automatische Spracherkennung**: Erkennt die Sprache der aktuellen GLPI-Benutzersitzung und schaltet nahtlos um (mit sicherem Fallback auf Englisch).
 - **Visueller In-Browser-Editor**: Texte und Bezeichnungen direkt im Browser bearbeiten, mit Echtzeit-Suche filtern und sofort speichern.
-- **Offizielle Vorlage herunterladen (`template.php`)**: Enthält alle 183 Schlüssel auf Englisch mit optimiertem Prompt für die Übersetzung mittels KI (ChatGPT, Claude, Gemini).
-- **Eigene Sprachdateien hochladen**: Laden Sie angepasste `.php`- oder `.json`-Dateien hoch (z.B. `pt_PT`, `ca_ES`, `nl_NL`). Das Plugin bindet neue Sprachen automatisch in die Auswahlliste ein.
+- **Offizielle Vorlage herunterladen (`template.php`)**: Enthält alle 495 Schlüssel auf Englisch mit optimiertem Prompt für die Übersetzung mittels KI (ChatGPT, Claude, Gemini).
+- **Eigene Sprachdateien hochladen**: Laden Sie angepasste `.php`- oder `.json`-Dateien hoch (z. B. `ca_ES`, `pt_BR`). Das Plugin bindet neue Sprachen automatisch in die Auswahlliste ein.
 
 <a id="voraussetzungen"></a>
 
@@ -154,6 +156,8 @@ Laden Sie Ihren Browser mit `Strg + F5` neu.
 | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Installations- und Updateanleitung. |
 | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Konfigurationshandbuch. |
 | [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) | Kompatibilitätshinweise (GLPI, PHP). |
+| [docs/PAGES.md](docs/PAGES.md) | Wichtigste PHP-Seiten. |
+| [docs/STRUCTURE.md](docs/STRUCTURE.md) | Repository-Struktur. |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Leitfaden für Mitwirkende und Übersetzungen. |
 | [SECURITY.md](SECURITY.md) | Sicherheitsrichtlinie. |
 | [CREDITS.md](CREDITS.md) | Autoren und Danksagung. |

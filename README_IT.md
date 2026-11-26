@@ -5,7 +5,7 @@
 <h1 align="center">School Manager per GLPI</h1>
 
 <p align="center">
-  Plugin GLPI per istituti scolastici ed educativi: creazione guidata ticket, gestione magazzino IT, planimetrie aule, inventario semplificato e gestione tecnica.
+  Plugin GLPI per istituti scolastici ed educativi: creazione guidata ticket e risorse, magazzino IT, planimetrie interattive e gestione ottimizzata anche su mobile.
 </p>
 
 <p align="center">
@@ -14,6 +14,7 @@
   <a href="README_FR.md">Français</a> ·
   <a href="README_DE.md">Deutsch</a> ·
   <b>Italiano</b> ·
+  <a href="README_PT.md">Português</a> ·
   <a href="#panoramica">Panoramica</a> ·
   <a href="#lingue">Lingue</a> ·
   <a href="#requisiti">Requisiti</a> ·
@@ -42,24 +43,24 @@
 
 ## Panoramica
 
-School Manager arricchisce GLPI con un'interfaccia intuitiva e specifica per scuole, istituti comprensivi, licei e accademie. GLPI rimane la piattaforma centrale di ITSM e inventario, mentre School Manager offre pagine chiare ed essenziali per docenti, tecnici IT e animatori digitali.
+School Manager arricchisce GLPI con un'interfaccia chiara e responsive per scuole, istituti comprensivi, licei e accademie. GLPI rimane la piattaforma centrale di ITSM e inventario, mentre School Manager offre flussi essenziali su desktop e smartphone per docenti, tecnici IT e amministratori.
 
 ## Funzionalità principali
 
 | Area | Descrizione |
 |---|---|
-| Creazione guidata ticket | Segnalazione guasti passo-passo per docenti e personale con selezione di categoria, aula, urgenza e dispositivo interessato. |
-| Dashboard IT | Area di lavoro per tecnici e personale IT per presa in carico, gestione e risoluzione degli interventi. |
-| Gestione magazzino | Materiali di consumo, toner/cartucce, movimenti di carico/scarico, soglie minime e pezzi associati ai ticket. |
-| Aule e planimetrie | Edifici, piani, aule, mappe interattive e collegamento nativo con le ubicazioni GLPI. |
-| Gestione dispositivi | Schermate semplificate per PC, monitor, proiettori, periferiche e apparati di rete. |
-| Pannello impostazioni | Personalizzazione di logo, moduli attivi, lingue e struttura dell'istituto direttamente in GLPI. |
+| Creazione guidata ticket (`new_ticket.php`) | Segnalazione guasti passo-passo con stepper mobile compatto, selezione di categoria, aula, urgenza e dispositivo interessato. |
+| Creazione guidata risorse (`new_asset.php`) | Cambio istantaneo tra tipi di dispositivo (PC, monitor, stampanti, rete, periferiche) e barra di avanzamento mobile. |
+| Dashboard IT (`it_panel.php`) | Area di lavoro per tecnici e personale IT per presa in carico, assegnazione automatica e risoluzione degli interventi. |
+| Gestione magazzino (`stock.php`) | Materiali di consumo, cartucce, movimenti di carico/scarico, soglie minime e pezzi associati ai ticket. |
+| Aule e planimetrie (`classrooms.php`, `selector.php`) | Edifici, piani, aule, mappe interattive `diagrams.net` (`draw.io`) e **modalità Solo Elenco** attivabile senza planimetrie. |
+| Attivazione e impostazioni (`install.php`, `settings.php`) | Procedura iniziale per installazione/aggiornamento e pannello unificato (logo, stile Navy & Teal, moduli, lingue e struttura). |
 
 <a id="lingue"></a>
 
 ## Lingue e Internazionalizzazione (i18n)
 
-GLPI School Manager supporta nativamente più lingue, con **l'inglese (`en_GB`)** come lingua base di riferimento e modello predefinito:
+GLPI School Manager integra **6 lingue ufficiali native** (copertura al 100% su 495 chiavi), con **l'inglese (`en_GB`)** come lingua base di riferimento:
 
 | Lingua | Codice | Stato | Copertura |
 |---|---|---|---|
@@ -68,14 +69,15 @@ GLPI School Manager supporta nativamente più lingue, con **l'inglese (`en_GB`)*
 | 🇫🇷 **Français** | `fr_FR` | Nativo | 100% |
 | 🇩🇪 **Deutsch** | `de_DE` | Nativo | 100% |
 | 🇮🇹 **Italiano** | `it_IT` | Nativo | 100% |
+| 🇵🇹 **Português** | `pt_PT` | Nativo | 100% |
 
 ### Centro Lingue ed Editor Visuale Integrato in GLPI
 
 Nessun bisogno di modificare codice o accedere al terminale! Da **GLPI > Strumenti > School Manager > Impostazioni > 🌐 Lingue**:
 - **Rilevamento automatico**: Si adatta alla lingua della sessione GLPI corrente, con fallback trasparente all'inglese.
-- **Editor visuale nel browser**: Modifica qualsiasi stringa o etichetta direttamente a schermo con ricerca in tempo reale e salvataggio istantaneo.
-- **Download modello ufficiale (`template.php`)**: Scarica il modello in inglese con tutte le 183 chiavi e un prompt pronto per la traduzione con IA (ChatGPT, Claude, Gemini).
-- **Caricamento pacchetti personalizzati**: Carica file `.php` o `.json` personalizzati (es. `pt_PT`, `ca_ES`, `nl_NL`). Il plugin li rileva e li rende subito disponibili nel menu a tendina.
+- **Editor visuale nel browser**: Modifica qualsiasi stringa direttamente a schermo con ricerca in tempo reale e salvataggio istantaneo.
+- **Download modello ufficiale (`template.php`)**: Scarica il modello in inglese con tutte le 495 chiavi e un prompt pronto per la traduzione con IA (ChatGPT, Claude, Gemini).
+- **Caricamento pacchetti personalizzati**: Carica file `.php` o `.json` personalizzati (es. `ca_ES`, `pt_BR`). Il plugin li rileva e li rende subito disponibili.
 
 <a id="requisiti"></a>
 
@@ -154,6 +156,8 @@ Ricarica il browser con `Ctrl + F5`.
 | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Guida all'installazione e all'aggiornamento. |
 | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Guida alle impostazioni del plugin. |
 | [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) | Note di compatibilità GLPI e PHP. |
+| [docs/PAGES.md](docs/PAGES.md) | Pagine PHP principali. |
+| [docs/STRUCTURE.md](docs/STRUCTURE.md) | Struttura del repository. |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Linee guida per contributi e traduzioni. |
 | [SECURITY.md](SECURITY.md) | Policy di sicurezza. |
 | [CREDITS.md](CREDITS.md) | Autori e ringraziamenti. |

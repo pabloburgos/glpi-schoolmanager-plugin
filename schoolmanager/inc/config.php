@@ -43,6 +43,9 @@ function plugin_schoolmanager_normalize_config(array $cfg): array {
         $cfg['credits']['license_url'] = 'https://www.gnu.org/licenses/gpl-3.0.html';
     }
     $cfg['credits']['show_footer_credit'] = !empty($cfg['credits']['show_footer_credit']);
+    if (isset($cfg['brand']['organization']) && trim((string)$cfg['brand']['organization']) === 'Educational center') {
+        $cfg['brand']['organization'] = 'Centro educativo';
+    }
     return $cfg;
 }
 
@@ -89,7 +92,7 @@ function plugin_schoolmanager_default_config(): array {
             // Backward compatible keys kept for older saved configurations.
             'title_es' => 'School Manager',
             'title_en' => 'School Manager',
-            'organization' => 'Educational center',
+            'organization' => 'Centro educativo',
             'logo' => 'logo.png',
             'show_logo' => true,
         ],
@@ -165,7 +168,10 @@ function plugin_schoolmanager_create_glpi_location(string $name, int $parent_id 
     global $DB;
     try {
         if (isset($DB) && method_exists($DB, 'request')) {
-            $where = ['name' => $name, 'is_deleted' => 0];
+            $where = ['name' => $name];
+            if (method_exists($DB, 'fieldExists') && $DB->fieldExists('glpi_locations', 'is_deleted')) {
+                $where['is_deleted'] = 0;
+            }
             if ($parent_id > 0) { $where['locations_id'] = $parent_id; }
             $it = $DB->request(['FROM' => 'glpi_locations', 'WHERE' => $where, 'LIMIT' => 1]);
             foreach ($it as $row) { return (int)$row['id']; }
@@ -215,14 +221,14 @@ function plugin_schoolmanager_is_configured(): bool {
 
 function plugin_schoolmanager_setup_url(): string {
     global $CFG_GLPI;
-    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/instalacion.php';
+    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/install.php';
 }
 
 function plugin_schoolmanager_require_initial_setup(): void {
     if (plugin_schoolmanager_is_configured()) { return; }
     if (!class_exists('Session') || !Session::getLoginUserID()) { return; }
     $uri = $_SERVER['REQUEST_URI'] ?? '';
-    if (strpos($uri, '/plugins/schoolmanager/front/instalacion.php') !== false || strpos($uri, '/plugins/schoolmanager/front/configuracion.php') !== false || strpos($uri, '/plugins/schoolmanager/front/media.php') !== false || strpos($uri, '/plugins/schoolmanager/front/i18n.php') !== false) { return; }
+    if (strpos($uri, '/plugins/schoolmanager/front/install.php') !== false || strpos($uri, '/plugins/schoolmanager/front/settings.php') !== false || strpos($uri, '/plugins/schoolmanager/front/media.php') !== false || strpos($uri, '/plugins/schoolmanager/front/i18n.php') !== false) { return; }
     if (function_exists('smgr_is_super_admin_user') && smgr_is_super_admin_user()) {
         Html::redirect(plugin_schoolmanager_setup_url());
     }
@@ -273,7 +279,7 @@ return " . var_export($cfg, true) . ";
 }
 
 function plugin_schoolmanager_builtin_locales(): array {
-    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT', 'pt_PT', 'nl_NL', 'pl_PL', 'tr_TR', 'zh_CN'];
+    return ['en_GB', 'es_ES', 'fr_FR', 'de_DE', 'it_IT', 'pt_PT'];
 }
 
 function plugin_schoolmanager_available_locales(bool $includeDetails = false): array {
@@ -286,13 +292,9 @@ function plugin_schoolmanager_available_locales(bool $includeDetails = false): a
         'de_DE' => 'Deutsch',
         'it_IT' => 'Italiano',
         'pt_PT' => 'Português',
-        'nl_NL' => 'Nederlands',
-        'pl_PL' => 'Polski',
-        'tr_TR' => 'Türkçe',
-        'zh_CN' => '简体中文',
         'en_US' => 'English (US)',
         'pt_BR' => 'Português (Brasil)',
-        'ru_RU' => 'Русский',
+        'ca_ES' => 'Català',
     ];
 
     $found = [];
@@ -428,7 +430,11 @@ function plugin_schoolmanager_tr(string $key, ?string $fallback = null): string 
         return $current[$key];
     }
 
-    if ($locale !== 'en_GB') {
+    if (str_starts_with($locale, 'es') && $fallback !== null && $fallback !== '') {
+        return $fallback;
+    }
+
+    if ($locale !== 'en_GB' && !str_starts_with($locale, 'es')) {
         $en = $load('en_GB');
         if (isset($en[$key]) && is_string($en[$key]) && $en[$key] !== '') {
             return $en[$key];
@@ -600,6 +606,31 @@ function plugin_schoolmanager_floor(string $buildingCode, string $floorCode): ?a
 function plugin_schoolmanager_default_building_code(): string { $b = plugin_schoolmanager_buildings(); return strtoupper((string)($b[0]['code'] ?? 'MAIN')); }
 function plugin_schoolmanager_default_floor_code(string $buildingCode): string { $f = plugin_schoolmanager_floors($buildingCode); return strtoupper((string)($f[0]['code'] ?? 'G')); }
 
+function plugin_schoolmanager_building_labels(): array {
+    $out = [];
+    foreach (plugin_schoolmanager_buildings() as $b) {
+        $bc = strtoupper((string)($b['code'] ?? ''));
+        if ($bc === '') { continue; }
+        $out[$bc] = plugin_schoolmanager_label($b, 'name', $bc);
+    }
+    return $out;
+}
+
+function plugin_schoolmanager_floors_by_building(): array {
+    $out = [];
+    foreach (plugin_schoolmanager_buildings() as $b) {
+        $bc = strtoupper((string)($b['code'] ?? ''));
+        if ($bc === '') { continue; }
+        $out[$bc] = [];
+        foreach (plugin_schoolmanager_floors($bc) as $f) {
+            $fc = strtoupper((string)($f['code'] ?? ''));
+            if ($fc === '') { continue; }
+            $out[$bc][$fc] = [(string)($f['number'] ?? $fc), plugin_schoolmanager_label($f, 'label', $fc)];
+        }
+    }
+    return $out;
+}
+
 function plugin_schoolmanager_room_rows(): array {
     $cfg = plugin_schoolmanager_config();
     $ids = [];
@@ -611,23 +642,41 @@ function plugin_schoolmanager_room_rows(): array {
         foreach (($b['floors'] ?? []) as $f) { $floorsByBuilding[strtoupper($b['code'])][strtoupper($f['code'])] = $rank++; }
     }
     $rows = [];
-    foreach (($cfg['rooms'] ?? []) as $r) {
+    $updatedCfg = false;
+    foreach (($cfg['rooms'] ?? []) as $idx => $r) {
         $building = strtoupper((string)($r['building'] ?? ''));
         $floor = strtoupper((string)($r['floor'] ?? ''));
-        $code = (string)($r['code'] ?? ($building . '-' . ($r['room'] ?? '')));
+        $aula = (string)($r['room'] ?? $r['aula'] ?? '');
+        $code = (string)($r['code'] ?? ($building . '-' . $aula));
         $floorMeta = plugin_schoolmanager_floor($building, $floor) ?: [];
+        $desc = plugin_schoolmanager_label($r, 'name', (string)($r['description'] ?? ''));
+        $locId = isset($r['glpi_location_id']) && (int)$r['glpi_location_id'] > 0
+            ? (int)$r['glpi_location_id']
+            : (isset($ids[$code]) && (int)$ids[$code] > 0 ? (int)$ids[$code] : 0);
+        if ($locId <= 0 && function_exists('plugin_schoolmanager_create_glpi_location')) {
+            $locName = $aula !== '' ? ($code . ' - ' . ($desc !== '' ? $desc : ('Aula ' . $aula))) : $code;
+            $createdId = plugin_schoolmanager_create_glpi_location($locName, 0);
+            if ($createdId > 0) {
+                $locId = $createdId;
+                $cfg['rooms'][$idx]['glpi_location_id'] = $locId;
+                $updatedCfg = true;
+            }
+        }
         $rows[] = [
             'building' => $building,
-            'aula' => (string)($r['room'] ?? $r['aula'] ?? ''),
+            'aula' => $aula,
             'codigo' => $code,
             'planta' => plugin_schoolmanager_label($floorMeta, 'label', $floor),
             'floor' => $floor,
-            'descripcion' => plugin_schoolmanager_label($r, 'name', (string)($r['description'] ?? '')),
-            'id' => isset($r['glpi_location_id']) && $r['glpi_location_id'] !== null ? (int)$r['glpi_location_id'] : ($ids[$code] ?? null),
+            'descripcion' => $desc,
+            'id' => $locId > 0 ? $locId : ($idx + 1),
             'is_numbered' => true,
             'is_top_special' => false,
             'sort_floor' => $floorsByBuilding[$building][$floor] ?? 99,
         ];
+    }
+    if ($updatedCfg) {
+        @plugin_schoolmanager_save_config($cfg);
     }
     usort($rows, static function($a, $b) {
         if ($a['building'] !== $b['building']) { return strcmp($a['building'], $b['building']); }
@@ -682,11 +731,13 @@ function plugin_schoolmanager_css_hex(string $value, string $fallback): string {
 
 function plugin_schoolmanager_theme_presets(): array {
     return [
-        'teal-red' => ['name'=>'Modern Teal (Signature)','primary'=>'#07384D','secondary'=>'#075D61','accent'=>'#B6252B','soft'=>'#F4FAFC','background'=>'#EEF6F9','card'=>'#FFFFFF','text'=>'#07384D','muted'=>'#5F7180','border'=>'#D7E6EC','dark'=>false],
-        'ocean'    => ['name'=>'Nordic Blue (Ocean)','primary'=>'#0B3A66','secondary'=>'#0E7490','accent'=>'#2563EB','soft'=>'#F3F8FF','background'=>'#EAF4FF','card'=>'#FFFFFF','text'=>'#082F49','muted'=>'#54708A','border'=>'#CFE2F3','dark'=>false],
-        'forest'   => ['name'=>'Campus Emerald (Forest)','primary'=>'#12372A','secondary'=>'#15803D','accent'=>'#D97706','soft'=>'#F4FAF6','background'=>'#EDF8F0','card'=>'#FFFFFF','text'=>'#12372A','muted'=>'#617568','border'=>'#CFE7D6','dark'=>false],
-        'graphite' => ['name'=>'Graphite Dark (High Contrast)','primary'=>'#38BDF8','secondary'=>'#0284C7','accent'=>'#FB7185','soft'=>'#1E293B','background'=>'#0B1120','card'=>'#111827','text'=>'#F1F5F9','muted'=>'#94A3B8','border'=>'#334155','dark'=>true],
-        'custom'   => ['name'=>'Custom','primary'=>'#07384D','secondary'=>'#075D61','accent'=>'#B6252B','soft'=>'#F4FAFC','background'=>'#EEF6F9','card'=>'#FFFFFF','text'=>'#07384D','muted'=>'#5F7180','border'=>'#D7E6EC','dark'=>false],
+        'teal-red' => ['name'=>'Signature Logo (Navy & Teal)','primary'=>'#0F2951','secondary'=>'#088E91','accent'=>'#F0B010','soft'=>'#F4FAFC','background'=>'#F8FAFC','card'=>'#FFFFFF','text'=>'#0F2951','muted'=>'#64748B','border'=>'#D7E6EC','dark'=>false],
+        'ocean'    => ['name'=>'Nordic Blue (Ocean Ice Glass)','primary'=>'#0B3A66','secondary'=>'#0284C7','accent'=>'#38BDF8','soft'=>'#F0F9FF','background'=>'#E0F2FE','card'=>'#FFFFFF','text'=>'#0C4A6E','muted'=>'#0369A1','border'=>'#BAE6FD','dark'=>false],
+        'forest'   => ['name'=>'Campus Emerald (Botanical Glass)','primary'=>'#064E3B','secondary'=>'#059669','accent'=>'#10B981','soft'=>'#F0FDF4','background'=>'#DCFCE7','card'=>'#FFFFFF','text'=>'#064E3B','muted'=>'#047857','border'=>'#A7F3D0','dark'=>false],
+        'sunset'   => ['name'=>'Warm Sunset (Amber & Coral)','primary'=>'#7C2D12','secondary'=>'#EA580C','accent'=>'#F59E0B','soft'=>'#FFF7ED','background'=>'#FFEDD5','card'=>'#FFFFFF','text'=>'#431407','muted'=>'#9A3412','border'=>'#FED7AA','dark'=>false],
+        'graphite' => ['name'=>'Graphite Dark (Cyber Glass)','primary'=>'#38BDF8','secondary'=>'#0284C7','accent'=>'#818CF8','soft'=>'#1E293B','background'=>'#0B1120','card'=>'#111827','text'=>'#F1F5F9','muted'=>'#94A3B8','border'=>'#334155','dark'=>true],
+        'midnight' => ['name'=>'Deep Cyber Midnight','primary'=>'#8B5CF6','secondary'=>'#6366F1','accent'=>'#EC4899','soft'=>'#0F172A','background'=>'#030712','card'=>'#090D16','text'=>'#F8FAFC','muted'=>'#A1A1AA','border'=>'#1F2937','dark'=>true],
+        'custom'   => ['name'=>'Personalizado','primary'=>'#0F2951','secondary'=>'#088E91','accent'=>'#F0B010','soft'=>'#F4FAFC','background'=>'#F8FAFC','card'=>'#FFFFFF','text'=>'#0F2951','muted'=>'#64748B','border'=>'#D7E6EC','dark'=>false],
     ];
 }
 
@@ -694,20 +745,14 @@ function plugin_schoolmanager_theme_values(?array $cfg = null): array {
     $cfg = $cfg ?: plugin_schoolmanager_config();
     $theme = $cfg['theme'] ?? [];
     $presets = plugin_schoolmanager_theme_presets();
-    $palette = (string)($theme['palette'] ?? 'teal-red');
-    if (!isset($presets[$palette])) { $palette = 'teal-red'; }
+    // Themes are currently in development; lock to official Signature Logo palette (teal-red)
+    $palette = 'teal-red';
     $p = $presets[$palette];
-    if ($palette === 'custom') {
-        foreach (['primary','secondary','accent','soft','background','card','text','muted','border'] as $key) {
-            $p[$key] = plugin_schoolmanager_css_hex((string)($theme[$key] ?? ''), (string)$p[$key]);
-        }
-        $p['dark'] = !empty($theme['dark']);
-    }
-    $radius = preg_match('/^[0-9.]+(px|rem|em|%)$/', (string)($theme['radius'] ?? '18px')) ? (string)$theme['radius'] : '18px';
+    $radius = '16px';
     $density = (string)($theme['density'] ?? 'comfortable');
-    $pad = $density === 'compact' ? '12px' : ($density === 'large' ? '24px' : '18px');
-    $gap = $density === 'compact' ? '12px' : ($density === 'large' ? '26px' : '18px');
-    $font = $density === 'compact' ? '14px' : ($density === 'large' ? '17px' : '15px');
+    $pad = $density === 'compact' ? '14px' : ($density === 'large' ? '24px' : '20px');
+    $gap = $density === 'compact' ? '12px' : ($density === 'large' ? '24px' : '18px');
+    $font = $density === 'compact' ? '14px' : ($density === 'large' ? '16px' : '15px');
     return [
         'palette'=>$palette,'name'=>(string)$p['name'],'primary'=>(string)$p['primary'],'secondary'=>(string)$p['secondary'],'accent'=>(string)$p['accent'],
         'soft'=>(string)$p['soft'],'background'=>(string)$p['background'],'card'=>(string)$p['card'],'text'=>(string)$p['text'],'muted'=>(string)$p['muted'],'border'=>(string)$p['border'],
@@ -718,34 +763,58 @@ function plugin_schoolmanager_theme_values(?array $cfg = null): array {
 function plugin_schoolmanager_write_theme_css(?array $cfg = null): void {
     $v = plugin_schoolmanager_theme_values($cfg);
     $dark = $v['dark'] ? '1' : '0';
-    $c = '.schoolmanager-configured,.sm-home,.smset,.pc-wrap,.pc-page,.pcd-page,.pcd-wrap,.pcd,.pcda,.pcda-shell,.pc-main,.pc-stock-page,.stp-wrap,.stp,.sid-wrap,.sid,.gsm-wrap,.gsm,.gsm-assets,.gsm-edit,.ticdesk,.al-wrap,.av,.av-wrap,.smdoc,.smdoc-wrap,.smv-wrap,.pe-wrap,.pc-editor,.ad-wrap,.da-wrap,.tr-wrap,.tr,.pcas,.pcas-wrap,.pc-form,.pc-requests,.pc-selector,.schoolmanager-credits,.pc-disabled';
+    $c = '.schoolmanager-configured,.sm-page-shell,.sm-home,.smset,.pc-wrap,.pc-page,.pcd-page,.pcd-wrap,.pcd,.pcda,.pcda-shell,.pc-main,.pc-stock-page,.stp-wrap,.stp,.sid-wrap,.sid,.gsm-wrap,.gsm,.gsm-assets,.gsm-edit,.ticdesk,.al-wrap,.av,.av-wrap,.smdoc,.smdoc-wrap,.smv-wrap,.pe-wrap,.pc-editor,.ad-wrap,.da-wrap,.tr-wrap,.tr,.pcas,.pcas-wrap,.pc-form,.pc-requests,.pc-selector,.schoolmanager-credits,.pc-disabled';
     $cards = '.pc-head,.gsm-hero,.sm-hero,.smdoc-hero,.stp-head,.sid-hero,.pcd-hero,.pcas-hero,.tr-hero,.pc-card,.sm-card,.gsm-card,.al-tablebox,.pcd-card,.av-card,.av-item,.tic-card,.stock-card,.da-card,.ad-card,.sid-card,.stp-side-card,.pc-request-card,.pc-detail-card,.pe-card,.gsm-panel,.tr-card,.tr-metric,.pcas-card,.pcas-box,.box,.al-card,.pc-section,.pc-category-block,.pc-child-box,.pc-empty-subcat,.pc-ticket,.tr-item';
-    $btnPrimary = '.pc-btn.primary,.gsm-btn.primary,.sm-btn.primary,.sm-btn:not(.light):not(.red):not(.secondary):not(.home),.tic-btn.primary,.sid-btn.primary,.stp-btn.primary,.av-btn.primary,.al-btn.primary,.pcd-btn.primary,.pe-btn.dark,.pcda-btn.primary,.pc-btn-create,.al-open,.tr-btn.primary,.pc-type.active';
-    $btnSecondary = '.sm-btn.light,.pc-btn.secondary,.gsm-btn.soft,.stp-btn.ghost,.av-btn:not(.primary):not(.home):not(.red),.al-btn:not(.primary):not(.al-home),.pe-btn:not(.dark):not(.red):not(.gold),.pcd-btn:not(.primary),.sid-btn:not(.primary):not(.red),.stp-btn:not(.primary):not(.danger):not(.red),.tr-btn:not(.primary),.pcda-btn:not(.primary),.pc-btn:not(.primary):not(.secondary):not(.home):not(.pc-btn-home):not(.pc-btn-cancel):not(.pc-btn-create):not(.gold)';
-    $btnHome = '.pc-header-home,.smgr-autohome,.pc-btn-home,.av-btn.home,.sm-tab.active,.al-tab.active,.al-home,.smn-action-home,.smc-btn.home,.sid-btn.red,.stp-btn.red,.pe-btn.red';
-    $btnDanger = '.sm-btn.red,.sid-btn.red,.stp-btn.danger,.stp-btn.red,.pe-btn.red,.sid-mini.out,.pc-btn-cancel,.pc-btn.red';
+    $btnPrimary = '.sm-btn-primary,.pc-btn-primary,.pc-btn.primary,.gsm-btn.primary,.sm-btn.primary,.tic-btn.primary,.sid-btn.primary,.stp-btn.primary,.av-btn.primary,.al-btn.primary,.pcd-btn.primary,.pe-btn.dark,.pcda-btn.primary,.pc-btn-create,.al-open,.tr-btn.primary';
+    $btnSecondary = '.sm-btn-secondary,.pc-btn-secondary,.sm-btn.light,.pc-btn.secondary,.gsm-btn.soft,.stp-btn.ghost,.av-btn:not(.primary):not(.home):not(.red),.al-btn:not(.primary):not(.al-home),.pe-btn:not(.dark):not(.red):not(.gold),.pcd-btn:not(.primary),.sid-btn:not(.primary):not(.red),.stp-btn:not(.primary):not(.danger):not(.red),.tr-btn:not(.primary),.pcda-btn:not(.primary),.pc-btn-cancel,.pc-btn:not(.primary):not(.secondary):not(.home):not(.pc-btn-home):not(.pc-btn-cancel):not(.pc-btn-create):not(.gold)';
+    $btnHome = '.pc-header-home,.smgr-autohome,.pc-btn-home,.av-btn.home,.al-home,.smn-action-home,.smc-btn.home,.sm-btn-home,.pc-btn-home-red';
+    $btnDanger = '.sm-btn-danger,.sm-btn.red,.sid-btn.red,.stp-btn.danger,.stp-btn.red,.pe-btn.red,.sid-mini.out,.pc-btn.red';
+
+    $cardBg = '#FFFFFF';
+    $heroBg = '#FFFFFF';
+    $cardBorder = '#E2E8F0';
+    $cardShadow = '0 4px 16px rgba(15, 41, 81, 0.05)';
+    $heroTitleColor = 'var(--sm-primary)';
+    $heroSubColor = 'var(--sm-muted)';
 
     $css = "/* Generated by School Manager settings. Do not edit manually. */\n";
     $css .= ":is({$c}){--sm-primary:{$v['primary']};--sm-secondary:{$v['secondary']};--sm-accent:{$v['accent']};--sm-soft:{$v['soft']};--sm-bg:{$v['background']};--sm-card:{$v['card']};--sm-text:{$v['text']};--sm-muted:{$v['muted']};--sm-border:{$v['border']};--sm-radius:{$v['radius']};--sm-pad:{$v['pad']};--sm-gap:{$v['gap']};--sm-font:{$v['font']};--sm-dark:{$dark};}\n";
-    $css .= ":is({$c}){--navy:{$v['primary']}!important;--teal:{$v['secondary']}!important;--red:{$v['accent']}!important;--sm-navy:{$v['primary']}!important;--sm-navy-2:color-mix(in srgb,{$v['primary']} 80%,#000)!important;--sm-blue:{$v['secondary']}!important;--sm-blue-2:color-mix(in srgb,{$v['secondary']} 85%,#000)!important;--sm-red:{$v['accent']}!important;--sm-red-2:color-mix(in srgb,{$v['accent']} 80%,#000)!important;--sm-red-soft:color-mix(in srgb,{$v['accent']} 12%,#fff)!important;--sm-ink:{$v['text']}!important;--pc-dark:{$v['primary']}!important;--pc-teal:{$v['secondary']}!important;--pc-red:{$v['accent']}!important;}\n";
-    $css .= ":is({$c}){--navy:var(--sm-primary)!important;--pc-dark:var(--sm-primary)!important;--pc-teal:var(--sm-secondary)!important;--pc-red:var(--sm-accent)!important;--teal:var(--sm-secondary)!important;--red:var(--sm-accent)!important;--soft:var(--sm-soft)!important;background:var(--sm-bg)!important;color:var(--sm-text)!important;font-size:var(--sm-font)!important;}\n";
-    $css .= ":is({$c}) :is({$cards}){background:linear-gradient(135deg,var(--sm-card),var(--sm-soft))!important;color:var(--sm-text)!important;border-color:var(--sm-border)!important;border-radius:var(--sm-radius)!important;box-shadow:0 20px 46px color-mix(in srgb,var(--sm-primary) 14%,transparent)!important;}\n";
-    $css .= ":is({$c}) :is(h1,h2,h3,.pc-title,.gsm-card-title,.smdoc-title,.stp-title h1,.sid-hero h1,.ticdesk h1,.smv-title){color:" . ($v['dark'] ? 'var(--sm-text)' : 'var(--sm-primary)') . "!important;}\n";
-    $css .= ":is({$c}) :is(p,small,.sm-help,.pc-subtitle,.gsm-muted,.muted,.pc-muted,.pcd-sub,.av-sub,.tr-sub){color:var(--sm-muted)!important;}\n";
-    $css .= ":is({$c}) :is(.sm-kicker,.pc-kicker,.pcd-kicker,.gsm-kicker,.stp-kicker,.smdoc-kicker,.al-kicker,.sid-kicker){color:var(--sm-accent)!important;}\n";
-    $css .= ":is({$c}) :is({$btnPrimary}){background:linear-gradient(135deg,var(--sm-primary),var(--sm-secondary))!important;border-color:var(--sm-primary)!important;color:#ffffff!important;}\n";
-    $css .= ":is({$c}) :is({$btnPrimary}) :is(span,b,strong,i,svg,path){color:#ffffff!important;stroke:#ffffff!important;fill:none!important;}\n";
-    $css .= ":is({$c}) :is({$btnSecondary}){background:var(--sm-card)!important;color:var(--sm-text)!important;border:1px solid var(--sm-border)!important;}\n";
-    $css .= ":is({$c}) :is({$btnSecondary}) :is(span,b,strong,i,svg,path){color:var(--sm-text)!important;stroke:var(--sm-text)!important;fill:none!important;}\n";
-    $css .= ":is({$c}) :is({$btnHome}){background:linear-gradient(135deg,var(--sm-accent),color-mix(in srgb,var(--sm-accent) 78%,#000))!important;border-color:var(--sm-accent)!important;color:#ffffff!important;}\n";
-    $css .= ":is({$c}) :is({$btnHome}) :is(span,b,strong,i,svg,path){color:#ffffff!important;stroke:#ffffff!important;fill:none!important;}\n";
-    $css .= ":is({$c}) :is({$btnDanger}){background:linear-gradient(135deg,#b6252b,#8b1e1e)!important;border-color:#8b1e1e!important;color:#ffffff!important;}\n";
-    $css .= ":is({$c}) :is({$btnDanger}) :is(span,b,strong,i,svg,path){color:#ffffff!important;stroke:#ffffff!important;fill:none!important;}\n";
-    $css .= ":is({$c}) :is(input:not([type=\"checkbox\"]):not([type=\"radio\"]):not([type=\"submit\"]):not([type=\"button\"]),select,textarea){background:var(--sm-card)!important;color:var(--sm-text)!important;border-color:var(--sm-border)!important;border-radius:calc(var(--sm-radius) - 6px)!important;}\n";
-    $css .= ":is({$c}) :is(.pc-card,.sm-card,.gsm-card,.al-tablebox,.pcd-card,.av-card,.tic-card,.stock-card,.da-card,.ad-card,.sid-card,.stp-side-card){padding:var(--sm-pad)!important;margin-bottom:var(--sm-gap)!important;}\n";
+    $css .= ":is({$c}){--navy:{$v['primary']}!important;--teal:{$v['secondary']}!important;--red:{$v['accent']}!important;--sm-navy:{$v['primary']}!important;--sm-navy-2:{$v['primary']}!important;--sm-blue:{$v['secondary']}!important;--sm-blue-2:{$v['secondary']}!important;--sm-red:{$v['accent']}!important;--sm-red-2:{$v['accent']}!important;--sm-red-soft:#FEF9EE!important;--sm-ink:{$v['text']}!important;--pc-dark:{$v['primary']}!important;--pc-teal:{$v['secondary']}!important;--pc-red:{$v['accent']}!important;}\n";
+    $css .= ":is({$c}){background:var(--sm-bg)!important;color:var(--sm-text)!important;font-size:var(--sm-font)!important;}\n";
+    $css .= ":is({$c}) :is({$cards}){background:{$cardBg}!important;color:var(--sm-text)!important;border:1px solid {$cardBorder}!important;border-radius:var(--sm-radius)!important;box-shadow:{$cardShadow}!important;}\n";
+    $css .= ":is({$c}) :is(h1,h2,h3,.pc-title,.gsm-card-title,.smdoc-title,.stp-title h1,.sid-hero h1,.ticdesk h1,.smv-title):not(.active *){color:var(--sm-primary)!important;}\n";
+    $css .= ":is({$c}) :is(p,small,.sm-help,.pc-subtitle,.gsm-muted,.muted,.pc-muted,.pcd-sub,.av-sub,.tr-sub):not(.active *){color:var(--sm-muted)!important;}\n";
+    $css .= ":is({$c}) :is(.sm-kicker,.pc-kicker,.pcd-kicker,.gsm-kicker,.stp-kicker,.smdoc-kicker,.al-kicker,.sid-kicker){color:var(--sm-secondary)!important;}\n";
+    $css .= ":is({$c}) .sm-universal-hero{background:{$heroBg}!important;border:1px solid {$cardBorder}!important;box-shadow:{$cardShadow}!important;border-radius:18px!important;}\n";
+    $css .= ":is({$c}) .sm-universal-hero::after{display:none!important;}\n";
+    $css .= ":is({$c}) :is(.sm-hero-logo,.pc-hero-logo,.sm-install-logo,.pc-logo,.al-logo,.pcd-logo,.gsm-logo,.sid-logo,.logo){background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;filter:none!important;-webkit-filter:none!important;outline:none!important;}\n";
+    $css .= ":is({$c}) .sm-universal-hero :is(.sm-hero-title, h1){color:{$heroTitleColor}!important;}\n";
+    $css .= ":is({$c}) .sm-universal-hero :is(.sm-hero-subtitle, p){color:{$heroSubColor}!important;}\n";
+    $css .= ":is({$c}) .sm-universal-hero .sm-hero-kicker{color:var(--sm-secondary)!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary},{$btnSecondary},{$btnHome},{$btnDanger},.sm-btn,.pc-btn,.gsm-btn,.tic-btn,.stp-btn,.sid-btn,.av-btn,.al-btn,.pcd-btn,.pcda-btn){display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:42px!important;padding:10px 18px!important;border-radius:12px!important;font-weight:650!important;font-size:13.5px!important;line-height:1.2!important;text-decoration:none!important;cursor:pointer!important;transition:background-color 0.16s ease,border-color 0.16s ease,color 0.16s ease,transform 0.16s ease,box-shadow 0.16s ease!important;stroke:none!important;-webkit-text-stroke:0!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary},{$btnSecondary},{$btnHome},{$btnDanger},.sm-btn,.pc-btn,.gsm-btn,.tic-btn,.stp-btn,.sid-btn,.av-btn,.al-btn,.pcd-btn,.pcda-btn) :is(span,b,strong,i){stroke:none!important;-webkit-text-stroke:0!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary},{$btnSecondary},{$btnHome},{$btnDanger},.sm-btn,.pc-btn,.gsm-btn,.tic-btn,.stp-btn,.sid-btn,.av-btn,.al-btn,.pcd-btn,.pcda-btn) svg{width:17px!important;height:17px!important;flex-shrink:0!important;fill:none!important;stroke:currentColor!important;stroke-width:2.1!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary}){background:#0F2951!important;border:1px solid #0F2951!important;color:#ffffff!important;box-shadow:0 2px 6px rgba(15,41,81,0.12)!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary}):hover{background:#088E91!important;border-color:#088E91!important;transform:translateY(-1px)!important;box-shadow:0 4px 12px rgba(8,142,145,0.20)!important;color:#ffffff!important;}\n";
+    $css .= ":is({$c}) :is({$btnPrimary}) :is(span,b,strong,i,svg){color:#ffffff!important;}\n";
+    $css .= ":is({$c}) :is({$btnSecondary}){background:#ffffff!important;color:#0F2951!important;border:1px solid #CBD5E1!important;box-shadow:0 1px 2px rgba(15,41,81,0.04)!important;}\n";
+    $css .= ":is({$c}) :is({$btnSecondary}):hover{background:#F1F5F9!important;border-color:#94A3B8!important;color:#0F2951!important;transform:translateY(-1px)!important;box-shadow:0 3px 8px rgba(15,41,81,0.07)!important;}\n";
+    $css .= ":is({$c}) :is({$btnSecondary}) :is(span,b,strong,i,svg){color:#0F2951!important;}\n";
+    $css .= ":is({$c}) :is({$btnHome}){background:#FFFFFF!important;border:1px solid #CBD5E1!important;color:#0F2951!important;border-radius:12px!important;box-shadow:0 1px 2px rgba(15,41,81,0.04)!important;}\n";
+    $css .= ":is({$c}) :is({$btnHome}):hover{background:#F1F5F9!important;border-color:#94A3B8!important;color:#0F2951!important;transform:translateY(-1px)!important;box-shadow:0 3px 8px rgba(15,41,81,0.07)!important;}\n";
+    $css .= ":is({$c}) :is({$btnHome}) :is(span,b,strong,i,svg){color:#0F2951!important;}\n";
+    $css .= ":is({$c}) :is({$btnDanger}){background:#DC2626!important;border:1px solid #DC2626!important;color:#ffffff!important;border-radius:12px!important;box-shadow:0 2px 6px rgba(220,38,38,0.16)!important;}\n";
+    $css .= ":is({$c}) :is({$btnDanger}):hover{background:#B91C1C!important;border-color:#B91C1C!important;color:#ffffff!important;transform:translateY(-1px)!important;}\n";
+    $css .= ":is({$c}) :is({$btnDanger}) :is(span,b,strong,i,svg){color:#ffffff!important;}\n";
+    $css .= ":is({$c}) :is(input:not([type=\"checkbox\"]):not([type=\"radio\"]):not([type=\"submit\"]):not([type=\"button\"]),textarea){background:#ffffff!important;color:var(--sm-text)!important;border:1.5px solid #CBD5E1!important;border-radius:12px!important;}\n";
+    $css .= ":is({$c}) select{appearance:none!important;-webkit-appearance:none!important;height:44px!important;padding:0 38px 0 14px!important;background-color:#ffffff!important;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230F2951' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:16px!important;color:#0F2951!important;border:1.5px solid #CBD5E1!important;border-radius:12px!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important;box-shadow:0 1px 2px rgba(15,41,81,0.03)!important;}\n";
+    $css .= ":is({$c}) select:focus{border-color:#088E91!important;box-shadow:0 0 0 3px rgba(8,142,145,0.14)!important;outline:none!important;}\n";
+    $css .= ":is({$c}) :is(.sm-card:not(:has(> .sm-table)),.gsm-card,.al-tablebox,.pcd-card,.av-card,.tic-card,.stock-card,.da-card,.ad-card,.sid-card,.stp-side-card){padding:var(--sm-pad);margin-bottom:var(--sm-gap)!important;border-radius:18px!important;}\n";
+    $css .= ":is({$c}) .sm-card:has(> .sm-table){padding:0!important;margin-bottom:var(--sm-gap)!important;border-radius:18px!important;overflow:hidden!important;}\n";
+    $css .= ":is({$c}) .sm-btn-sm{min-height:36px!important;padding:7px 14px!important;font-size:12.5px!important;border-radius:10px!important;gap:6px!important;}\n";
     $css .= ":is({$c}) :is(.pc-grid,.sm-grid,.gsm-grid,.stp-grid,.tic-grid,.pcd-grid,.pcda-grid,.al-actions,.sm-card-grid){gap:var(--sm-gap)!important;}\n";
     $css .= ".sm-home .sm-main{padding:var(--sm-gap)!important;}\n";
-    $css .= "@media(max-width:900px){:is(.sm-home,.smset,.pc-wrap,.pc-page,.pcd-wrap,.pcda-shell,.gsm-wrap,.ticdesk,.pc-stock-page,.smdoc,.al-wrap){padding:12px!important}:is(.pc-head,.gsm-hero,.sm-hero,.smdoc-hero,.stp-head,.sid-hero){grid-template-columns:1fr!important;display:grid!important}:is(.pc-head-actions,.gsm-hero-actions,.smdoc-actions,.al-head-actions,.stp-actions,.sid-actions){justify-content:flex-start!important;width:100%!important;flex-wrap:wrap!important}}\n";
+    $css .= "@media(max-width:900px){:is(.sm-home,.smset,.pc-wrap,.pc-page,.pcd-wrap,.pcda-shell,.gsm-wrap,.ticdesk,.pc-stock-page,.smdoc,.al-wrap){padding:12px!important}:is(.pc-head,.gsm-hero,.sm-hero,.smdoc-hero,.stp-head,.sid-hero){grid-template-columns:1fr!important;display:grid!important}:is(.pc-head-actions,.gsm-hero-actions,.smdoc-actions,.al-head-actions,.stp-actions,.sid-actions){justify-content:flex-start!important;width:100%!important;flex-wrap:wrap!important}:is({$btnPrimary},{$btnSecondary},{$btnHome},{$btnDanger},.sm-btn,.pc-btn,.gsm-btn,.tic-btn,.stp-btn,.sid-btn,.av-btn,.al-btn,.pcd-btn,.pcda-btn){min-height:44px!important;padding:10px 18px!important;}}\n";
     $file = __DIR__ . '/../css/generated-theme.css';
     @file_put_contents($file, $css, LOCK_EX);
     @chmod($file, 0664);
@@ -757,12 +826,20 @@ function plugin_schoolmanager_write_runtime_config_js(?array $cfg = null): void 
     $values = plugin_schoolmanager_theme_values($cfg);
     global $CFG_GLPI;
     $root = $CFG_GLPI['root_doc'] ?? '';
+    $paletteFile = __DIR__ . '/../css/themes/' . $values['palette'] . '.css';
+    $paletteVer = rawurlencode((string)(@filemtime($paletteFile) ?: '1.1.0'));
+    $themeCssUrl = $root !== ''
+        ? ($root . '/plugins/schoolmanager/css/themes/' . rawurlencode((string)$values['palette']) . '.css?v=' . $paletteVer)
+        : '';
     $payload = [
         'locale' => plugin_schoolmanager_locale(),
         'menuTitle' => plugin_schoolmanager_clean_brand_name($brand['menu_title'] ?? ($brand['title'] ?? 'School Manager')),
         'appName' => plugin_schoolmanager_clean_brand_name($brand['title'] ?? 'School Manager'),
+        'features' => $cfg['features'] ?? [],
         'theme' => $values,
-        'themeCss' => ($root ?: '') . '/plugins/schoolmanager/css/themes/' . rawurlencode((string)$values['palette']) . '.css',
+        'themeCss' => $themeCssUrl,
+        'themePalette' => (string)$values['palette'],
+        'themeVer' => $paletteVer,
     ];
     $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (!is_string($json)) { return; }
@@ -777,6 +854,14 @@ function plugin_schoolmanager_write_runtime_config_js(?array $cfg = null): void 
     '--sm-gap':t.gap,'--sm-font':t.font,'--sm-navy':t.primary,'--sm-blue':t.secondary,'--sm-red':t.accent,'--sm-ink':t.text,
     '--navy':t.primary,'--teal':t.secondary,'--red':t.accent,'--pc-dark':t.primary,'--pc-teal':t.secondary,'--pc-red':t.accent
   };
+  function resolveThemeCss(){
+    if (cfg.themeCss) return cfg.themeCss;
+    if (!isSM) return '';
+    var base = window.location.pathname.split('/plugins/schoolmanager/')[0] || '';
+    var pal = encodeURIComponent(cfg.themePalette || t.palette || 'teal-red');
+    var ver = encodeURIComponent(cfg.themeVer || '1.1.0');
+    return base + '/plugins/schoolmanager/css/themes/' + pal + '.css?v=' + ver;
+  }
   function applyVars(){
     if (!isSM) return;
     document.documentElement.setAttribute('data-sm-theme', t.palette || 'teal-red');
@@ -793,15 +878,16 @@ function plugin_schoolmanager_write_runtime_config_js(?array $cfg = null): void 
         if (document.body) document.body.style.setProperty(k, vars[k], 'important');
       }
     });
-    if (cfg.themeCss) {
+    var themeHref = resolveThemeCss();
+    if (themeHref) {
       var l = document.getElementById('schoolmanager-active-theme');
       if (l) {
-        if (l.getAttribute('href') !== cfg.themeCss) l.setAttribute('href', cfg.themeCss);
+        if (l.getAttribute('href') !== themeHref) l.setAttribute('href', themeHref);
       } else {
         l = document.createElement('link');
         l.id = 'schoolmanager-active-theme';
         l.rel = 'stylesheet';
-        l.href = cfg.themeCss;
+        l.href = themeHref;
         document.head.appendChild(l);
       }
     }
@@ -837,15 +923,15 @@ JS;
 
 function plugin_schoolmanager_page_feature_map(): array {
     return [
-        'nueva_incidencia.php' => 'tickets', 'mis_solicitudes.php' => 'tickets', 'avisos.php' => 'tickets', 'solicitud_detalle.php' => 'tickets',
-        'aulas.php' => 'classrooms', 'detalle_aula.php' => 'classrooms', 'assets_aula.php' => 'classrooms',
-        'selector.php' => 'plans', 'mapa.php' => 'plans', 'plan_frame.php' => 'plans',
-        'nuevo_activo.php' => 'assets', 'gestion_activos.php' => 'assets', 'editar_activo.php' => 'assets', 'nuevo_ordenador.php' => 'assets',
-        'stock_glpi.php' => 'stock', 'stock_item.php' => 'stock', 'stock_movimiento.php' => 'stock',
-        'panel_tic.php' => 'tic_panel', 'tecnico_resumen.php' => 'tic_panel',
-        'asignaciones_tic.php' => 'tic_assignment_rules',
-        'versiones.php' => 'versions',
-        'archivos.php' => 'file_editor',
+        'new_ticket.php' => 'tickets', 'my_requests.php' => 'tickets', 'notifications.php' => 'tickets', 'ticket_detail.php' => 'tickets',
+        'classrooms.php' => 'classrooms', 'classroom_detail.php' => 'classrooms', 'classroom_assets.php' => 'classrooms',
+        'selector.php' => 'plans', 'map.php' => 'plans', 'plan_frame.php' => 'plans',
+        'new_asset.php' => 'assets', 'asset_management.php' => 'assets', 'edit_asset.php' => 'assets', 'new_computer.php' => 'assets',
+        'stock.php' => 'stock', 'stock_item.php' => 'stock', 'stock_movement.php' => 'stock',
+        'it_panel.php' => 'tic_panel', 'technician_summary.php' => 'tic_panel',
+        'it_assignments.php' => 'tic_assignment_rules',
+        'versions.php' => 'versions',
+        'file_editor.php' => 'file_editor',
     ];
 }
 function plugin_schoolmanager_guard_current_feature(): void {
@@ -924,22 +1010,21 @@ function plugin_schoolmanager_translation_map_for_locale(?string $locale = null)
     }
 
     if (str_starts_with($locale, 'es')) {
-        // Target is Spanish: map English phrases -> Spanish
-        $enMapFile = $localesDir . '/es_en_map.json';
-        if (is_file($enMapFile)) {
-            $raw = @file_get_contents($enMapFile);
-            $tmp = is_string($raw) ? json_decode($raw, true) : null;
-            if (is_array($tmp)) {
-                foreach ($tmp as $es => $en) {
-                    if (is_string($es) && is_string($en) && trim($es) !== '' && trim($en) !== '') {
-                        $pairs[trim($en)] = trim($es);
-                    }
+        // Target is Spanish: only map default English placeholders -> Spanish.
+        // Never allow any Spanish string to be mapped to English.
+        $pairs['Educational center'] = 'Centro educativo';
+        foreach ($enDict as $k => $enVal) {
+            if (isset($esDict[$k]) && is_string($enVal) && is_string($esDict[$k])) {
+                $enTrim = trim($enVal);
+                $esTrim = trim($esDict[$k]);
+                if ($enTrim !== '' && $esTrim !== '' && $enTrim !== $esTrim) {
+                    $pairs[$enTrim] = $esTrim;
                 }
             }
         }
-        foreach ($enDict as $k => $enVal) {
-            if (isset($esDict[$k]) && is_string($enVal) && is_string($esDict[$k]) && trim($enVal) !== '' && trim($esDict[$k]) !== '') {
-                $pairs[trim($enVal)] = trim($esDict[$k]);
+        foreach ($esDict as $esVal) {
+            if (is_string($esVal)) {
+                unset($pairs[trim($esVal)]);
             }
         }
     } elseif (str_starts_with($locale, 'en')) {
@@ -1028,32 +1113,27 @@ function plugin_schoolmanager_translate_fragment(string $text, ?array $map = nul
 
 
 function plugin_schoolmanager_global_ui_guard_html(): string {
-    $label = htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Home'), ENT_QUOTES, 'UTF-8');
-    global $CFG_GLPI;
-    $root = $CFG_GLPI['root_doc'] ?? '';
-    $href = htmlspecialchars($root . '/plugins/schoolmanager/front/formularios.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : time()), ENT_QUOTES, 'UTF-8');
-    return '<style id="smgr-final-polish-ui">
-.smgr-autohome,.pc-header-home{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:48px!important;border:1px solid var(--sm-accent,#b6252b)!important;background:linear-gradient(135deg,var(--sm-accent,#b6252b),color-mix(in srgb,var(--sm-accent,#b6252b) 78%,#000))!important;color:#fff!important;border-radius:18px!important;padding:0 22px!important;text-decoration:none!important;font-weight:950!important;box-shadow:0 18px 38px color-mix(in srgb,var(--sm-accent,#b6252b) 28%,transparent)!important;white-space:nowrap!important;transition:.2s!important}
-.smgr-autohome:hover,.pc-header-home:hover{transform:translateY(-3px)!important;color:#fff!important}.smgr-autohome svg,.pc-header-home svg{width:18px!important;height:18px!important;stroke:currentColor!important;fill:none!important;stroke-width:2.2!important}
-.pcda-card,.gsm-card,.st-card,.tic-card,.pc-request-card,.pc-detail-card{box-shadow:0 20px 44px color-mix(in srgb,var(--sm-primary,#07384d) 12%,transparent)!important}.pcda-note,.pc-empty,.tic-empty{border-radius:18px!important}.pcda-actions .pcda-btn,.gsm-btn,.st-btn,.tic-btn{transition:transform .18s ease,box-shadow .18s ease!important}.pcda-actions .pcda-btn:hover,.gsm-btn:hover,.st-btn:hover,.tic-btn:hover{transform:translateY(-2px)!important}
-/* Never inject Home into the GLPI left sidebar. */
-#navbar-menu .smgr-autohome,#navbar-menu .pc-header-home,.sidebar .smgr-autohome,.sidebar .pc-header-home,.layout-navbar .smgr-autohome,.layout-navbar .pc-header-home{display:none!important}
-@media(max-width:760px){.smgr-autohome,.pc-header-home{width:auto!important}.pc-head-actions,.gsm-hero-actions,.ad-actions,.da-actions,.smv-actions{gap:10px!important;flex-wrap:wrap!important}}
-</style><script id="smgr-final-home-guard">
+    return '<script id="smgr-final-home-guard">
 (function(){
-  var href="' . $href . '", label="' . $label . '";
   function ready(fn){if(document.readyState!=="loading")fn();else document.addEventListener("DOMContentLoaded",fn);}
   function isSidebar(el){return !!(el && el.closest && el.closest("#navbar-menu,.sidebar,.layout-navbar,aside.navbar"));}
-  function isHome(a){var h=a.getAttribute("href")||""; return /formularios\.php/.test(h) && /home|inicio|panel|school manager|gesti/i.test((a.textContent||""));}
-  function icon(){return "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3.75 10.5 12 4.25l8.25 6.25\"/><path d=\"M6.75 9.75v9.5h10.5v-9.5\"/><path d=\"M10 19.25V14.5a2 2 0 0 1 4 0v4.75\"/></svg>";}
   function run(){
     Array.prototype.forEach.call(document.querySelectorAll("a.smgr-autohome,a.pc-header-home"),function(a){ if(isSidebar(a)) a.remove(); });
-    var homes=Array.prototype.slice.call(document.querySelectorAll("a")).filter(function(a){return !isSidebar(a)&&isHome(a);});
-    homes.forEach(function(a){a.classList.add("smgr-autohome");a.href=href;if(!a.querySelector("svg"))a.innerHTML=icon()+"<span>"+label+"</span>";});
-    homes=Array.prototype.slice.call(document.querySelectorAll("a.smgr-autohome,a.pc-header-home")).filter(function(a){return !isSidebar(a)&&isHome(a);});
-    if(homes.length>1) homes.slice(1).forEach(function(e){e.remove();});
+    var heroHome = document.querySelector(".sm-universal-hero .sm-btn-home");
+    if (heroHome) {
+      Array.prototype.forEach.call(document.querySelectorAll("a.pc-btn-home-red, a.pc-header-home, a.smgr-autohome, .pc-selector a.pc-btn-home"), function(a){
+        if (a !== heroHome && !a.closest(".sm-universal-hero")) {
+          var card = a.closest(".pc-card");
+          if (card && card.children.length === 1 && card.querySelector(".pc-head-actions")) {
+            card.remove();
+          } else {
+            a.remove();
+          }
+        }
+      });
+    }
   }
-  ready(function(){run();setTimeout(run,300);setTimeout(run,1000);});
+  ready(function(){run();setTimeout(run,200);});
 })();
 </script>';
 }
@@ -1061,7 +1141,7 @@ function plugin_schoolmanager_global_ui_guard_html(): string {
 function plugin_schoolmanager_translate_html_output(string $html): string {
     if (!str_contains($_SERVER['REQUEST_URI'] ?? '', '/plugins/schoolmanager/')) { return $html; }
     $script = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
-    if (in_array($script, ['media.php','i18n.php','assets_aula.php','plan_frame.php'], true)) { return $html; }
+    if (in_array($script, ['media.php','i18n.php','classroom_assets.php','plan_frame.php'], true)) { return $html; }
     $map = plugin_schoolmanager_translation_map_for_locale();
     if (!$map || $html === '') { return $html; }
     // Translate attributes first, including placeholders inside textarea elements.
@@ -1097,7 +1177,7 @@ function plugin_schoolmanager_start_translation_buffer(): void {
     if (PHP_SAPI === 'cli') { return; }
     if (!str_contains($_SERVER['REQUEST_URI'] ?? '', '/plugins/schoolmanager/')) { return; }
     $script = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
-    if (in_array($script, ['media.php','i18n.php','assets_aula.php','plan_frame.php','configuracion.php','instalacion.php'], true)) { return; }
+    if (in_array($script, ['media.php','i18n.php','classroom_assets.php','plan_frame.php','settings.php','install.php'], true)) { return; }
     if (!empty($GLOBALS['PLUGIN_SCHOOLMANAGER_TRANSLATION_BUFFER_STARTED'])) { return; }
     $GLOBALS['PLUGIN_SCHOOLMANAGER_TRANSLATION_BUFFER_STARTED'] = true;
     ob_start('plugin_schoolmanager_translate_html_output');

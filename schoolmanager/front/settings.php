@@ -1,8 +1,12 @@
 <?php
+if (!defined('GLPI_KEEP_CSRF_TOKEN')) {
+    define('GLPI_KEEP_CSRF_TOKEN', true);
+}
 include('../../../inc/includes.php');
 require_once(__DIR__ . '/../inc/config.php');
 require_once(__DIR__ . '/../inc/permissions.php');
 require_once(__DIR__ . '/../inc/ui_helpers.php');
+require_once(__DIR__ . '/../inc/layout.php');
 
 if (!class_exists('Session') || !Session::getLoginUserID()) { Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/index.php'); }
 if (!function_exists('plugin_schoolmanager_can_configure') || !plugin_schoolmanager_can_configure()) {
@@ -50,7 +54,11 @@ function smcfg_h($v): string { return htmlspecialchars((string)$v, ENT_QUOTES, '
 function smcfg_tr(string $key, string $fallback): string { return plugin_schoolmanager_tr($key, $fallback); }
 function smcfg_slug($v): string { $v = strtoupper(trim((string)$v)); $v = preg_replace('/[^A-Z0-9_-]+/', '-', $v); return trim($v, '-'); }
 function smcfg_bool(string $key): bool { return !empty($_POST[$key]); }
-function smcfg_token(): void { static $tok = null; if (method_exists('Session','getNewCSRFToken')) { if ($tok === null) { $tok = Session::getNewCSRFToken(); } echo '<input type="hidden" name="_glpi_csrf_token" value="' . smcfg_h($tok) . '">'; } }
+function smcfg_token(): void {
+    if (class_exists('Session') && method_exists('Session', 'getNewCSRFToken')) {
+        echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
+    }
+}
 function smcfg_redirect(string $msg='saved'): void {
     global $CFG_GLPI;
     $tab = 'general';
@@ -64,7 +72,7 @@ function smcfg_redirect(string $msg='saved'): void {
     if (!empty($_GET['edit_locale']) && !str_contains($msg, 'edit_locale=')) {
         $extra .= '&edit_locale=' . rawurlencode((string)$_GET['edit_locale']);
     }
-    Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/configuracion.php?' . $msg . '&tab=' . rawurlencode($tab) . $extra);
+    Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/settings.php?' . $msg . '&tab=' . rawurlencode($tab) . $extra);
 }
 function smcfg_save(array $cfg, array &$errors): bool {
     $cfg['schema'] = 6;
@@ -121,11 +129,20 @@ function smcfg_parse_uploaded_locale(string $tmpPath, string $ext, ?string &$err
 }
 
 $cfg = plugin_schoolmanager_config(true);
+$isSetupWizard = false;
 $errors = [];
 $info = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = (string)($_POST['action'] ?? '');
+
+    if ($action === 'complete_wizard') {
+        if (smcfg_save($cfg, $errors)) {
+            plugin_schoolmanager_write_theme_css($cfg);
+            plugin_schoolmanager_write_runtime_config_js($cfg);
+            Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/dashboard.php?wizard_completed=1');
+        }
+    }
 
     if ($action === 'save_general') {
         $name = trim((string)($_POST['title'] ?? 'School Manager'));
@@ -144,7 +161,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $availableLocales = array_keys(plugin_schoolmanager_available_locales(true));
         $cfg['locale'] = (in_array($locale, $availableLocales, true) || $locale === 'auto') ? $locale : 'auto';
         if (smcfg_save($cfg, $errors)) {
+            plugin_schoolmanager_write_theme_css($cfg);
             plugin_schoolmanager_write_runtime_config_js($cfg);
+            if (!empty($_POST['enter_plugin_after_save'])) {
+                Html::redirect(($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/dashboard.php?wizard_completed=1');
+            }
             smcfg_redirect('saved=general');
         }
     }
@@ -175,9 +196,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_POST['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
-                    'success' => true,
-                    'palette' => $palette,
-                    'message' => smcfg_tr('theme_auto_saved', 'Tema aplicado y guardado')
+                    'success'    => true,
+                    'palette'    => $palette,
+                    'csrf_token' => (class_exists('Session') && method_exists('Session', 'getNewCSRFToken')) ? Session::getNewCSRFToken() : '',
+                    'message'    => smcfg_tr('theme_auto_saved', 'Tema aplicado y guardado')
                 ]);
                 exit;
             }
@@ -200,6 +222,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $enabled = array_map('strval', $enabled);
         foreach ($keys as $k) { $cfg['features'][$k] = in_array($k, $enabled, true); }
         if (smcfg_save($cfg, $errors)) smcfg_redirect('saved=modules');
+    }
+
+    if ($action === 'toggle_plans') {
+        $newPlans = !empty($_POST['plans_enabled']);
+        $cfg['features']['plans'] = $newPlans;
+        if (smcfg_save($cfg, $errors)) smcfg_redirect('saved=plans_toggled');
     }
 
     if ($action === 'upload_logo') {
@@ -423,6 +451,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $features = $cfg['features'] ?? [];
+$plansActive = !empty($features['plans']);
 $theme = $cfg['theme'] ?? [];
 $brand = $cfg['brand'] ?? [];
 $currentLocale = plugin_schoolmanager_locale();
@@ -460,8 +489,9 @@ $moduleLabels = [
 $availableLocalesList = plugin_schoolmanager_available_locales(true);
 $builtinLocalesList = plugin_schoolmanager_builtin_locales();
 
-// Canonical base dictionary for editor (English en_GB)
+// Canonical base dictionaries for editor (English en_GB and Spanish es_ES)
 $canonicalEn = (include __DIR__ . '/../locales/en_GB.php') ?: [];
+$canonicalEs = (include __DIR__ . '/../locales/es_ES.php') ?: [];
 $canonicalKeys = array_keys(array_filter($canonicalEn, static fn($k) => $k !== '_language_name' && !str_starts_with((string)$k, '_'), ARRAY_FILTER_USE_KEY));
 
 // Selected locale for editor
@@ -489,38 +519,87 @@ if ($editLocale !== 'new') {
 
 $root = $CFG_GLPI['root_doc'] ?? '';
 
-Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP_SELF'], 'tools', 'PluginSchoolmanagerMapa');
+sm_page_header([
+    'kicker'      => 'GLPI School Manager',
+    'title'       => plugin_schoolmanager_app_name() . ' · ' . smcfg_tr('settings_heading', 'Ajustes'),
+    'subtitle'    => smcfg_tr('settings_subtitle', 'Configura marca, módulos, aulas, planos, idiomas y temas visuales.'),
+    'active_tab'  => 'configuracion',
+    'show_home'   => true,
+]);
 ?>
 <style>
-.smset{--navy:var(--sm-primary,#07384d);--teal:var(--sm-secondary,#075d61);--red:var(--sm-accent,#b6252b);--soft:var(--sm-soft,#f4fafc);--line:#d7e6ec;--muted:#5f7180;max-width:1500px;margin:0 auto;padding:18px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--sm-text,#07384d)}.smset *{box-sizing:border-box}.sm-hero{background:linear-gradient(135deg,#fff,var(--soft));border:1px solid var(--line);border-radius:28px;padding:26px;display:flex;gap:22px;align-items:center;justify-content:space-between;box-shadow:0 20px 50px rgba(7,56,77,.08);margin-bottom:18px}.sm-hero h1{font-size:clamp(30px,3.8vw,56px);line-height:1;margin:0;color:var(--navy);font-weight:950}.sm-hero p{font-weight:800;color:var(--muted);font-size:15px;margin:6px 0 0}.sm-logo-preview{width:110px;height:110px;object-fit:contain;border-radius:22px;background:#fff;border:1px solid var(--line);padding:10px}.sm-kicker{text-transform:uppercase;letter-spacing:.16em;color:var(--red);font-weight:950;font-size:12px}.sm-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.sm-tab{border:1px solid var(--line);background:#fff;color:var(--navy);padding:11px 16px;border-radius:16px;font-weight:900;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.18s}.sm-tab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(7,56,77,.12)}.sm-tab.active{background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;border-color:var(--navy);box-shadow:0 12px 28px rgba(7,56,77,.16)}.sm-panel{display:none}.sm-panel.active{display:block;animation:smFade .18s ease}.sm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.sm-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.sm-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 14px 36px rgba(7,56,77,.06);margin-bottom:16px}.sm-card h2{margin:0 0 12px;font-size:22px;color:var(--navy);font-weight:900}.sm-card h3{margin:16px 0 10px;font-size:17px;font-weight:900}.sm-field{display:block;margin:0 0 12px}.sm-field span,.sm-label{display:block;font-weight:900;margin:0 0 6px;color:var(--navy);font-size:14px}.sm-input,.sm-select,.sm-textarea{width:100%;border:1px solid #d9e5ea;border-radius:14px;padding:12px 14px;font-weight:800;background:#fff;color:var(--navy)}.sm-textarea{min-height:300px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}.sm-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sm-row.three{grid-template-columns:repeat(3,minmax(0,1fr))}.sm-help{font-weight:700;color:var(--muted);font-size:13px;margin-top:6px;line-height:1.4}.sm-btn{border:1px solid transparent!important;background:linear-gradient(135deg,var(--navy),var(--teal))!important;color:#fff!important;border-radius:14px!important;padding:10px 18px!important;font-weight:900!important;font-size:14px!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;text-decoration:none!important;transition:all .18s ease!important;white-space:nowrap!important;flex-shrink:0!important;line-height:1.2!important;min-height:42px!important;box-sizing:border-box!important}.sm-btn:hover{transform:translateY(-2px)!important;box-shadow:0 12px 28px rgba(7,56,77,.2)!important;color:#fff!important}.sm-btn.red{background:linear-gradient(135deg,#b6252b,#8b1e1e)!important;color:#fff!important;border:1px solid #7c1b1b!important;box-shadow:0 4px 12px rgba(182,37,43,.18)!important}.sm-btn.red:hover{background:linear-gradient(135deg,#cc2c33,#9f1c22)!important;color:#fff!important}.sm-btn.light,button.sm-btn.light,a.sm-btn.light{background:#fff!important;color:var(--navy)!important;border:1.5px solid var(--line,#c4d8e2)!important;box-shadow:0 4px 12px rgba(7,56,77,.06)!important;opacity:1!important;visibility:visible!important}.sm-btn.light:hover,button.sm-btn.light:hover,a.sm-btn.light:hover{background:var(--soft,#f0f7fb)!important;color:var(--navy)!important;border-color:var(--navy)!important}.sm-btn.small{font-size:13px!important;min-height:36px!important;padding:6px 14px!important;border-radius:11px!important}.sm-lang-banner .sm-btn{flex-shrink:0!important;min-width:180px!important;background:#fff!important;color:var(--navy)!important;border:1.5px solid var(--line,#c4d8e2)!important}.sm-alert{padding:14px 16px;border-radius:16px;margin:12px 0;font-weight:900}.sm-alert.ok{background:#e9fbf1;color:#14783b;border:1px solid #b5eac8}.sm-alert.error{background:#fff0f0;color:#b6252b;border:1px solid #ffb4b4}.sm-switches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sm-switch{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:18px;background:#fbfdff;font-weight:900}.sm-switch input{width:20px;height:20px;margin-top:2px}.sm-switch small{color:var(--muted);font-weight:700}.sm-table{width:100%;border-collapse:separate;border-spacing:0 8px}.sm-table th{text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px}.sm-table th:last-child,.sm-table td:last-child{width:140px!important;min-width:140px!important;text-align:right!important;white-space:nowrap!important}.sm-table td{background:#fbfdff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px;font-weight:800}.sm-table td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px}.sm-table td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}.sm-table td:last-child form{margin:0!important;display:inline-flex!important;justify-content:flex-end!important}.sm-table td:last-child .sm-btn{min-width:86px!important;padding:7px 15px!important;border-radius:11px!important;overflow:visible!important}.sm-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#f8fbfd;border-radius:999px;padding:5px 9px;font-weight:900;font-size:12px}.sm-ok{color:#168346}.sm-bad{color:#b6252b}.sm-current-logo{display:flex;gap:18px;align-items:center}.sm-structure{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sm-building-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;background:#fbfdff}.sm-building-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.sm-building-head form{margin:0;flex-shrink:0;display:inline-flex}.sm-floor-list{display:grid;gap:8px;margin-top:10px}.sm-floor{border:1px dashed #cfe0e7;border-radius:14px;padding:10px 12px;background:#fff}.sm-muted{color:var(--muted);font-weight:700}.sm-palette-card{border:2px solid var(--line)!important;border-radius:18px!important;padding:16px!important;cursor:pointer!important;display:block!important;transition:all .18s ease!important}.sm-palette-card:hover{transform:translateY(-2px)!important;box-shadow:0 12px 28px rgba(7,56,77,.12)!important}.sm-palette-card.active{border:2.5px solid var(--navy)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--navy) 22%,transparent),0 14px 30px rgba(7,56,77,.16)!important;transform:scale(1.02)!important}@media(max-width:1050px){.sm-grid,.sm-grid.three,.sm-structure{grid-template-columns:1fr}.sm-switches{grid-template-columns:1fr 1fr}.sm-hero{align-items:flex-start;flex-direction:column}}@media(max-width:650px){.sm-row,.sm-row.three,.sm-switches{grid-template-columns:1fr}.smset{padding:10px}.sm-card{padding:14px}.sm-hero{padding:18px}.sm-logo-preview{width:86px;height:86px}}
-.sm-info-callout{display:flex;gap:12px;align-items:flex-start;border:1px solid color-mix(in srgb,var(--teal) 24%,#d7e6ec);background:linear-gradient(135deg,#f7fcff,#eef8f8);border-radius:18px;padding:13px 15px;margin:8px 0 14px;font-weight:800;color:var(--navy)}
+.smset{--navy:#0F2951;--teal:#088E91;--emerald:#088E91;--soft:#F8FAFC;--line:#E2E8F0;--muted:#64748B;max-width:100%!important;width:100%!important;margin:0!important;padding:0!important;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0F172A}.smset *{box-sizing:border-box}
+.sm-tabs{display:inline-flex!important;background:rgba(255,255,255,.88)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;padding:6px!important;border-radius:16px!important;gap:6px!important;margin:12px 0 22px 0!important;border:1px solid rgba(226,232,240,.9)!important;flex-wrap:wrap!important;box-shadow:0 4px 14px rgba(15,41,81,.04)!important}
+.sm-tab{border:1.5px solid transparent!important;background:transparent!important;color:#475569!important;padding:10px 20px!important;border-radius:12px!important;font-weight:800!important;font-size:13.5px!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:8px!important;transition:all .18s cubic-bezier(.16,1,.3,1)!important}
+.sm-tab:hover{color:#088E91!important;background:#F0FDFA!important}
+.sm-tab.active{background:#0F2951!important;color:#ffffff!important;border-color:transparent!important;box-shadow:0 4px 14px rgba(15,41,81,.2)!important}
+.sm-panel{display:none}.sm-panel.active{display:block;animation:smFade .2s ease}
+.sm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.sm-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sm-card{background:rgba(255,255,255,.88)!important;backdrop-filter:blur(18px) saturate(180%)!important;-webkit-backdrop-filter:blur(18px) saturate(180%)!important;border:1px solid rgba(255,255,255,.75)!important;border-radius:22px!important;padding:26px!important;box-shadow:0 10px 30px -5px rgba(15,41,81,.05),0 4px 12px -2px rgba(15,41,81,.03)!important;margin-bottom:20px!important}
+.sm-card h2{margin:0 0 16px;font-size:20px;color:#0F2951;font-weight:850;letter-spacing:-.015em}.sm-card h3{margin:16px 0 10px;font-size:16px;font-weight:800;color:#0F2951}
+.sm-field{display:block;margin:0 0 14px}.sm-field span,.sm-label{display:block;font-weight:800;margin:0 0 6px;color:#0F2951;font-size:13.5px}
+.sm-input,.sm-select,.sm-textarea{width:100%!important;border:1.5px solid #CBD5E1!important;border-radius:12px!important;padding:11px 16px!important;font-weight:650!important;background:rgba(255,255,255,.95)!important;color:#0F172A!important;font-size:14px!important;box-sizing:border-box!important;transition:all .18s ease!important}
+.sm-input:focus,.sm-select:focus,.sm-textarea:focus{border-color:#088E91!important;background:#FFFFFF!important;box-shadow:0 0 0 3.5px rgba(8,142,145,.18)!important;outline:none!important}
+.sm-textarea{min-height:300px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.sm-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sm-row.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sm-help{font-weight:600;color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.4}
+.sm-btn{border:1px solid #088E91!important;background:#088E91!important;background-image:none!important;color:#fff!important;border-radius:12px!important;padding:10px 20px!important;font-weight:800!important;font-size:13.5px!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;text-decoration:none!important;transition:all .2s cubic-bezier(.16,1,.3,1)!important;white-space:nowrap!important;flex-shrink:0!important;line-height:1.2!important;min-height:42px!important;box-sizing:border-box!important;box-shadow:0 4px 14px rgba(8,142,145,.22)!important}
+.sm-btn:hover{background:#0F2951!important;border-color:#0F2951!important;box-shadow:0 6px 18px rgba(15,41,81,.26)!important;color:#fff!important;transform:translateY(-1px)!important}
+.sm-btn.red{background:#DC2626!important;background-image:none!important;color:#fff!important;border:1px solid #DC2626!important;border-radius:12px!important;box-shadow:0 2px 6px rgba(220,38,38,.18)!important}
+.sm-btn.red:hover{background:#B91C1C!important;border-color:#B91C1C!important;color:#fff!important}
+.sm-btn.light,button.sm-btn.light,a.sm-btn.light{background:rgba(255,255,255,.9)!important;background-image:none!important;color:#0F2951!important;border:1.5px solid #CBD5E1!important;border-radius:12px!important;box-shadow:0 1px 3px rgba(0,0,0,.04)!important;opacity:1!important;visibility:visible!important}
+.sm-btn.light:hover,button.sm-btn.light:hover,a.sm-btn.light:hover{background:#F0FDFA!important;border-color:#088E91!important;color:#0F2951!important}
+.sm-btn.small{font-size:12.5px!important;min-height:36px!important;padding:6px 14px!important;border-radius:10px!important}
+.sm-alert{padding:14px 18px;border-radius:14px;margin:12px 0 18px;font-weight:800;display:flex;align-items:center;gap:10px}
+.sm-alert.ok{background:#F0FDFA;color:#0F766E;border:1px solid #99F6E4}
+.sm-alert.error{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
+.sm-switches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sm-switch{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfdff;font-weight:800;transition:border-color .18s ease}
+.sm-switch:hover{border-color:#088E91}
+.sm-switch input{width:18px;height:18px;margin-top:2px;accent-color:#088E91}
+.sm-switch small{color:var(--muted);font-weight:600}
+.sm-table{width:100%;border-collapse:separate;border-spacing:0 8px}
+.sm-table th{text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px}
+.sm-table th:last-child,.sm-table td:last-child{width:140px!important;min-width:140px!important;text-align:right!important;white-space:nowrap!important}
+.sm-table td{background:#fbfdff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px;font-weight:800}
+.sm-table td:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
+.sm-table td:last-child{border-right:1px solid var(--line);border-radius:0 10px 10px 0}
+.sm-table td:last-child form{margin:0!important;display:inline-flex!important;justify-content:flex-end!important}
+.sm-table td:last-child .sm-btn{min-width:86px!important;padding:7px 15px!important;border-radius:10px!important;overflow:visible!important}
+.sm-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#f8fbfd;border-radius:8px;padding:4px 10px;font-weight:800;font-size:12px}
+.sm-ok{color:#088E91}.sm-bad{color:#dc2626}
+.sm-current-logo{display:flex;gap:18px;align-items:center}
+.sm-logo-preview{width:96px;height:96px;object-fit:contain;border-radius:14px;background:#fff;border:1px solid var(--line);padding:8px;box-shadow:0 2px 8px rgba(15,41,81,.06)}
+.sm-structure{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sm-building-card{border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;background:#fbfdff}
+.sm-building-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.sm-building-head form{margin:0;flex-shrink:0;display:inline-flex}
+.sm-floor-list{display:grid;gap:8px;margin-top:10px}
+.sm-floor{border:1px dashed #cfe0e7;border-radius:12px;padding:12px 14px;background:#fff}
+.sm-muted{color:var(--muted);font-weight:600}
+.sm-palette-card{border:2px solid var(--line)!important;border-radius:14px!important;padding:16px!important;cursor:pointer!important;display:block!important;transition:all .18s ease!important}
+.sm-palette-card:hover{transform:translateY(-2px)!important;box-shadow:0 8px 24px rgba(15,41,81,.08)!important}
+.sm-palette-card.active{border:2.5px solid #088E91!important;box-shadow:0 0 0 4px rgba(8,142,145,.18),0 10px 24px rgba(15,41,81,.12)!important}
+@media(max-width:1050px){.sm-grid,.sm-grid.three,.sm-structure{grid-template-columns:1fr}.sm-switches{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.sm-row,.sm-row.three,.sm-switches{grid-template-columns:1fr}.smset{padding:8px}.sm-card{padding:16px}.sm-logo-preview{width:72px;height:72px}}
+.sm-info-callout{display:flex;gap:12px;align-items:flex-start;border:1px solid #99F6E4;background:#F0FDFA;border-radius:14px;padding:14px 16px;margin:8px 0 16px;font-weight:750;color:#0F2951}
 .sm-editor-table{width:100%;border-collapse:collapse}
-.sm-editor-table th{background:var(--soft);color:var(--navy);font-weight:900;padding:12px;text-align:left;border-bottom:2px solid var(--line);font-size:13px;text-transform:uppercase}
-.sm-editor-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle;font-weight:800}
+.sm-editor-table th{background:var(--soft);color:#0F2951;font-weight:850;padding:12px;text-align:left;border-bottom:2px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+.sm-editor-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle;font-weight:750}
 .sm-editor-table tr:hover td{background:#f8fcfe}
-.sm-badge-builtin{background:#e8f4fd;color:#0b5cab;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:900;border:1px solid #c2e0f8}
-.sm-badge-custom{background:#fef3e7;color:#b45309;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:900;border:1px solid #fed7aa}
-.sm-code-snippet{background:#1e293b;color:#f8fafc;padding:14px;border-radius:14px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.5;overflow-x:auto;margin:10px 0}
-.sm-actions-sticky{position:sticky;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:12px 18px;z-index:4;box-shadow:0 14px 36px rgba(7,56,77,.15);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
-.sm-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:linear-gradient(135deg,var(--navy),#0b4f6c);color:#fff;padding:14px 22px;border-radius:18px;font-weight:900;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.18);transform:translateY(100px);opacity:0;transition:all .32s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.sm-badge-builtin{background:#F0FDFA;color:#0F766E;padding:4px 9px;border-radius:8px;font-size:11.5px;font-weight:800;border:1px solid #99F6E4}
+.sm-badge-custom{background:#fef3e7;color:#b45309;padding:4px 9px;border-radius:8px;font-size:11.5px;font-weight:800;border:1px solid #fed7aa}
+.sm-code-snippet{background:#0F2951;color:#f8fafc;padding:14px;border-radius:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.5;overflow-x:auto;margin:10px 0}
+.sm-actions-sticky{position:sticky;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:16px;padding:14px 20px;z-index:4;box-shadow:0 10px 30px rgba(15,41,81,.12);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.sm-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:#0F2951;color:#fff;padding:14px 22px;border-radius:14px;font-weight:800;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.18);transform:translateY(100px);opacity:0;transition:all .32s cubic-bezier(.16,1,.3,1);pointer-events:none}
 .sm-toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
-.sm-toast.sm-toast-ok{border-left:5px solid #10b981;box-shadow:0 20px 50px rgba(16,185,129,.25),0 10px 24px rgba(7,56,77,.2)}
+.sm-toast.sm-toast-ok{border-left:5px solid #088E91;box-shadow:0 20px 50px rgba(8,142,145,.25),0 10px 24px rgba(15,41,81,.2)}
 .sm-btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:smSpin .6s linear infinite;margin-right:6px;vertical-align:middle}
 @keyframes smSpin{to{transform:rotate(360deg)}}
 @keyframes smFade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
 </style>
 
 <div class="smset schoolmanager-configured">
-  <section class="sm-hero">
-    <div>
-      <div class="sm-kicker">GLPI School Manager</div>
-      <h1><?= smcfg_h(plugin_schoolmanager_app_name()) ?> · <?= smcfg_h(smcfg_tr('settings_heading', 'Settings')) ?></h1>
-      <p><?= smcfg_h(smcfg_tr('settings_subtitle', 'Configure branding, modules, classrooms, plans, language and visual theme from GLPI.')) ?></p>
-    </div>
-    <div class="sm-hero-side">
-      <img class="sm-logo-preview" src="<?= smcfg_h($logoUrl) ?>" alt="Logo" onerror="this.onerror=null;this.src='<?= smcfg_h(plugin_schoolmanager_logo_data_uri()) ?>';">
-    </div>
-  </section>
 
   <?php if(isset($_GET['saved'])): ?>
     <div class="sm-alert ok">
@@ -532,6 +611,8 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <?= smcfg_h(smcfg_tr('locale_deleted_msg', 'Custom language removed successfully.')) ?>
       <?php elseif($_GET['saved'] === 'theme_saved'): ?>
         <?= smcfg_h(smcfg_tr('theme_saved_msg', 'Visual theme updated and compiled successfully.')) ?>
+      <?php elseif($_GET['saved'] === 'plans_toggled'): ?>
+        <?= smcfg_h(smcfg_tr('plans_toggled_msg', 'Modo de planos interactivos (diagrams.net) actualizado correctamente.')) ?>
       <?php else: ?>
         <?= smcfg_h(smcfg_tr('configuration_saved', 'Configuration saved successfully.')) ?>
       <?php endif; ?>
@@ -545,7 +626,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
 
   <!-- Unified tabs with consistent emojis and pure SSR localization -->
   <div class="sm-tabs">
-    <button class="sm-tab active" data-tab="general" type="button">⚙️ <?= smcfg_h(smcfg_tr('tab_general', 'General')) ?></button>
+    <button class="sm-tab active" data-tab="general" type="button">⚙️ <?= smcfg_h(smcfg_tr('tab_settings', 'Configuración')) ?></button>
     <button class="sm-tab" data-tab="i18n" type="button">🌐 <?= smcfg_h(smcfg_tr('tab_languages', 'Languages')) ?></button>
     <button class="sm-tab" data-tab="modules" type="button">🧩 <?= smcfg_h(smcfg_tr('tab_modules', 'Modules')) ?></button>
     <button class="sm-tab" data-tab="visual" type="button">🎨 <?= smcfg_h(smcfg_tr('tab_visual', 'Branding & Themes')) ?></button>
@@ -557,7 +638,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   <!-- TAB: GENERAL -->
   <section class="sm-panel active" id="tab-general">
     <form method="post" class="sm-card"><?php smcfg_token(); ?><input type="hidden" name="action" value="save_general">
-      <h2>⚙️ <?= smcfg_h(smcfg_tr('main_config', 'Main Configuration')) ?></h2>
+      <h2>⚙️ <?= smcfg_h(smcfg_tr('main_config', 'Configuración Principal')) ?></h2>
       <div class="sm-row">
         <label class="sm-field">
           <span><?= smcfg_h(smcfg_tr('app_name', 'Plugin name')) ?></span>
@@ -584,7 +665,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
               <option value="<?= smcfg_h($lcode) ?>" <?= ($cfg['locale']??'')===$lcode?'selected':'' ?>><?= smcfg_h($linfo['name']) ?> (<?= smcfg_h($lcode) ?>)<?= $linfo['is_custom'] ? ' [' . smcfg_h(smcfg_tr('custom', 'Custom')) . ']' : '' ?></option>
             <?php endforeach; ?>
           </select>
-          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English (UK), Español, Français, Deutsch, Italiano, Português, Nederlands, Polski, Türkçe, 简体中文.')) ?></small>
+          <small class="sm-help"><?= smcfg_h(smcfg_tr('builtin_languages_help', 'Official languages: English (UK), Español, Français, Deutsch, Italiano, Português.')) ?></small>
           <small class="sm-help" style="display:block;margin-top:5px;color:var(--navy);font-weight:800">🤖 <?= smcfg_h(smcfg_tr('ai_translation_notice', 'Additional language translations were generated with AI assistance. Found an issue? Report it at:')) ?> <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="color:var(--red);text-decoration:underline">GitHub Issues</a></small>
         </label>
       </div>
@@ -603,7 +684,9 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
         <span><?= smcfg_h(smcfg_tr('show_logo_header', 'Show logo in headers')) ?><br><small><?= smcfg_h(smcfg_tr('show_logo_help', 'Display the school / center logo on main screens.')) ?></small></span>
       </label>
 
-      <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('save_general_settings', 'Save general settings')) ?></button>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('save_settings', 'Guardar configuración')) ?></button>
+      </div>
     </form>
   </section>
 
@@ -611,14 +694,14 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   <section class="sm-panel" id="tab-i18n">
     <div class="sm-card">
       <h2>🌐 <?= smcfg_h(smcfg_tr('language_center_title', 'Language Center & Visual Translation Editor')) ?></h2>
-      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'School Manager natively includes 10 languages: English (primary base), Spanish, French, German, Italian, Portuguese, Dutch, Polish, Turkish, and Simplified Chinese. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload it here, or edit any language directly from this screen.')) ?></p>
+      <p class="sm-help"><?= smcfg_h(smcfg_tr('language_center_desc', 'School Manager natively includes 6 official languages: English (primary base), Spanish, French, German, Italian, and Portuguese. You can download the English translation template, translate it manually or using an AI model (ChatGPT, Claude, Gemini), upload custom files here, or edit any language directly from this screen.')) ?></p>
 
       <!-- AI Disclaimer and GitHub Issues Callout -->
       <div class="sm-alert" style="background:#eef8fc;border:1.5px solid #bce1f1;color:#07384d;margin-top:14px;border-radius:18px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px">
         <span style="font-size:26px;line-height:1;flex-shrink:0">🤖</span>
         <div style="font-size:14px;line-height:1.55">
           <strong style="display:block;font-size:15px;margin-bottom:3px;color:#07384d"><?= smcfg_h(smcfg_tr('ai_disclaimer_title', 'AI-Generated Translations Notice & Community Contributions')) ?></strong>
-          <?= smcfg_h(smcfg_tr('ai_disclaimer_desc', 'Language packs for Portuguese, Dutch, Polish, Turkish, Chinese, German, and Italian have been generated and structured with AI assistance. If you notice any awkward phrasing, grammar issues, or missing terminology, you can edit them directly in the Visual Editor below or submit an issue/PR at our GitHub repository:')) ?>
+          <?= smcfg_h(smcfg_tr('ai_disclaimer_desc', 'Language packs for French, German, Italian, and Portuguese have been structured with AI assistance. If you notice any awkward phrasing, grammar issues, or missing terminology, you can edit them directly in the Visual Editor below or submit an issue/PR at our GitHub repository:')) ?>
           <a href="https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;color:#b6252b;font-weight:950;text-decoration:underline">https://github.com/pabloburgos/glpi-schoolmanager-plugin/issues</a>
         </div>
       </div>
@@ -703,19 +786,31 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
           <table class="sm-editor-table" translate="no">
             <thead>
               <tr>
-                <th style="width:240px"><?= smcfg_h(smcfg_tr('key_identifier', 'Key identifier')) ?></th>
-                <th style="width:40%"><?= smcfg_h(smcfg_tr('english_reference_col', 'English Reference (Primary Base)')) ?></th>
+                <th style="width:230px"><?= smcfg_h(smcfg_tr('key_identifier', 'Key identifier')) ?></th>
+                <th style="width:42%"><?= smcfg_h(smcfg_tr('reference_col', 'Reference (English / Español)')) ?></th>
                 <th><?= smcfg_h(smcfg_tr('translation_col', 'Translation')) ?></th>
               </tr>
             </thead>
             <tbody id="smLocaleTbody">
               <?php foreach($canonicalKeys as $k):
                 $enVal = (string)($canonicalEn[$k] ?? '');
-                $curVal = (string)($editDict[$k] ?? ($editLocale==='en_GB' ? $enVal : ''));
+                $esVal = (string)($canonicalEs[$k] ?? '');
+                $curVal = (string)($editDict[$k] ?? ($editLocale==='en_GB' ? $enVal : ($editLocale==='es_ES' ? $esVal : '')));
               ?>
-                <tr class="sm-locale-row" data-key="<?= smcfg_h(strtolower($k)) ?>" data-en="<?= smcfg_h(strtolower($enVal)) ?>" data-val="<?= smcfg_h(strtolower($curVal)) ?>">
+                <tr class="sm-locale-row" data-key="<?= smcfg_h(strtolower($k)) ?>" data-es="<?= smcfg_h(strtolower($esVal)) ?>" data-en="<?= smcfg_h(strtolower($enVal)) ?>" data-val="<?= smcfg_h(strtolower($curVal)) ?>">
                   <td><code><?= smcfg_h($k) ?></code></td>
-                  <td><span class="sm-no-translate" translate="no" style="color:var(--muted)"><?= smcfg_h($enVal) ?></span></td>
+                  <td>
+                    <div style="font-weight:800;color:var(--navy);display:flex;align-items:flex-start;gap:6px">
+                      <span class="sm-pill" style="font-size:10px;padding:2px 6px;background:#e8f4fd;color:#0b5cab;border-color:#c2e0f8;flex-shrink:0">EN</span>
+                      <span><?= smcfg_h($enVal ?: $esVal) ?></span>
+                    </div>
+                    <?php if ($esVal && $esVal !== $enVal): ?>
+                      <div style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:flex-start;gap:6px">
+                        <span class="sm-pill" style="font-size:10px;padding:2px 6px;background:#fef3e7;color:#b45309;border-color:#fed7aa;flex-shrink:0">ES</span>
+                        <span><?= smcfg_h($esVal) ?></span>
+                      </div>
+                    <?php endif; ?>
+                  </td>
                   <td><input class="sm-input" style="padding:8px 10px;font-size:13px" name="trans[<?= smcfg_h($k) ?>]" value="<?= smcfg_h($curVal) ?>"></td>
                 </tr>
               <?php endforeach; ?>
@@ -823,73 +918,124 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
       </div>
     </div>
 
-    <!-- Active 4-Theme Selection Form -->
-    <form class="sm-card sm-theme-card" id="smThemeForm" method="post">
-      <?php smcfg_token(); ?>
-      <input type="hidden" name="action" value="save_theme">
-      <h2>🎨 <?= smcfg_h(smcfg_tr('visual_themes', 'Visual themes')) ?></h2>
-      <p class="sm-help"><?= smcfg_h(smcfg_tr('theme_description', 'Choose a modern, simple, and functional theme for School Manager. All components, tables, and contrast adapt automatically.')) ?></p>
-
-      <div class="sm-palette-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:16px">
-        <?php
-          $currentPalette = (string)($theme['palette'] ?? 'teal-red');
-          $presets = plugin_schoolmanager_theme_presets();
-          $themeLabels = [
-            'teal-red' => ['title' => smcfg_tr('theme_teal_title', 'Modern Teal'), 'desc' => smcfg_tr('theme_teal_desc', 'Signature School Manager palette: balanced dark teal with crimson accents')],
-            'ocean'    => ['title' => smcfg_tr('theme_ocean_title', 'Nordic Blue'), 'desc' => smcfg_tr('theme_ocean_desc', 'Clean SaaS ocean blue, sky accents and crisp ice-white cards')],
-            'forest'   => ['title' => smcfg_tr('theme_forest_title', 'Campus Emerald'), 'desc' => smcfg_tr('theme_forest_desc', 'Academic pine forest green with warm amber gold highlights')],
-            'graphite' => ['title' => smcfg_tr('theme_graphite_title', 'Graphite Dark'), 'desc' => smcfg_tr('theme_graphite_desc', 'High-contrast modern slate dark mode (WCAG AA accessible)')],
-          ];
-          foreach ($themeLabels as $palKey => $palInfo):
-            $p = $presets[$palKey] ?? null;
-            if (!$p) continue;
-            $isActive = ($currentPalette === $palKey);
-        ?>
-          <label class="sm-palette-card <?= $isActive ? 'active' : '' ?>" style="border:2px solid <?= $isActive ? 'var(--navy)' : 'var(--line)' ?>;border-radius:18px;padding:16px;background:<?= $p['dark'] ? '#111827' : '#fff' ?>;cursor:pointer;display:block;transition:.18s">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <input type="radio" name="theme_palette" value="<?= smcfg_h($palKey) ?>" <?= $isActive ? 'checked' : '' ?> style="width:18px;height:18px">
-              <span class="sm-pill" style="font-size:11px;background:<?= $p['dark'] ? '#1e293b' : '#f0f7fb' ?>;color:<?= $p['dark'] ? '#f1f5f9' : '#07384d' ?>"><?= $p['dark'] ? 'Dark' : 'Light' ?></span>
-            </div>
-            <b style="font-size:16px;color:<?= $p['dark'] ? '#f1f5f9' : '#07384d' ?>;display:block"><?= smcfg_h($palInfo['title']) ?></b>
-            <span class="sm-help" style="font-size:12px;display:block;margin:4px 0 12px;color:<?= $p['dark'] ? '#94a3b8' : '#5f7180' ?>"><?= smcfg_h($palInfo['desc']) ?></span>
-            <span class="sm-swatches" style="display:flex;gap:6px">
-              <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['primary'] ?>;border:1px solid rgba(0,0,0,.15)" title="Primary"></i>
-              <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['secondary'] ?>;border:1px solid rgba(0,0,0,.15)" title="Secondary"></i>
-              <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['accent'] ?>;border:1px solid rgba(0,0,0,.15)" title="Accent"></i>
-              <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['background'] ?>;border:1px solid rgba(0,0,0,.15)" title="Background"></i>
-            </span>
-          </label>
-        <?php endforeach; ?>
+    <!-- Themes Section (Disabled - In Development) -->
+    <div class="sm-card sm-theme-card" id="smThemeForm" style="position:relative;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+        <h2 style="margin:0;display:flex;align-items:center;gap:10px">
+          <span>🎨 <?= smcfg_h(smcfg_tr('visual_themes', 'Temas visuales')) ?></span>
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;font-size:12px;font-weight:800;letter-spacing:0.3px;text-transform:uppercase">🚧 En desarrollo</span>
+        </h2>
+      </div>
+      <div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1.5px solid #FCD34D;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;color:#92400E">
+        <span style="font-size:22px;line-height:1">🚧</span>
+        <div style="font-size:13.5px;line-height:1.5;font-weight:600">
+          <strong style="display:block;font-size:14px;color:#78350F;margin-bottom:2px">Selector de temas visuales en desarrollo</strong>
+          Los temas adicionales están desactivados temporalmente mientras se completa su adaptación visual. Actualmente se aplica el diseño institucional oficial <b>Signature (Navy &amp; Teal)</b> en todo el plugin.
+        </div>
       </div>
 
-      <div class="sm-row" style="margin-top:16px">
-        <label class="sm-field">
-          <span><?= smcfg_h(smcfg_tr('interface_density', 'Interface density')) ?></span>
-          <select class="sm-select" name="theme_density">
-            <option value="compact" <?= ($theme['density'] ?? '') === 'compact' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('density_compact', 'Compact (more information on screen)')) ?></option>
-            <option value="comfortable" <?= ($theme['density'] ?? 'comfortable') === 'comfortable' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('density_comfortable', 'Comfortable (balanced and spacious)')) ?></option>
-            <option value="large" <?= ($theme['density'] ?? '') === 'large' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('density_large', 'Large (larger fonts and padding)')) ?></option>
-          </select>
-        </label>
-        <label class="sm-field">
-          <span><?= smcfg_h(smcfg_tr('corner_radius', 'Corner radius')) ?></span>
-          <select class="sm-select" name="theme_radius">
-            <option value="12px" <?= ($theme['radius'] ?? '') === '12px' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('radius_subtle', 'Subtle (12px)')) ?></option>
-            <option value="18px" <?= ($theme['radius'] ?? '18px') === '18px' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('radius_modern', 'Modern (18px)')) ?></option>
-            <option value="24px" <?= ($theme['radius'] ?? '') === '24px' ? 'selected' : '' ?>><?= smcfg_h(smcfg_tr('radius_rounded', 'Extra rounded (24px)')) ?></option>
-          </select>
-        </label>
-      </div>
+      <div style="opacity:0.5;pointer-events:none;user-select:none;filter:grayscale(0.2)" aria-disabled="true">
+        <div class="sm-palette-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:12px">
+          <?php
+            $currentPalette = 'teal-red';
+            $presets = plugin_schoolmanager_theme_presets();
+            $themeLabels = [
+              'teal-red' => ['title' => smcfg_tr('theme_teal_title', 'Signature (Navy & Teal)'), 'desc' => smcfg_tr('theme_teal_desc', 'Paleta oficial School Manager: azul marino profundo, turquesa líquido y toques dorados / ámbar')],
+              'ocean'    => ['title' => smcfg_tr('theme_ocean_title', 'Nordic Blue (Ocean Ice)'), 'desc' => smcfg_tr('theme_ocean_desc', 'Azul ártico cristalino con acentos cielo y superficies translúcidas refrescantes')],
+              'forest'   => ['title' => smcfg_tr('theme_forest_title', 'Campus Emerald (Botanical)'), 'desc' => smcfg_tr('theme_forest_desc', 'Verde esmeralda universitario y menta natural con reflejos dorados botánicos')],
+              'sunset'   => ['title' => smcfg_tr('theme_sunset_title', 'Warm Sunset (Amber & Coral)'), 'desc' => smcfg_tr('theme_sunset_desc', 'Cálido degradado terracota y ámbar solar con cristales ahumados y vibrantes')],
+              'graphite' => ['title' => smcfg_tr('theme_graphite_title', 'Graphite Dark (Cyber Glass)'), 'desc' => smcfg_tr('theme_graphite_desc', 'Modo oscuro pizarra de alto contraste con reflejos cian neón y violeta suave (WCAG AA)')],
+              'midnight' => ['title' => smcfg_tr('theme_midnight_title', 'Deep Cyber Midnight'), 'desc' => smcfg_tr('theme_midnight_desc', 'Oscuridad espacial profunda con glassmorphism púrpura holográfico y destellos magenta')],
+            ];
+            foreach ($themeLabels as $palKey => $palInfo):
+              $p = $presets[$palKey] ?? null;
+              if (!$p) continue;
+              $isActive = ($currentPalette === $palKey);
+              $cardBg = $p['dark'] ? 'rgba(17, 24, 39, 0.85)' : 'rgba(255, 255, 255, 0.82)';
+              $cardBorder = $isActive ? '#0F2951' : ($p['dark'] ? 'rgba(255,255,255,0.12)' : 'rgba(15,41,81,0.12)');
+          ?>
+            <label class="sm-palette-card <?= $isActive ? 'active' : '' ?>" style="border:2px solid <?= $cardBorder ?>;border-radius:16px;padding:18px;background:<?= $cardBg ?>;display:block;position:relative">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <input type="radio" name="theme_palette" value="<?= smcfg_h($palKey) ?>" <?= $isActive ? 'checked' : '' ?> disabled style="width:18px;height:18px">
+                <span class="sm-pill" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px"><?= $isActive ? '✓ Activo por defecto' : 'En desarrollo' ?></span>
+              </div>
+              <b style="font-size:15px;color:<?= $p['dark'] ? '#F1F5F9' : '#0F2951' ?>;display:block"><?= smcfg_h($palInfo['title']) ?></b>
+              <span class="sm-help" style="font-size:12px;display:block;margin:6px 0 14px;color:<?= $p['dark'] ? '#94A3B8' : '#5F7180' ?>;line-height:1.45"><?= smcfg_h($palInfo['desc']) ?></span>
+              <span class="sm-swatches" style="display:flex;gap:7px;align-items:center">
+                <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['primary'] ?>;border:2px solid rgba(255,255,255,0.7)"></i>
+                <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['secondary'] ?>;border:2px solid rgba(255,255,255,0.7)"></i>
+                <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['accent'] ?>;border:2px solid rgba(255,255,255,0.7)"></i>
+                <i style="width:24px;height:24px;border-radius:50%;display:inline-block;background:<?= $p['background'] ?>;border:2px solid rgba(255,255,255,0.7)"></i>
+              </span>
+            </label>
+          <?php endforeach; ?>
+        </div>
 
-      <button class="sm-btn primary" type="submit" style="margin-top:12px">🎨 <?= smcfg_h(smcfg_tr('save_theme_btn', 'Save theme settings')) ?></button>
-    </form>
+        <button class="sm-btn primary" type="button" disabled style="margin-top:16px">🚧 Temas en desarrollo</button>
+      </div>
+    </div>
   </section>
 
   <!-- TAB: PLANS -->
   <section class="sm-panel" id="tab-plans">
-    <div class="sm-grid">
+    <!-- Master diagrams.net plans logic card -->
+    <div class="sm-card" style="border-left: 5px solid <?= $plansActive ? '#088E91' : '#94A3B8' ?>; margin-bottom: 20px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+            <h2 style="margin:0;font-size:20px;display:flex;align-items:center;gap:8px">
+              <span>📐</span>
+              <span><?= smcfg_h(smcfg_tr('plans_diagrams_title', 'Lógica de Planos Interactivos (diagrams.net)')) ?></span>
+            </h2>
+            <span class="sm-pill" style="font-size:12px;padding:4px 12px;border-radius:999px;font-weight:800;background:<?= $plansActive ? '#EFFBFB;color:#088E91;border:1.5px solid #99F6E4' : '#F1F5F9;color:#64748B;border:1.5px solid #CBD5E1' ?>">
+              <?= $plansActive ? '✓ Lógica diagrams.net ACTIVADA' : '✕ Modo Solo Lista de Aulas (Sin planos)' ?>
+            </span>
+          </div>
+          <p class="sm-help" style="margin:0 0 10px 0;font-size:13.5px;line-height:1.5">
+            <?= smcfg_h(smcfg_tr('plans_diagrams_desc', 'Permite subir planos de planta diseñados en diagrams.net (draw.io). Cada aula etiquetada en el diagrama se detecta automáticamente permitiendo pulsar sobre ella para seleccionarla en incidencias, activos o abrir su ficha.')) ?>
+          </p>
+          <div style="background:<?= $plansActive ? '#F0FDFA' : '#F8FAFC' ?>;border:1px solid <?= $plansActive ? '#CCFBF1' : '#E2E8F0' ?>;border-radius:12px;padding:12px 14px;font-size:12.5px;color:<?= $plansActive ? '#0F766E' : '#475569' ?>;line-height:1.45">
+            <b><?= $plansActive ? '💡 Al estar ACTIVADOS:' : 'ℹ️ Al estar DESACTIVADOS (Modo Solo Lista):' ?></b>
+            <ul style="margin:6px 0 0 18px;padding:0">
+              <?php if ($plansActive): ?>
+                <li>El selector de ubicación de incidencias y activos abre el visor interactivo de diagrams.net con detección de aulas en tiempo real.</li>
+                <li>En el directorio de aulas aparece el botón directo <b>"Ver en el plano"</b>.</li>
+                <li>En el panel principal (dashboard) se muestra el acceso directo a <b>Planos de Planta</b>.</li>
+              <?php else: ?>
+                <li>En el selector de ubicación de incidencias y activos <b>NO se carga ningún plano</b>: se muestra directamente la lista limpia de aulas con búsqueda instantánea y filtros por edificio y planta.</li>
+                <li>En el directorio de aulas se <b>oculta por completo</b> el botón "Ver en el plano".</li>
+                <li>En el panel principal (dashboard) se <b>elimina el módulo de Planos</b> tanto de las tarjetas como de accesos rápidos.</li>
+              <?php endif; ?>
+            </ul>
+          </div>
+        </div>
+        <form method="post" style="margin:0;flex-shrink:0">
+          <?php smcfg_token(); ?>
+          <input type="hidden" name="action" value="toggle_plans">
+          <input type="hidden" name="plans_enabled" value="<?= $plansActive ? '0' : '1' ?>">
+          <button type="submit" class="sm-btn <?= $plansActive ? 'light' : 'primary' ?>" style="min-height:44px;padding:10px 20px;font-size:14px">
+            <?= $plansActive ? '🚫 Desactivar planos (Usar solo lista)' : '✅ Activar planos diagrams.net' ?>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <?php if (!$plansActive): ?>
+      <div class="sm-card" style="background:#F8FAFC;border:2px dashed #CBD5E1;text-align:center;padding:36px 20px">
+        <div style="font-size:36px;margin-bottom:10px">📋</div>
+        <h3 style="margin:0 0 8px;font-size:17px;color:#0F2951">Modo Solo Lista de Aulas Activo</h3>
+        <p class="sm-help" style="max-width:620px;margin:0 auto 16px;font-size:13px">
+          El plugin está configurado para operar sin planos interactivos. La subida y visualización de planos está pausada. Puedes volver a activarla en cualquier momento con el botón superior.
+        </p>
+      </div>
+    <?php endif; ?>
+
+    <div class="sm-grid" style="<?= !$plansActive ? 'opacity:0.55;pointer-events:none;filter:grayscale(0.3)' : '' ?>">
       <div class="sm-card">
         <h2>🗺️ <?= smcfg_h(smcfg_tr('upload_plan_title', 'Upload floor plan')) ?></h2>
+        <p class="sm-help" style="margin-top:-6px;margin-bottom:14px">
+          Exporta tu diagrama desde <b>diagrams.net (draw.io)</b> como archivo <code>.html</code> o <code>.svg</code> e insértalo para cada planta:
+        </p>
         <form method="post" enctype="multipart/form-data">
           <?php smcfg_token(); ?>
           <input type="hidden" name="action" value="upload_plan">
@@ -913,7 +1059,7 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
             </select>
           </label>
           <input class="sm-input" type="file" name="plan_file" accept=".html,.htm,.svg,.png,.jpg,.jpeg,.webp" required>
-          <p class="sm-help"><?= smcfg_h(smcfg_tr('plan_formats_help', 'Supports HTML, SVG, PNG, JPG/JPEG and WEBP.')) ?></p>
+          <p class="sm-help"><?= smcfg_h(smcfg_tr('plan_formats_help', 'Supports HTML (diagrams.net export), SVG, PNG, JPG/JPEG and WEBP.')) ?></p>
           <button class="sm-btn primary" type="submit"><?= smcfg_h(smcfg_tr('upload_plan_btn', 'Upload plan')) ?></button>
         </form>
       </div>
@@ -1100,11 +1246,12 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
   document.querySelectorAll('form').forEach(f=>{
     f.addEventListener('submit', function(){
       const b=f.querySelector('button[type=submit]');
-      if(b && !b.disabled){
-        b.dataset.oldHtml=b.innerHTML;
+      if(b && !b.dataset.submitting){
+        b.dataset.submitting='1';
         b.style.minWidth=b.offsetWidth+'px';
-        b.disabled=true;
+        b.classList.add('loading');
         b.innerHTML='<span class="sm-btn-spinner" aria-hidden="true"></span> ' + (b.getAttribute('data-saving') || '<?= smcfg_h(smcfg_tr("saving", "Guardando...")) ?>');
+        setTimeout(function(){ b.disabled=true; }, 0);
       }
     });
   });
@@ -1145,8 +1292,8 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
     const rows = document.querySelectorAll('.sm-locale-row');
     let count = 0;
     rows.forEach(r => {
-      const k = r.dataset.key || '', en = r.dataset.en || '', val = (r.querySelector('input')?.value || '').toLowerCase();
-      const match = !q || k.includes(q) || en.includes(q) || val.includes(q);
+      const k = r.dataset.key || '', en = r.dataset.en || '', es = r.dataset.es || '', val = (r.querySelector('input')?.value || '').toLowerCase();
+      const match = !q || k.includes(q) || en.includes(q) || es.includes(q) || val.includes(q);
       r.style.display = match ? '' : 'none';
       if(match) count++;
     });
@@ -1168,74 +1315,6 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
     t._timer = setTimeout(() => t.classList.remove('show'), 4200);
   }
 
-  // Live reactive theme switching preview
-  const themePresets = <?= json_encode(plugin_schoolmanager_theme_presets(), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>;
-  const rootDoc = <?= json_encode($CFG_GLPI['root_doc'] ?? '', JSON_UNESCAPED_SLASHES) ?>;
-  
-  function applyLiveTheme(palKey){
-    const p = themePresets[palKey];
-    if(!p) return;
-    document.documentElement.setAttribute('data-sm-theme', palKey);
-    document.documentElement.setAttribute('data-sm-dark', p.dark ? '1' : '0');
-    if(document.body){
-      document.body.setAttribute('data-sm-theme', palKey);
-      document.body.setAttribute('data-sm-dark', p.dark ? '1' : '0');
-    }
-    const vars = {
-      '--sm-primary': p.primary, '--sm-secondary': p.secondary, '--sm-accent': p.accent,
-      '--sm-soft': p.soft, '--sm-bg': p.background, '--sm-card': p.card,
-      '--sm-text': p.text, '--sm-muted': p.muted, '--sm-border': p.border,
-      '--sm-navy': p.primary, '--sm-blue': p.secondary, '--sm-red': p.accent, '--sm-ink': p.text,
-      '--navy': p.primary, '--teal': p.secondary, '--red': p.accent,
-      '--pc-dark': p.primary, '--pc-teal': p.secondary, '--pc-red': p.accent
-    };
-    Object.keys(vars).forEach(k => {
-      document.documentElement.style.setProperty(k, vars[k], 'important');
-      if(document.body) document.body.style.setProperty(k, vars[k], 'important');
-    });
-    let l = document.getElementById('schoolmanager-active-theme');
-    const href = rootDoc + '/plugins/schoolmanager/css/themes/' + encodeURIComponent(palKey) + '.css';
-    if(l){
-      l.setAttribute('href', href);
-    } else {
-      l = document.createElement('link');
-      l.id = 'schoolmanager-active-theme';
-      l.rel = 'stylesheet';
-      l.href = href;
-      document.head.appendChild(l);
-    }
-  }
-
-  document.querySelectorAll('input[name="theme_palette"]').forEach(radio => {
-    radio.addEventListener('change', function(){
-      document.querySelectorAll('.sm-palette-card').forEach(c => c.classList.remove('active'));
-      const card = this.closest('.sm-palette-card');
-      if(card) card.classList.add('active');
-      applyLiveTheme(this.value);
-
-      const formData = new FormData();
-      formData.append('action', 'save_theme');
-      formData.append('ajax', '1');
-      formData.append('theme_palette', this.value);
-      const densitySel = document.querySelector('select[name="theme_density"]');
-      if(densitySel) formData.append('theme_density', densitySel.value);
-      const radiusSel = document.querySelector('select[name="theme_radius"]');
-      if(radiusSel) formData.append('theme_radius', radiusSel.value);
-      const tokenInput = document.querySelector('#smThemeForm input[name="_glpi_csrf_token"]') || document.querySelector('input[name="_glpi_csrf_token"]');
-      if(tokenInput) formData.append('_glpi_csrf_token', tokenInput.value);
-
-      fetch(location.pathname, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).then(r => r.json()).then(data => {
-        showToast('🎨 ' + (data?.message || 'Tema aplicado y guardado'));
-      }).catch(() => {
-        showToast('🎨 ' + (themePresets[this.value]?.name || this.value));
-      });
-    });
-  });
-
   const savedParam = params.get('saved');
   if(savedParam){
     const msgs = {
@@ -1244,10 +1323,11 @@ Html::header(smcfg_tr('settings_title','School Manager Settings'), $_SERVER['PHP
       'modules': '<?= smcfg_h(smcfg_tr("configuration_saved", "Configuration saved successfully.")) ?>',
       'locale_saved': '<?= smcfg_h(smcfg_tr("locale_saved_msg", "Language translations saved successfully.")) ?>',
       'locale_uploaded': '<?= smcfg_h(smcfg_tr("locale_uploaded_msg", "Language file uploaded and registered successfully.")) ?>',
-      'locale_deleted': '<?= smcfg_h(smcfg_tr("locale_deleted_msg", "Custom language removed successfully.")) ?>'
+      'locale_deleted': '<?= smcfg_h(smcfg_tr("locale_deleted_msg", "Custom language removed successfully.")) ?>',
+      'plans_toggled': '<?= smcfg_h(smcfg_tr("plans_toggled_msg", "Modo de planos interactivos (diagrams.net) actualizado correctamente.")) ?>'
     };
     showToast('✓ ' + (msgs[savedParam] || '<?= smcfg_h(smcfg_tr("configuration_saved", "Configuration saved successfully.")) ?>'));
   }
 })();
 </script>
-<?php Html::footer(); ?>
+<?php sm_page_footer(); ?>

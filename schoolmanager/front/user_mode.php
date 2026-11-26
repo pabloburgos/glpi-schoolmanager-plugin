@@ -12,6 +12,6 @@ echo json_encode([
     'mode'        => $mode,
     'canTickets'  => plugin_schoolmanager_can_create_ticket(),
     'canAssets'   => plugin_schoolmanager_can_create_asset(null),
-    'target'      => ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/formularios.php?v=139',
+    'target'      => ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/dashboard.php?v=139',
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 

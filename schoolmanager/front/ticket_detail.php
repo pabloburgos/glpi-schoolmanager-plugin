@@ -4,6 +4,8 @@ Session::checkLoginUser();
 require_once(__DIR__ . '/../inc/permissions.php');
 require_once(__DIR__ . '/../inc/stats_helpers.php');
 require_once(__DIR__ . '/../inc/stock_helpers.php');
+require_once(__DIR__ . '/../inc/layout.php');
+require_once(__DIR__ . '/../inc/ui_helpers.php');
 
 global $DB, $CFG_GLPI;
 $root = $CFG_GLPI['root_doc'] ?? '';
@@ -19,10 +21,6 @@ $canReply = false;
 $isArchived = false;
 $usedMaterialDetail = [];
 $usedMaterialRows = [];
-
-Html::header('Detalle de solicitud', $_SERVER['PHP_SELF'], 'helpdesk', 'PluginSchoolmanagerMapa');
-require_once(__DIR__ . '/../inc/ui_helpers.php');
-echo plugin_schoolmanager_home_button();
 
 function pcd_h($value) { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
 function pcd_plain($html) {
@@ -153,7 +151,7 @@ function pcd_location_detail_link($locationId, $label = '') {
     $label = trim((string)$label);
     if ($label === '') { $label = $locationId > 0 ? ('Ubicación #' . $locationId) : 'Sin ubicación'; }
     if ($locationId <= 0) { return '<b>' . pcd_h($label) . '</b>'; }
-    $plugin = pcd_plugin_detail_url('detalle_aula.php', ['id'=>$locationId]);
+    $plugin = pcd_plugin_detail_url('classroom_detail.php', ['id'=>$locationId]);
     $html = '<a class="pcd-inline-link" href="' . pcd_h($plugin) . '">' . pcd_h($label) . '</a>';
     if (pcd_can_link_objects()) {
         global $root;
@@ -407,28 +405,30 @@ Material utilizado:
 $latestSolutionText = $latestSolutionText ?? '';
 [$statusLabel, $statusClass, $statusHelp] = $ticket ? pcd_status($ticket['status'] ?? 0) : ['Error','new',''];
 $nativeUrl = $root . '/front/ticket.form.php?id=' . $ticketId;
-$listUrl = $root . '/plugins/schoolmanager/front/mis_solicitudes.php?v=234';
-$newUrl = $root . '/plugins/schoolmanager/front/nueva_incidencia.php?v=234';
+$listUrl = $root . '/plugins/schoolmanager/front/my_requests.php?v=234';
+$newUrl = $root . '/plugins/schoolmanager/front/new_ticket.php?v=234';
 $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_selectable_items(false) : [];
 ?>
 <style id="pcd-v280-clean">
 .pcd{
-  --pcd-teal:#07384d;
-  --pcd-blue:#0b5f7a;
-  --pcd-red:#a82025;
-  --pcd-red2:#8f1d1d;
+  --pcd-teal:#0F2951;
+  --pcd-blue:#1b3d6f;
+  --pcd-red:#088E91;
+  --pcd-red2:#067375;
   --pcd-gold:#efa300;
-  --pcd-line:#d6e5ed;
-  --pcd-muted:#627386;
-  --pcd-ink:#102638;
-  min-height:calc(100vh - 76px);
-  padding:clamp(12px,1.6vw,24px);
-  background:linear-gradient(135deg,#f6fafb 0%,#eef6f8 62%,#fffaf0 100%);
+  --pcd-line:#D4DFED;
+  --pcd-muted:#526580;
+  --pcd-ink:#0F2951;
+  min-height:auto;
+  padding:0!important;
+  background:transparent!important;
   font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
   color:var(--pcd-ink);
+  width:100%!important;
+  max-width:100%!important;
 }
 .pcd *{box-sizing:border-box}
-.pcd-wrap{max-width:1510px;margin:0 auto;display:grid;gap:16px}
+.pcd-wrap{max-width:100%!important;width:100%!important;margin:0 auto;display:grid;gap:16px}
 .pcd-hero{
   position:relative!important;
   overflow:hidden;
@@ -529,9 +529,8 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
 .pcd-btn::after{content:""!important;position:absolute!important;inset:0!important;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.08) 36%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.08) 64%,transparent 100%)!important;transform:translateX(-145%)!important;transition:transform .42s ease!important;pointer-events:none!important;}
 .pcd-btn:hover::after{transform:translateX(145%)!important;}
 .pcd-btn span,.pcd-btn .pcd-svg{position:relative!important;z-index:2!important;}
-@media(max-width:1280px){.pcd-actions{grid-template-columns:repeat(2,minmax(190px,1fr))!important;max-width:460px!important}.pcd-actions .pcd-btn{min-height:52px!important}}
-@media(max-width:980px){.pcd-actions{grid-template-columns:repeat(3,minmax(170px,1fr))!important;max-width:100%!important;justify-content:start!important}}
-@media(max-width:680px){.pcd-actions{grid-template-columns:1fr!important}.pcd-actions .pcd-btn{width:100%!important}}
+@media(max-width:1280px){.pcd-actions{grid-template-columns:repeat(2,minmax(160px,1fr))!important;max-width:440px!important}.pcd-actions .pcd-btn{min-height:48px!important}}
+@media(max-width:768px){.pcd-actions{grid-template-columns:1fr!important;max-width:100%!important}.pcd-actions .pcd-btn{width:100%!important;min-height:46px!important}}
 
 
 
@@ -572,20 +571,36 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
 .pcd-stock-add{justify-self:flex-start;min-height:44px!important;border-radius:15px!important;padding:0 15px!important;background:#fff!important;color:var(--pcd-teal)!important}
 .pcd-solve-actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(249,252,254,0),#f9fcfe 35%,#f9fcfe 100%);padding-top:16px;margin-top:2px;z-index:3}
 @media (max-width:760px){.pcd-stock-help{display:block}.pcd-stock-help span{text-align:left;display:block;margin-top:6px}.pcd-stock-row{grid-template-columns:1fr!important}.pcd-stock-remove{width:100%}.pcd-solve-actions{position:static}.pcd-solve-actions .pcd-btn{width:100%}}
-
 </style>
 
-<div class="pcd"><div class="pcd-wrap">
-  <section class="pcd-hero">
-    <div class="pcd-brand"><img class="pcd-logo" src="<?= pcd_h($logoUrl) ?>" alt="Logo"><div><div class="pcd-kicker">GLPI SCHOOL MANAGER</div><h1>Detalle de solicitud</h1><p class="pcd-sub">Vista sencilla con estado, respuestas y solución.</p></div></div>
-    <div class="pcd-actions">
-      <a class="pcd-btn red pc-btn-home" href="<?= pcd_h($root . '/plugins/schoolmanager/front/formularios.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION)) ?>"><?= pcd_icon('home') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_home', 'Inicio')) ?></span></a>
-      <a class="pcd-btn primary" href="<?= pcd_h($newUrl) ?>"><?= pcd_icon('plus') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) ?></span></a>
-      <a class="pcd-btn" href="<?= pcd_h($listUrl) ?>"><?= pcd_icon('list') ?><span><?= pcd_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) ?></span></a>
-      <?php if ($ticket): ?><a class="pcd-btn" href="<?= pcd_h($nativeUrl) ?>"><?= pcd_icon('external') ?><span><?= pcd_h(plugin_schoolmanager_tr('native_tickets_list', 'Vista nativa GLPI')) ?></span></a><?php endif; ?>
-    </div>
-  </section>
+<?php
+$topActions = '
+<a class="sm-btn sm-btn-primary" href="' . pcd_h($newUrl) . '">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M12 5v14M5 12h14"/></svg>
+  <span>' . pcd_h(plugin_schoolmanager_tr('menu_create_ticket', 'Crear incidencia')) . '</span>
+</a>
+<a class="sm-btn sm-btn-secondary" href="' . pcd_h($listUrl) . '">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M4.5 12.5 9.2 17 19.5 7"/></svg>
+  <span>' . pcd_h(plugin_schoolmanager_tr('menu_my_requests', 'Mis solicitudes')) . '</span>
+</a>';
+if ($ticket) {
+  $topActions .= '
+  <a class="sm-btn sm-btn-secondary" href="' . pcd_h($nativeUrl) . '">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M14 5h5v5M10 14 19 5M19 13v5H5V5h5"/></svg>
+    <span>' . pcd_h(plugin_schoolmanager_tr('native_tickets_list', 'Vista nativa GLPI')) . '</span>
+  </a>';
+}
 
+sm_page_header([
+    'title'       => 'Detalle de Solicitud #' . (int)$ticketId,
+    'subtitle'    => 'Seguimiento de resolución, chat técnico y control de materiales.',
+    'active_tab'  => 'mis_solicitudes',
+    'actions'     => $topActions,
+    'helpdesk_menu' => true,
+]);
+?>
+
+<div class="pcd">
   <?php if ($message): ?><div class="pcd-msg <?= pcd_h($messageType) ?>"><?= pcd_h($message) ?></div><?php endif; ?>
 
   <?php if ($error): ?>
@@ -732,7 +747,7 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
     <?php endif; ?>
   </section>
   <?php endif; ?>
-</div></div>
+</div>
 
 <script>
 (function(){
@@ -801,4 +816,6 @@ $pcdStockOptions = function_exists('smgr_stock_selectable_items') ? smgr_stock_s
 })();
 </script>
 
-<?php Html::footer(); ?>
+<?php
+sm_page_footer();
+

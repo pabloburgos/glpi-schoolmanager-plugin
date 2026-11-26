@@ -75,7 +75,11 @@ GitHub repository metadata.
 | File | Purpose |
 |---|---|
 | `README.md` | Main repository presentation in English. |
-| `README_ES.md` | Main repository presentation in Spanish. |
+| `README_ES.md` | Repository presentation in Spanish. |
+| `README_FR.md` | Repository presentation in French. |
+| `README_DE.md` | Repository presentation in German. |
+| `README_IT.md` | Repository presentation in Italian. |
+| `README_PT.md` | Repository presentation in Portuguese. |
 | `LICENSE` | Canonical GPLv3+ license file. |
 | `docs/LEGAL.md` | License and legal notes. |
 | `docs/COMPATIBILITY.md` | Compatibility notes. |

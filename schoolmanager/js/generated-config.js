@@ -1,4 +1,4 @@
-window.SCHOOLMANAGER_CONFIG = {"locale":"es_ES","menuTitle":"School Manager","appName":"School Manager","theme":{"palette":"teal-red","name":"Modern Teal (Signature)","primary":"#07384D","secondary":"#075D61","accent":"#B6252B","soft":"#F4FAFC","background":"#EEF6F9","card":"#FFFFFF","text":"#07384D","muted":"#5F7180","border":"#D7E6EC","dark":false,"radius":"18px","pad":"18px","gap":"18px","font":"15px","density":"comfortable"},"themeCss":"/plugins/schoolmanager/css/themes/teal-red.css"};
+window.SCHOOLMANAGER_CONFIG = {"locale":"auto","menuTitle":"School Manager","appName":"School Manager","theme":{"palette":"teal-red","name":"Signature Logo (Navy & Teal)","primary":"#0F2951","secondary":"#088E91","accent":"#F0B010","soft":"#F4FAFC","background":"#F8FAFC","card":"#FFFFFF","text":"#0F2951","muted":"#64748B","border":"#D7E6EC","dark":false,"radius":"16px","pad":"20px","gap":"18px","font":"15px","density":"comfortable"},"themeCss":"","themePalette":"teal-red","themeVer":"1.1.0"};
 (function(){
   var isSM = window.location.pathname.indexOf('/plugins/schoolmanager/') !== -1;
   var cfg = window.SCHOOLMANAGER_CONFIG || {}, t = cfg.theme || {};
@@ -8,6 +8,14 @@ window.SCHOOLMANAGER_CONFIG = {"locale":"es_ES","menuTitle":"School Manager","ap
     '--sm-gap':t.gap,'--sm-font':t.font,'--sm-navy':t.primary,'--sm-blue':t.secondary,'--sm-red':t.accent,'--sm-ink':t.text,
     '--navy':t.primary,'--teal':t.secondary,'--red':t.accent,'--pc-dark':t.primary,'--pc-teal':t.secondary,'--pc-red':t.accent
   };
+  function resolveThemeCss(){
+    if (cfg.themeCss) return cfg.themeCss;
+    if (!isSM) return '';
+    var base = window.location.pathname.split('/plugins/schoolmanager/')[0] || '';
+    var pal = encodeURIComponent(cfg.themePalette || t.palette || 'teal-red');
+    var ver = encodeURIComponent(cfg.themeVer || '1.1.0');
+    return base + '/plugins/schoolmanager/css/themes/' + pal + '.css?v=' + ver;
+  }
   function applyVars(){
     if (!isSM) return;
     document.documentElement.setAttribute('data-sm-theme', t.palette || 'teal-red');
@@ -24,15 +32,16 @@ window.SCHOOLMANAGER_CONFIG = {"locale":"es_ES","menuTitle":"School Manager","ap
         if (document.body) document.body.style.setProperty(k, vars[k], 'important');
       }
     });
-    if (cfg.themeCss) {
+    var themeHref = resolveThemeCss();
+    if (themeHref) {
       var l = document.getElementById('schoolmanager-active-theme');
       if (l) {
-        if (l.getAttribute('href') !== cfg.themeCss) l.setAttribute('href', cfg.themeCss);
+        if (l.getAttribute('href') !== themeHref) l.setAttribute('href', themeHref);
       } else {
         l = document.createElement('link');
         l.id = 'schoolmanager-active-theme';
         l.rel = 'stylesheet';
-        l.href = cfg.themeCss;
+        l.href = themeHref;
         document.head.appendChild(l);
       }
     }

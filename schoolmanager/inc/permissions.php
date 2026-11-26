@@ -74,17 +74,41 @@ function plugin_schoolmanager_can_view_locations() {
 function plugin_schoolmanager_is_superadmin() {
     if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
     try {
+        $uid = (int)Session::getLoginUserID();
+        // Root GLPI administrator
+        if ($uid === 2) { return true; }
+
+        $superIds = [4];
+        if (class_exists('Profile') && method_exists('Profile', 'getSuperAdminProfilesId')) {
+            $dbSuperIds = Profile::getSuperAdminProfilesId();
+            if (is_array($dbSuperIds) && !empty($dbSuperIds)) {
+                $superIds = array_map('intval', $dbSuperIds);
+            }
+        }
+
         if (isset($_SESSION['glpiactiveprofile']) && is_array($_SESSION['glpiactiveprofile'])) {
             $p = $_SESSION['glpiactiveprofile'];
             $id = (int)($p['id'] ?? 0);
             $name = strtolower(trim((string)($p['name'] ?? '')));
             $name = strtr($name, ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']);
-            if (in_array($name, ['super-admin', 'super admin', 'superadmin'], true) || $id === 4) {
+            if (in_array($id, $superIds, true) || in_array($name, ['super-admin', 'super admin', 'superadmin'], true) || str_contains($name, 'super-admin') || str_contains($name, 'superadmin')) {
                 return true;
             }
         }
-        if (method_exists('Session', 'haveRight') && Session::haveRight('config', UPDATE)) {
-            return true;
+
+        // Check if user has super-admin in their available profiles
+        if (isset($_SESSION['glpiprofiles']) && is_array($_SESSION['glpiprofiles'])) {
+            foreach ($_SESSION['glpiprofiles'] as $pid => $pdata) {
+                if (in_array((int)$pid, $superIds, true)) {
+                    return true;
+                }
+            }
+        }
+
+        if (method_exists('Session', 'haveRight')) {
+            if (Session::haveRight('config', UPDATE) || Session::haveRight('profile', UPDATE)) {
+                return true;
+            }
         }
     } catch (Throwable $e) {}
     return false;
@@ -112,9 +136,12 @@ function plugin_schoolmanager_is_technician() {
 function plugin_schoolmanager_can_configure() {
     if (!class_exists('Session') || !Session::getLoginUserID()) { return false; }
     if (plugin_schoolmanager_is_superadmin()) { return true; }
+    if (function_exists('smgr_is_super_admin_user') && smgr_is_super_admin_user()) { return true; }
     if (function_exists('plugin_schoolmanager_is_admin_tic_user') && plugin_schoolmanager_is_admin_tic_user()) { return true; }
     if (function_exists('plugin_schoolmanager_is_tic_user') && plugin_schoolmanager_is_tic_user()) { return true; }
-    if (method_exists('Session', 'haveRight') && Session::haveRight('config', UPDATE)) { return true; }
+    if (method_exists('Session', 'haveRight')) {
+        if (Session::haveRight('config', UPDATE) || Session::haveRight('config', READ)) { return true; }
+    }
     return false;
 }
 
@@ -218,7 +245,7 @@ function plugin_schoolmanager_can_open_native_locations() {
 
 function plugin_schoolmanager_gestion_url() {
     global $CFG_GLPI;
-    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/formularios.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1');
+    return ($CFG_GLPI['root_doc'] ?? '') . '/plugins/schoolmanager/front/dashboard.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1');
 }
 
 function plugin_schoolmanager_error_page($title = 'No se puede acceder', $message = '', $details = '') {
@@ -236,7 +263,10 @@ function plugin_schoolmanager_error_page($title = 'No se puede acceder', $messag
     </style>';
     echo '<div class="pc-error-wrap"><section class="pc-error-card"><div class="pc-error-head"><img class="pc-error-logo" src="' . htmlspecialchars((function_exists('plugin_schoolmanager_logo_url') ? plugin_schoolmanager_logo_url() : ($root . '/plugins/schoolmanager/logo.svg')), ENT_QUOTES, 'UTF-8') . '" alt="Logo"><div><p class="pc-error-kicker">' . htmlspecialchars(function_exists('plugin_schoolmanager_app_name') ? plugin_schoolmanager_app_name() : 'GLPI School Manager', ENT_QUOTES, 'UTF-8') . '</p><h1>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</h1></div></div><p class="pc-error-message">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p>';
     if ($details !== '') { echo '<div class="pc-error-details">' . htmlspecialchars($details, ENT_QUOTES, 'UTF-8') . '</div>'; }
-    echo '<div class="pc-error-actions"><a class="pc-error-btn primary" href="' . htmlspecialchars(plugin_schoolmanager_gestion_url(), ENT_QUOTES, 'UTF-8') . '">Volver a ' . htmlspecialchars(function_exists('plugin_schoolmanager_app_name') ? plugin_schoolmanager_app_name() : 'GLPI School Manager', ENT_QUOTES, 'UTF-8') . '</a><a class="pc-error-btn gold" href="' . htmlspecialchars($root . '/plugins/schoolmanager/front/nueva_incidencia.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1'), ENT_QUOTES, 'UTF-8') . '">Crear incidencia</a><a class="pc-error-btn" href="' . htmlspecialchars($root . '/plugins/schoolmanager/front/selector.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1'), ENT_QUOTES, 'UTF-8') . '">Abrir plano</a></div></section></div>';
+    $plansBtn = (!function_exists('plugin_schoolmanager_feature_enabled') || plugin_schoolmanager_feature_enabled('plans'))
+        ? '<a class="pc-error-btn" href="' . htmlspecialchars($root . '/plugins/schoolmanager/front/selector.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1.1.0'), ENT_QUOTES, 'UTF-8') . '">Abrir plano</a>'
+        : '';
+    echo '<div class="pc-error-actions"><a class="pc-error-btn primary" href="' . htmlspecialchars(plugin_schoolmanager_gestion_url(), ENT_QUOTES, 'UTF-8') . '">Volver a ' . htmlspecialchars(function_exists('plugin_schoolmanager_app_name') ? plugin_schoolmanager_app_name() : 'GLPI School Manager', ENT_QUOTES, 'UTF-8') . '</a><a class="pc-error-btn gold" href="' . htmlspecialchars($root . '/plugins/schoolmanager/front/new_ticket.php?v=' . (defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1.1.0'), ENT_QUOTES, 'UTF-8') . '">Crear incidencia</a>' . $plansBtn . '</div></section></div>';
     Html::footer();
     exit;
 }

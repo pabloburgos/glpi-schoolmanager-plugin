@@ -31,7 +31,7 @@ function schoolmanager_go_location_or_detail(string $code, int $id, string $buil
         'room' => $room,
         'v' => defined('PLUGIN_SCHOOLMANAGER_VERSION') ? PLUGIN_SCHOOLMANAGER_VERSION : '1.0.0',
     ];
-    Html::redirect($root . '/plugins/schoolmanager/front/detalle_aula.php?' . http_build_query($params));
+    Html::redirect($root . '/plugins/schoolmanager/front/classroom_detail.php?' . http_build_query($params));
     exit;
 }
 

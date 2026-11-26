@@ -1,8 +1,8 @@
 <?php
 return [
-  'schema' => 5,
+  'schema' => 6,
   'setup_complete' => false,
-  'locale' => 'es_ES',
+  'locale' => 'auto',
   'brand' => [
     'title' => 'School Manager',
     'menu_title' => 'School Manager',

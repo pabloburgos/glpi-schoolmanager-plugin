@@ -33,6 +33,7 @@ Supported official languages:
 - 🇫🇷 **Français (`fr_FR`)**
 - 🇩🇪 **Deutsch (`de_DE`)**
 - 🇮🇹 **Italiano (`it_IT`)**
+- 🇵🇹 **Português (`pt_PT`)**
 
 ### Adding a new language or updating existing translations
 
@@ -43,7 +44,7 @@ Supported official languages:
    - Upload your `.php` or `.json` file back into GLPI.
 
 2. **Via Pull Request**:
-   - Copy `schoolmanager/locales/template.php` to `schoolmanager/locales/{code}.php` (e.g. `pt_PT.php`).
+   - Copy `schoolmanager/locales/template.php` to `schoolmanager/locales/{code}.php` (e.g. `ca_ES.php`).
    - Translate values while keeping keys intact. Set `_language_name` => `'Your Language'`.
    - You can use an AI model (ChatGPT, Claude, Gemini) with the prompt included in `template.php`.
    - Submit your PR with the new locale file.
@@ -52,6 +53,6 @@ Supported official languages:
 
 - [ ] I tested the plugin in GLPI.
 - [ ] I cleared GLPI cache (`sudo -u www-data php bin/console cache:clear`).
-- [ ] I checked translations (English, Spanish, French, German, Italian or new language).
+- [ ] I checked translations (English, Spanish, French, German, Italian, Portuguese or new language).
 - [ ] I did not include private data.
 - [ ] I updated documentation if needed.

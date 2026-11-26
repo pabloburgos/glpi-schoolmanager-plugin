@@ -5,7 +5,7 @@
 <h1 align="center">School Manager para GLPI</h1>
 
 <p align="center">
-  Plugin de GLPI orientado a centros educativos para incidencias guiadas, stock TIC, planos, activos y trabajo técnico.
+  Plugin de GLPI orientado a centros educativos para incidencias guiadas, alta de activos, stock TIC, planos interactivos y trabajo técnico en escritorio y móvil.
 </p>
 
 <p align="center">
@@ -14,6 +14,7 @@
   <a href="README_FR.md">Français</a> ·
   <a href="README_DE.md">Deutsch</a> ·
   <a href="README_IT.md">Italiano</a> ·
+  <a href="README_PT.md">Português</a> ·
   <a href="#descripcion">Descripción</a> ·
   <a href="#idiomas">Idiomas</a> ·
   <a href="#requisitos">Requisitos</a> ·
@@ -42,24 +43,24 @@
 
 ## Descripción
 
-School Manager añade una capa de gestión más clara sobre GLPI para colegios e institutos. GLPI sigue siendo la plataforma base de ITSM e inventario, pero el plugin ofrece páginas más sencillas para profesorado, técnicos TIC y administradores del centro.
+School Manager añade una capa operativa simplificada sobre GLPI para colegios e institutos. GLPI sigue siendo la plataforma base de ITSM e inventario, mientras el plugin ofrece pantallas claras y optimizadas tanto para escritorio como para móvil para profesorado, técnicos TIC y administradores del centro.
 
 ## Funciones principales
 
 | Área | Descripción |
 |---|---|
-| Incidencias guiadas | Creación simplificada de tickets con categoría, aula, prioridad y activo afectado. |
-| Panel TIC | Espacio de trabajo técnico para incidencias abiertas, asignación, seguimiento y resolución. |
-| Control de stock | Consumibles, cartuchos, movimientos, avisos de stock bajo y uso vinculado a tickets. |
-| Aulas y planos | Edificios, plantas, aulas, recursos de mapas y enlaces directos a ubicaciones GLPI. |
-| Gestión de activos | Vistas simplificadas para ordenadores, monitores, impresoras, periféricos y red. |
-| Configuración | Marca, logo, módulos, idioma, edificios, aulas y planos desde GLPI. |
+| Incidencias guiadas (`new_ticket.php`) | Creación paso a paso con barra de progreso móvil, selector por bloques/problemas, aula rápida o desde plano, prioridad y activo afectado. |
+| Alta guiada de activos (`new_asset.php`) | Cambio instantáneo entre tipos de activo (ordenadores, monitores, impresoras, red, periféricos), selector de aula y barra inferior móvil con progreso. |
+| Panel TIC (`it_panel.php`) | Espacio de trabajo técnico para incidencias abiertas, reglas de asignación automática, seguimiento y resolución. |
+| Control de stock (`stock.php`) | Consumibles, cartuchos, movimientos, avisos de stock bajo y uso vinculado a tickets. |
+| Aulas y planos (`classrooms.php`, `selector.php`) | Edificios, plantas, aulas, planos interactivos con `diagrams.net` (`draw.io`) y **Modo Solo Lista** activable para centros sin planos. |
+| Activación y ajustes (`install.php`, `settings.php`) | Pantalla dedicada para instalación/actualización y centro unificado de configuración (marca, paleta Navy & Teal, módulos, idiomas, estructura y planos). |
 
 <a id="idiomas"></a>
 
 ## Idiomas e Internacionalización (i18n)
 
-GLPI School Manager ofrece soporte multilingüe nativo con el **Inglés (`en_GB`)** como base principal de traducción y plantilla:
+GLPI School Manager ofrece soporte multilingüe nativo con **6 idiomas oficiales incluidos** (100% de cobertura sobre 495 claves) y el **Inglés (`en_GB`)** como base principal:
 
 | Idioma | Código | Estado | Cobertura |
 |---|---|---|---|
@@ -68,14 +69,15 @@ GLPI School Manager ofrece soporte multilingüe nativo con el **Inglés (`en_GB`
 | 🇫🇷 **Français** | `fr_FR` | Nativo | 100% |
 | 🇩🇪 **Deutsch** | `de_DE` | Nativo | 100% |
 | 🇮🇹 **Italiano** | `it_IT` | Nativo | 100% |
+| 🇵🇹 **Português** | `pt_PT` | Nativo | 100% |
 
 ### Centro de Idiomas y Editor Visual Integrado en GLPI
 
-¡Sin tocar código ni usar la terminal! Desde **GLPI > Herramientas > School Manager > Configuración > 🌐 Idiomas**, los administradores pueden:
+¡Sin tocar código ni usar la terminal! Desde **GLPI > Herramientas > School Manager > Ajustes > 🌐 Idiomas**, los administradores pueden:
 - **Detección Automática**: Detecta el idioma de la sesión de GLPI del usuario y se adapta al instante con fallback seguro al inglés.
-- **Editor Visual en el Navegador**: Modifica o traduce cualquier texto directamente en la pantalla con buscador en vivo y guardado inmediato en el archivo `.php`.
-- **Descarga de Plantilla Oficial (`template.php`)**: Descarga la plantilla estándar en inglés con 183 claves y un prompt optimizado para traducir con IA (ChatGPT, Claude, Gemini).
-- **Subida de Archivos de Idioma**: Sube archivos `.php` o `.json` personalizados (ej: `pt_PT`, `ca_ES`, `nl_NL`). El plugin detecta el nuevo idioma y lo añade automáticamente al selector sin necesidad de reiniciar GLPI.
+- **Editor Visual en el Navegador**: Modifica o traduce cualquier texto directamente en pantalla con buscador en vivo y guardado inmediato en el archivo `.php`.
+- **Descarga de Plantilla Oficial (`template.php`)**: Descarga la plantilla estándar en inglés con 495 claves y un prompt optimizado para traducir con IA (ChatGPT, Claude, Gemini).
+- **Subida de Archivos de Idioma**: Sube archivos `.php` o `.json` personalizados (ej: `ca_ES`, `pt_BR`). El plugin detecta el nuevo idioma y lo añade automáticamente al selector.
 
 <a id="requisitos"></a>
 
@@ -134,6 +136,10 @@ glpi-schoolmanager-plugin/
 ├── .github/                # Workflows y plantillas de GitHub
 ├── README.md               # README principal en inglés
 ├── README_ES.md            # README en español
+├── README_FR.md            # README en francés
+├── README_DE.md            # README en alemán
+├── README_IT.md            # README en italiano
+├── README_PT.md            # README en portugués
 ├── AUTHORS.md              # Autores
 ├── CREDITS.md              # Créditos y agradecimientos
 ├── CHANGELOG.md            # Historial de cambios

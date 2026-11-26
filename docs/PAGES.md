@@ -2,19 +2,20 @@
 
 This document explains the main PHP pages included in the School Manager plugin.
 
-> Some file names are in Spanish because the original prototype was created in Spanish.  
-> The public project is documented in English and Spanish, and the UI can be configured from GLPI.
+> All user-facing entrypoints have been standardized to clear English filenames under `schoolmanager/front/`.  
+> Legacy Spanish URLs remain supported automatically via `schoolmanager/front/.htaccess` rewrite rules.
 
 ## Main pages
 
 | File | Purpose |
 |---|---|
 | `front/index.php` | Redirects to the main School Manager dashboard. |
-| `front/formularios.php` | Main dashboard for users, teachers, technicians and administrators. |
-| `front/configuracion.php` | Plugin configuration page: branding, modules, buildings, rooms, maps and language. |
-| `front/instalacion.php` | Initial setup wizard entrypoint. |
-| `front/creditos.php` | Credits and license information inside the plugin. |
-| `front/versiones.php` | Version notes and internal documentation page. |
+| `front/dashboard.php` | Main dashboard for users, teachers, technicians and administrators. |
+| `front/settings.php` | Unified plugin configuration center: branding, modules, `diagrams.net` floor-plan toggle, buildings, rooms, maps and languages. |
+| `front/install.php` | Dedicated post-install / post-update activation screen. |
+| `front/credits.php` | Credits and license information inside the plugin. |
+| `front/versions.php` | Version notes and internal documentation page. |
+| `front/file_editor.php` | Internal template/file editor with automatic `.bak` backups (Super-Admin only, optional module). |
 | `front/media.php` | Safe logo/media delivery endpoint used by the plugin. |
 | `front/error.php` | Friendly error page for restricted or invalid actions. |
 | `front/i18n.php` | JSON endpoint for translation strings used by JavaScript. |
@@ -24,52 +25,52 @@ This document explains the main PHP pages included in the School Manager plugin.
 
 | File | Purpose |
 |---|---|
-| `front/nueva_incidencia.php` | Guided ticket creation form. |
-| `front/mis_solicitudes.php` | User request list and status tracking. |
-| `front/solicitud_detalle.php` | Request details page with replies, resolution and used material. |
-| `front/avisos.php` | Notices and user-facing support alerts. |
-| `front/panel_tic.php` | IT technician dashboard. |
-| `front/tecnico_resumen.php` | Technician summary page. |
-| `front/asignaciones_tic.php` | Automatic assignment rules for technicians. |
+| `front/new_ticket.php` | Step-by-step guided ticket creation form (desktop & mobile optimized). |
+| `front/my_requests.php` | User request list and status tracking. |
+| `front/ticket_detail.php` | Request details page with replies, resolution and used material. |
+| `front/notifications.php` | Notices and user-facing support alerts. |
+| `front/it_panel.php` | IT technician dashboard. |
+| `front/technician_summary.php` | Technician summary page. |
+| `front/it_assignments.php` | Automatic assignment rules for technicians. |
 
 ## Classroom, locations and maps
 
 | File | Purpose |
 |---|---|
-| `front/selector.php` | Classroom map selector by building and floor. |
+| `front/selector.php` | Classroom selector by building and floor (with `diagrams.net` plans or list-only fallback). |
 | `front/plan_frame.php` | Embedded map renderer used by the selector and modal. |
-| `front/mapa.php` | Compatibility redirect to the selector. |
-| `front/mapa_calor.php` | Retired heat map page with a friendly message. |
-| `front/aulas.php` | Classroom list. |
-| `front/detalle_aula.php` | Classroom detail page with inventory summary and actions. |
-| `front/assets_aula.php` | JSON endpoint for assets linked to a classroom/location. |
+| `front/map.php` | Compatibility redirect to `selector.php`. |
+| `front/heatmap.php` | Retired heat map page with a friendly redirect/notice. |
+| `front/classrooms.php` | Classroom directory list with GLPI IDs and quick links. |
+| `front/classroom_detail.php` | Classroom detail page with inventory summary and actions. |
+| `front/classroom_assets.php` | JSON endpoint for assets linked to a classroom/location. |
 | `front/locate.php` | Compatibility resolver for classroom codes and GLPI locations. |
 
 ## Asset pages
 
 | File | Purpose |
 |---|---|
-| `front/gestion_activos.php` | Asset management list, filters and shortcuts. |
-| `front/nuevo_activo.php` | Guided asset creation. |
-| `front/nuevo_ordenador.php` | Compatibility redirect to `nuevo_activo.php?itemtype=Computer`. |
-| `front/editar_activo.php` | Simplified asset edit page. |
+| `front/asset_management.php` | Asset management list, filters and shortcuts. |
+| `front/new_asset.php` | Step-by-step guided asset creation (desktop & mobile optimized). |
+| `front/new_computer.php` | Compatibility redirect to `new_asset.php?itemtype=Computer`. |
+| `front/edit_asset.php` | Simplified asset edit page. |
 
 ## Stock pages
 
 | File | Purpose |
 |---|---|
-| `front/stock_glpi.php` | IT stock dashboard. |
+| `front/stock.php` | IT stock dashboard. |
 | `front/stock_item.php` | Stock item detail page, movements and unit history. |
-| `front/stock_movimiento.php` | Stock movement handler. |
+| `front/stock_movement.php` | Stock movement handler. |
 
 ## Internal helper files
 
 | Folder | Purpose |
 |---|---|
-| `inc/` | PHP helpers, permissions, configuration, stock, stats, assets and map classes. |
-| `css/` | Plugin stylesheets and generated theme CSS. |
-| `js/` | JavaScript helpers and generated runtime config. |
-| `locales/` | Spanish and English translations. |
+| `inc/` | Shared layout (`layout.php`), mobile form UX (`form_mobile_ux.php`), permissions, configuration, stock, stats, assets and map helpers. |
+| `css/` | Plugin stylesheets, themes and generated theme CSS. |
+| `js/` | JavaScript helpers, native combobox restorer and generated runtime config. |
+| `locales/` | 6 official dictionaries (`en_GB`, `es_ES`, `fr_FR`, `de_DE`, `it_IT`, `pt_PT`), `template.php`, and runtime JSON phrase maps. |
 | `data/` | Local default configuration and assignment rules. |
 | `maps/` | Map examples and uploaded map resources. |
 
@@ -78,4 +79,4 @@ This document explains the main PHP pages included in the School Manager plugin.
 - Keep user-facing text translatable.
 - Avoid hardcoding school names, classroom codes or internal locations.
 - Keep native GLPI links available when the user has permission.
-- If you rename a file, update internal links and this document.
+- If you rename a file, update internal links, `front/.htaccess` (if needed) and this document.

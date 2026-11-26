@@ -1,25 +1,35 @@
 # Changelog
 
-## [1.1.0] - 2026-10-27
+## [1.1.0] - 2026-11-26
 
 ### Added
 
-- **Official Multilingual Support**: Native support for **French (`fr_FR`)**, **German (`de_DE`)**, and **Italian (`it_IT`)**, joining English and Spanish with 296 synchronized UI keys.
-- **English as Primary Base Language**: Set English (`en_GB`) as the canonical base language for templates, fallbacks, and UI references.
+- **Official 6-Language Support (495 keys, 100% coverage)**: Native support for **English (`en_GB`)**, **Spanish (`es_ES`)**, **French (`fr_FR`)**, **German (`de_DE`)**, **Italian (`it_IT`)**, and **Portuguese (`pt_PT`)**, with `en_GB` as the canonical base language.
+- **Guided Ticket & Asset Step-by-Step Redesign (`new_ticket.php`, `new_asset.php`)**: Instant client-side asset-type switching, interactive step-tracker capsules, quick suggestion chips, and integrated classroom/location picker cards.
+- **Dedicated Mobile-First UX Layer (`inc/form_mobile_ux.php`)**: Compact single-row mobile header (hiding subtitle descriptions on screens `<= 900px`), expanding capsule stepper, 2-column type/category grids, 16px touch-friendly inputs, and sticky bottom progress bar.
+- **Dedicated Post-Install / Update Activation Page (`front/install.php`)**: Clear separation between initial/update plugin activation and full day-to-day settings (`front/settings.php`).
+- **Optional `diagrams.net` Floor Plans / Classroom List-Only Mode**: Toggle interactive floor plans completely on or off from **Settings > Floor Plans**; when disabled, dashboards, classroom directories, modals, and toolbars hide plan links and switch cleanly to list-only classroom selection.
+- **Standardized English Routes**: Renamed front PHP pages to English (`dashboard.php`, `settings.php`, `install.php`, `new_ticket.php`, `new_asset.php`, `classrooms.php`, `stock.php`, `it_panel.php`, etc.) while keeping backward compatibility via `front/.htaccess`.
+- **Unified Shared Page Layout (`inc/layout.php`)**: Consistent flat-styled Signature Navy & Teal header, transparent logo integration, and simplified Home button across every plugin page.
 - **Server-Side Rendering (SSR) i18n**: Eliminated Flash of Untranslated Content (FOUC) by rendering localized strings on the server (`smcfg_tr()`) before page delivery.
 - **4 Modern, Simple, Accessible Themes**:
   - `teal-red`: Modern Teal with clean contrast.
   - `ocean`: Nordic Blue with cool sky tones.
   - `forest`: Campus Emerald with amber accents.
   - `graphite`: Graphite Dark mode with WCAG AA compliant contrast (> 4.5:1 ratio).
-- **In-Browser Language Center & Visual Editor**: Complete translation management interface inside GLPI settings (`front/configuracion.php`):
+- **In-Browser Language Center & Visual Editor**: Complete translation management interface inside GLPI settings (`front/settings.php`):
   - In-browser string editor with live search, English reference column, and one-click saving.
   - Direct download button for the official English translation template (`template.php`).
   - File uploader supporting `.php` and `.json` custom language packs.
   - Registered languages table showing key counts, status, and management actions.
-- **Dynamic Locale Discovery**: The plugin automatically detects any `.php` or `.json` dictionary in `schoolmanager/locales/` and populates the settings selector automatically.
-- **AI Translation Guide**: Ready-to-copy AI prompt in the template and settings UI to generate new language packs in seconds via LLMs (ChatGPT, Claude, Gemini).
-- **GitHub Multilingual Documentation**: Added localized READMEs (`README_FR.md`, `README_DE.md`, `README_IT.md`), language request issue template, and updated contribution guides.
+- **Dynamic Locale Discovery**: Automatically detects any `.php` or `.json` dictionary in `schoolmanager/locales/` and populates the settings selector automatically.
+- **AI Translation Guide**: Ready-to-copy AI prompt in the template and settings UI to generate new language packs via LLMs (ChatGPT, Claude, Gemini).
+- **GitHub Multilingual Documentation**: Updated localized READMEs (`README.md`, `README_ES.md`, `README_FR.md`, `README_DE.md`, `README_IT.md`, `README_PT.md`), language request issue templates, and contribution guides.
+
+### Changed
+
+- **Signature Navy & Teal Design System**: Standardized buttons, cards, badges, and native `<select>` elements across desktop and mobile without floating DOM combobox clipping bugs.
+- **Fresh GitHub Defaults**: Reset `schoolmanager/data/config.json`, `config.php`, and `js/generated-config.js` to neutral defaults (`locale: auto`, `setup_complete: false`).
 
 ### Fixed
 

@@ -8,7 +8,7 @@ $root = $CFG_GLPI['root_doc'] ?? '';
 
 // Esta pagina es solo de acciones. Si se abre a mano por GET, volvemos al panel y evitamos pantalla roja de GLPI.
 if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
-    Html::redirect($root . '/plugins/schoolmanager/front/stock_glpi.php?v=282');
+    Html::redirect($root . '/plugins/schoolmanager/front/stock.php?v=282');
 }
 
 $canAssets = function_exists('plugin_schoolmanager_can_create_asset') && plugin_schoolmanager_can_create_asset(null);
@@ -91,4 +91,4 @@ if ($return === 'detail' && $item_id > 0) {
     $params['id'] = $item_id;
     Html::redirect($root . '/plugins/schoolmanager/front/stock_item.php?' . http_build_query($params));
 }
-Html::redirect($root . '/plugins/schoolmanager/front/stock_glpi.php?' . http_build_query($params));
+Html::redirect($root . '/plugins/schoolmanager/front/stock.php?' . http_build_query($params));

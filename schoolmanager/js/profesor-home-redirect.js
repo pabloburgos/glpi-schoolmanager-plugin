@@ -31,7 +31,7 @@
     if (!looksLikeProfessorHome()) return;
     if (isPluginPage()) return;
 
-    var target = info.target || (rootDoc() + '/plugins/schoolmanager/front/formularios.php?v=139');
+    var target = info.target || (rootDoc() + '/plugins/schoolmanager/front/dashboard.php?v=139');
     if (window.location.href.indexOf(target) >= 0) return;
 
     window.location.replace(target);

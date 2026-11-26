@@ -4,6 +4,7 @@
   const PATH = window.location.pathname || '';
   const IS_TARGET_FORM = /\/front\/(computer|ticket)\.form\.php$/i.test(PATH);
   if (!IS_TARGET_FORM) return;
+  if (window.SCHOOLMANAGER_CONFIG && window.SCHOOLMANAGER_CONFIG.features && window.SCHOOLMANAGER_CONFIG.features.plans === false) return;
 
   const ROOT = (window.GLPI_SCHOOLMANAGER_ROOT || getRootDoc());
   const SELECTOR_URL = ROOT + '/plugins/schoolmanager/front/selector.php?building=ED1&floor=P0&mode=select&embed=1&compact=1&v=238';

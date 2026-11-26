@@ -5,7 +5,7 @@
 <h1 align="center">School Manager for GLPI</h1>
 
 <p align="center">
-  School-focused GLPI plugin for guided tickets, IT stock, classroom maps, assets and technician workflows.
+  School-focused GLPI plugin for guided tickets, guided asset creation, IT stock, interactive classroom plans, and mobile-ready technician workflows.
 </p>
 
 <p align="center">
@@ -14,6 +14,7 @@
   <a href="README_FR.md">Français</a> ·
   <a href="README_DE.md">Deutsch</a> ·
   <a href="README_IT.md">Italiano</a> ·
+  <a href="README_PT.md">Português</a> ·
   <a href="#overview">Overview</a> ·
   <a href="#languages">Languages</a> ·
   <a href="#requirements">Requirements</a> ·
@@ -42,24 +43,24 @@
 
 ## Overview
 
-School Manager adds a simplified operational layer on top of GLPI for schools and educational centres. It keeps GLPI as the core ITSM and inventory platform while providing clearer pages for teachers, technicians and school IT administrators.
+School Manager adds a simplified operational layer on top of GLPI for schools and educational centres. It keeps GLPI as the core ITSM and inventory platform while providing clearer desktop and mobile pages for teachers, technicians and school IT administrators.
 
 ## Main features
 
 | Area | Description |
 |---|---|
-| Guided tickets | Simplified incident creation for teachers and staff with category, classroom, priority and affected asset. |
-| IT dashboard | Technician-oriented workspace for open requests, assignment, follow-up and resolution. |
-| Stock control | Consumables, cartridges, stock movements, low-stock warnings and ticket-linked usage. |
-| Classrooms and maps | Buildings, floors, classrooms, map resources and direct links to GLPI locations. |
-| Asset management | Simplified views for computers, monitors, printers, peripherals and network devices. |
-| Configuration | Branding, logo, modules, language, buildings, rooms and maps from GLPI. |
+| Guided tickets (`new_ticket.php`) | Step-by-step incident creation with expanding mobile stepper, parent/sub-category picker, quick classroom selector, priority and linked asset. |
+| Guided asset creation (`new_asset.php`) | Instant client-side asset type switching (computers, monitors, printers, network, peripherals), location picker, and mobile sticky progress bar. |
+| IT dashboard (`it_panel.php`) | Technician-oriented workspace for open requests, rules-based auto-assignment, follow-up and resolution. |
+| Stock control (`stock.php`) | Consumables, cartridges, stock movements, low-stock warnings and ticket-linked usage. |
+| Classrooms & interactive plans (`classrooms.php`, `selector.php`) | Buildings, floors, classrooms, `diagrams.net` (`draw.io`) interactive floor plans, plus a toggleable **List-Only Mode** when floor plans are disabled. |
+| Activation & settings (`install.php`, `settings.php`) | Dedicated post-install/update activation wizard and unified configuration center (branding, Signature Navy & Teal UI, modules, languages, buildings, rooms and plans). |
 
 <a id="languages"></a>
 
 ## Languages & Internationalization (i18n)
 
-GLPI School Manager provides native, out-of-the-box multilingual support with **English (`en_GB`)** as the primary base language:
+GLPI School Manager provides native, out-of-the-box multilingual support with **6 official built-in languages** (100% coverage across 495 keys) and **English (`en_GB`)** as the primary base language:
 
 | Language | Code | Status | Coverage |
 |---|---|---|---|
@@ -68,22 +69,19 @@ GLPI School Manager provides native, out-of-the-box multilingual support with **
 | 🇫🇷 **Français** | `fr_FR` | Built-in | 100% |
 | 🇩🇪 **Deutsch** | `de_DE` | Built-in | 100% |
 | 🇮🇹 **Italiano** | `it_IT` | Built-in | 100% |
+| 🇵🇹 **Português** | `pt_PT` | Built-in | 100% |
 
 ### In-Browser Language Center & Visual Editor
 
 No developer tools or terminal commands required! From **GLPI > Tools > School Manager > Settings > 🌐 Languages**, administrators can:
 - **Automatic Language Detection**: Detects the active GLPI session language and switches smoothly, with automatic fallback to English.
 - **In-Browser String Editor**: Edit and translate any string directly from the browser with real-time search and save changes instantly.
-- **Official English Template (`template.php`)**: Download the canonical 296-key template (`schoolmanager/locales/template.php`) with ready-to-use AI translation prompts.
-- **Custom Language Packs**: Upload `.php` or `.json` translation files (e.g. `pt_PT`, `ca_ES`, `nl_NL`). The plugin dynamically discovers new files and registers them in the settings combobox immediately.
+- **Official English Template (`template.php`)**: Download the canonical 495-key template (`schoolmanager/locales/template.php`) with ready-to-use AI translation prompts.
+- **Custom Language Packs**: Upload `.php` or `.json` translation files (e.g. `ca_ES`, `pt_BR`). The plugin dynamically discovers new files and registers them immediately.
 
-### Modern Themes & Accessibility (WCAG AA)
+### Visual Identity
 
-School Manager includes 4 modern, functional themes accessible directly from **Settings > 🎨 Branding & Themes**:
-- **Modern Teal (`teal-red`)**: Classic clean education theme with teal primary and ruby accents.
-- **Nordic Blue (`ocean`)**: Bright ice-blue palette with sky accents and crisp typography.
-- **Campus Emerald (`forest`)**: Academic green palette with warm amber highlights.
-- **Graphite Dark (`graphite`)**: High-contrast WCAG AA accessible dark mode with slate surfaces and glowing indicators.
+School Manager uses the **Signature Navy & Teal (`#0F2951` & `#088E91`)** institutional design system across desktop and mobile, featuring crisp native form controls, zero CSS leakage into GLPI core navigation, and compact responsive headers. Additional theme presets remain clearly marked as in development inside Settings.
 
 <a id="requirements"></a>
 
@@ -142,6 +140,10 @@ glpi-schoolmanager-plugin/
 ├── .github/                # GitHub workflows and templates
 ├── README.md               # Main English README
 ├── README_ES.md            # Spanish README
+├── README_FR.md            # French README
+├── README_DE.md            # German README
+├── README_IT.md            # Italian README
+├── README_PT.md            # Portuguese README
 ├── AUTHORS.md              # Authors
 ├── CREDITS.md              # Credits and acknowledgements
 ├── CHANGELOG.md            # Change history

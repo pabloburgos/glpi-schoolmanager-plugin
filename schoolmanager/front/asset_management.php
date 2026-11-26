@@ -3,6 +3,7 @@ include('../../../inc/includes.php');
 Session::checkLoginUser();
 require_once(__DIR__ . '/../inc/permissions.php');
 require_once(__DIR__ . '/../inc/assets_helpers.php');
+require_once(__DIR__ . '/../inc/layout.php');
 
 if (!plugin_schoolmanager_can_update_asset(null)) {
     plugin_schoolmanager_access_denied_page('Gestión de activos restringida', 'Tu perfil no tiene permisos para modificar inventario.');
@@ -77,7 +78,22 @@ if ($sort === 'location' && $rows) {
     });
 }
 
-Html::header('Gestión de activos', $_SERVER['PHP_SELF'], 'tools', 'PluginSchoolmanagerMapa');
+$topActions = '
+<a class="sm-btn sm-btn-primary" href="' . htmlspecialchars($root, ENT_QUOTES, 'UTF-8') . '/plugins/schoolmanager/front/new_asset.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION) . '">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M12 5v14M5 12h14"/></svg>
+  <span>' . htmlspecialchars(plugin_schoolmanager_tr('menu_create_asset', 'Alta Guiada'), ENT_QUOTES, 'UTF-8') . '</span>
+</a>
+<a class="sm-btn sm-btn-secondary" href="' . htmlspecialchars($root, ENT_QUOTES, 'UTF-8') . '/plugins/schoolmanager/front/classrooms.php?v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION) . '">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>
+  <span>' . htmlspecialchars(plugin_schoolmanager_tr('classroom_list', 'Lista de Aulas'), ENT_QUOTES, 'UTF-8') . '</span>
+</a>';
+
+sm_page_header([
+    'title'      => plugin_schoolmanager_tr('menu_assets', 'Inventario y Equipamiento'),
+    'subtitle'   => plugin_schoolmanager_tr('assets_subtitle', 'Gestión centralizada de ordenadores, periféricos y dispositivos del centro.'),
+    'active_tab' => 'gestion_activos',
+    'actions'    => $topActions,
+]);
 require_once(__DIR__ . '/../inc/ui_helpers.php');
 ?>
 <style>
@@ -215,12 +231,13 @@ function gsm_asset_icon_html($type, $fallbackClass, $extraClass = '') {
 .gsm-assets .gsm-panel{border-radius:22px!important;padding:16px!important;box-shadow:0 9px 24px rgba(7,56,77,.052)!important;overflow:hidden!important;min-width:0!important;}
 .gsm-assets .gsm-panel h2{font-size:23px!important;margin-bottom:8px!important;}
 .gsm-assets .gsm-type-list{grid-template-columns:1fr!important;gap:10px!important;}
-.gsm-assets .gsm-type{min-height:64px!important;padding:11px 12px!important;border-radius:16px!important;gap:11px!important;}
-.gsm-assets .gsm-type b{width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:15px!important;background:linear-gradient(135deg,#f8fbfa,#fff8e6)!important;color:#07384d!important;border-color:#d7e6ec!important;box-shadow:0 8px 18px rgba(7,56,77,.06)!important;}
-.gsm-assets .gsm-type.active{background:linear-gradient(135deg,#b6252b,#951923)!important;border-color:#b6252b!important;color:#fff!important;}
-.gsm-assets .gsm-type.active b{background:#fff!important;color:#b6252b!important;border-color:#fff!important;}
-.gsm-assets .gsm-type b .gsm-inline-icon{width:28px!important;height:28px!important;min-width:28px!important;display:block!important;stroke:currentColor!important;fill:none!important;}
-.gsm-assets .gsm-asset-icon{background:linear-gradient(135deg,#07384d,#0f8f86)!important;color:#fff!important;border:0!important;box-shadow:0 10px 24px rgba(7,56,77,.14)!important;}
+.gsm-assets .gsm-type{min-height:64px!important;padding:11px 12px!important;border-radius:14px!important;gap:11px!important;}
+.gsm-assets .gsm-type b{width:44px!important;height:44px!important;flex:0 0 44px!important;border-radius:12px!important;background:#F1F5F9!important;color:#0F2951!important;border-color:#E2E8F0!important;box-shadow:none!important;}
+.gsm-assets .gsm-type.active{background:#0F2951!important;background-image:none!important;border-color:#0F2951!important;color:#fff!important;}
+.gsm-assets .gsm-type.active b{background:rgba(255,255,255,.16)!important;color:#fff!important;border-color:rgba(255,255,255,.25)!important;}
+.gsm-assets .gsm-type.active span,.gsm-assets .gsm-type.active small{color:#fff!important;}
+.gsm-assets .gsm-type b .gsm-inline-icon{width:24px!important;height:24px!important;min-width:24px!important;display:block!important;stroke:currentColor!important;fill:none!important;}
+.gsm-assets .gsm-asset-icon{background:#0F2951!important;background-image:none!important;color:#fff!important;border:0!important;box-shadow:0 4px 10px rgba(15,41,81,.14)!important;}
 .gsm-assets .gsm-asset-icon .gsm-inline-icon{width:30px!important;height:30px!important;min-width:30px!important;stroke:currentColor!important;}
 .gsm-assets .gsm-tool{display:flex!important;align-items:center!important;gap:10px!important;}
 .gsm-assets .gsm-tool .gsm-inline-icon{width:20px!important;height:20px!important;min-width:20px!important;color:#07384d!important;stroke:currentColor!important;}
@@ -320,35 +337,26 @@ function gsm_asset_icon_html($type, $fallbackClass, $extraClass = '') {
 @media(max-width:760px){.gsm-assets .smn-actions-v265{grid-template-columns:1fr!important}.gsm-assets .gsm-panel h2{font-size:24px!important}}
 </style>
 
-<div class="gsm-assets"><div class="gsm-wrap">
-  <section class="gsm-hero">
-    <div class="gsm-brand"><img class="gsm-logo" src="<?= htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="Logo"><div><div class="gsm-kicker">GLPI SCHOOL MANAGER · INVENTARIO</div><h1>Gestión de activos</h1><p>Inventario ordenado por tipo, aula y ficha nativa de GLPI.</p></div></div>
-    <div class="gsm-hero-actions smn-actions-v265">
-      <a class="smn-action-btn smn-action-home" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/formularios.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('home', 'smn-action-svg') ?><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_home', 'Inicio'), ENT_QUOTES, 'UTF-8') ?></span></a>
-      <a class="smn-action-btn smn-action-list" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/aulas.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('classroom_list', 'Lista de aulas'), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('list', 'smn-action-svg') ?><span><?= htmlspecialchars(plugin_schoolmanager_tr('classroom_list', 'Lista de aulas'), ENT_QUOTES, 'UTF-8') ?></span></a>
-      <a class="smn-action-btn smn-action-primary" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/nuevo_activo.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>" aria-label="<?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_asset', 'Alta guiada'), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('plus', 'smn-action-svg') ?><span><?= htmlspecialchars(plugin_schoolmanager_tr('menu_create_asset', 'Alta guiada'), ENT_QUOTES, 'UTF-8') ?></span></a>
-    </div>
-  </section>
+<div class="gsm-assets">
   <section class="gsm-sections">
     <aside class="gsm-panel"><h2>Tipo de activo</h2><small>Elige qué parte del inventario quieres modificar.</small><div class="gsm-type-list">
       <?php foreach ($types as $type => $info): ?>
-        <a class="gsm-type <?= $type === $itemtype ? 'active' : '' ?>" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/gestion_activos.php?itemtype=' . urlencode($type) . '&sort=' . urlencode($sort) . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><b><?= gsm_asset_icon_html($type, $info['icon']) ?></b><span><?= htmlspecialchars($info['label'], ENT_QUOTES, 'UTF-8') ?></span></a>
+        <a class="gsm-type <?= $type === $itemtype ? 'active' : '' ?>" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/asset_management.php?itemtype=' . urlencode($type) . '&sort=' . urlencode($sort) . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><b><?= gsm_asset_icon_html($type, $info['icon']) ?></b><span><?= htmlspecialchars($info['label'], ENT_QUOTES, 'UTF-8') ?></span></a>
       <?php endforeach; ?>
-    </div><div class="gsm-tools"><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/selector.php?building=<?= urlencode(plugin_schoolmanager_default_building_code()) ?>&floor=<?= urlencode(plugin_schoolmanager_default_floor_code(plugin_schoolmanager_default_building_code())) ?>&mode=normal&v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><?= gsm_icon_svg('map') ?> Abrir plano de clases</a><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/aulas.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><?= gsm_icon_svg('list') ?> Lista de aulas</a><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/front/location.php"><?= gsm_icon_svg('location') ?> Ubicaciones nativas</a></div></aside>
+    </div><div class="gsm-tools"><?php if (plugin_schoolmanager_feature_enabled('plans')): ?><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/selector.php?building=<?= urlencode(plugin_schoolmanager_default_building_code()) ?>&floor=<?= urlencode(plugin_schoolmanager_default_floor_code(plugin_schoolmanager_default_building_code())) ?>&mode=normal&v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><?= gsm_icon_svg('map') ?> Abrir plano de clases</a><?php endif; ?><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/plugins/schoolmanager/front/classrooms.php?v=<?= urlencode(PLUGIN_SCHOOLMANAGER_VERSION) ?>"><?= gsm_icon_svg('list') ?> Lista de aulas</a><a class="gsm-tool" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>/front/location.php"><?= gsm_icon_svg('location') ?> Ubicaciones nativas</a></div></aside>
     <main class="gsm-panel"><h2><?= gsm_asset_icon_html($itemtype, $current['icon']) ?> <?= htmlspecialchars($current['label'], ENT_QUOTES, 'UTF-8') ?></h2><small>Filtra por nombre, inventario, número de serie, comentario o aula.</small>
-      <form method="get" class="gsm-filter"><input type="hidden" name="itemtype" value="<?= htmlspecialchars($itemtype, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="v" value="<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>"><label class="gsm-field"><span>Buscar</span><input class="gsm-input" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" placeholder="Nombre, serie, inventario, comentario..."></label><label class="gsm-field"><span>Aula</span><select class="gsm-select" name="location"><option value="0">Todas las aulas</option><?php foreach ($locations as $lid => $loc): ?><option value="<?= (int)$lid ?>" <?= $location === (int)$lid ? 'selected' : '' ?>><?= htmlspecialchars($loc['label'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label><label class="gsm-field"><span>Ordenar</span><select class="gsm-select" name="sort"><option value="name" <?= $sort==='name'?'selected':'' ?>>Por nombre</option><option value="location" <?= $sort==='location'?'selected':'' ?>>Por aula</option><option value="id" <?= $sort==='id'?'selected':'' ?>>Más recientes</option></select></label><label class="gsm-check"><input type="checkbox" name="empty_location" value="1" <?= $onlyEmpty ? 'checked' : '' ?>> Sin ubicación</label><button class="gsm-btn primary" type="submit"><?= gsm_icon_svg('search') ?><span>Buscar</span></button><a class="gsm-btn soft" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/gestion_activos.php?itemtype=' . urlencode($itemtype) . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('reset') ?><span>Limpiar</span></a></form>
+      <form method="get" class="gsm-filter"><input type="hidden" name="itemtype" value="<?= htmlspecialchars($itemtype, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="v" value="<?= htmlspecialchars(PLUGIN_SCHOOLMANAGER_VERSION, ENT_QUOTES, 'UTF-8') ?>"><label class="gsm-field"><span>Buscar</span><input class="gsm-input" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" placeholder="Nombre, serie, inventario, comentario..."></label><label class="gsm-field"><span>Aula</span><select class="gsm-select" name="location"><option value="0">Todas las aulas</option><?php foreach ($locations as $lid => $loc): ?><option value="<?= (int)$lid ?>" <?= $location === (int)$lid ? 'selected' : '' ?>><?= htmlspecialchars($loc['label'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label><label class="gsm-field"><span>Ordenar</span><select class="gsm-select" name="sort"><option value="name" <?= $sort==='name'?'selected':'' ?>>Por nombre</option><option value="location" <?= $sort==='location'?'selected':'' ?>>Por aula</option><option value="id" <?= $sort==='id'?'selected':'' ?>>Más recientes</option></select></label><label class="gsm-check"><input type="checkbox" name="empty_location" value="1" <?= $onlyEmpty ? 'checked' : '' ?>> Sin ubicación</label><button class="gsm-btn primary" type="submit"><?= gsm_icon_svg('search') ?><span>Buscar</span></button><a class="gsm-btn soft" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/asset_management.php?itemtype=' . urlencode($itemtype) . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('reset') ?><span>Limpiar</span></a></form>
       <div class="gsm-results-head"><h2>Resultados</h2><span class="gsm-count"><?= count($rows) ?> encontrados</span></div>
       <?php if (!empty($loadError)): ?><div class="gsm-empty">No se pudieron cargar los activos: <?= htmlspecialchars($loadError, ENT_QUOTES, 'UTF-8') ?></div><?php elseif (!$rows): ?><div class="gsm-empty">No hay resultados con estos filtros. Prueba a limpiar la búsqueda o cambiar de tipo de activo.</div><?php else: ?><div class="gsm-grid">
-        <?php $lastLoc = null; foreach ($rows as $row): $id=(int)$row['id']; $title=plugin_schoolmanager_asset_clean_title($itemtype,$row); $locId=(int)($row['locations_id'] ?? 0); $loc=plugin_schoolmanager_asset_location_label($locId); $serial=trim((string)($row['serial'] ?? '')); $inv=trim((string)($row['otherserial'] ?? '')); if ($sort === 'location' && $lastLoc !== $loc): $lastLoc = $loc; ?><div class="gsm-group"><div class="left"><b><?= gsm_icon_svg('location') ?></b><span><?= htmlspecialchars($loc, ENT_QUOTES, 'UTF-8') ?></span></div><?php if ($locId > 0): ?><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/detalle_aula.php?id=' . $locId . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('eye') ?><span>Detalles del aula</span></a><?php endif; ?></div><?php endif; ?>
-          <article class="gsm-card"><div class="gsm-card-top"><span class="gsm-asset-icon"><?= gsm_asset_icon_html($itemtype, $current['icon']) ?></span><div class="gsm-card-title"><h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3><div class="gsm-meta"><span class="gsm-chip">ID <?= $id ?></span><span class="gsm-chip loc <?= ($loc === 'Sin ubicación') ? 'warn' : '' ?>"><?= gsm_icon_svg('location') ?> <?= htmlspecialchars($loc, ENT_QUOTES, 'UTF-8') ?></span><?php if ($inv): ?><span class="gsm-chip">Inv. <?= htmlspecialchars($inv, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?><?php if ($serial): ?><span class="gsm-chip">S/N <?= htmlspecialchars($serial, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?></div></div></div><div class="gsm-card-actions"><a class="gsm-mini-btn edit" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/editar_activo.php?itemtype=' . urlencode($itemtype) . '&id=' . $id . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('edit') ?><span>Modificar</span></a><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . $current['native'] . '?id=' . $id, ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('external') ?><span>Vista nativa</span></a><?php if ($locId > 0): ?><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/detalle_aula.php?id=' . $locId . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('location') ?><span>Aula</span></a><?php endif; ?></div></article>
+        <?php $lastLoc = null; foreach ($rows as $row): $id=(int)$row['id']; $title=plugin_schoolmanager_asset_clean_title($itemtype,$row); $locId=(int)($row['locations_id'] ?? 0); $loc=plugin_schoolmanager_asset_location_label($locId); $serial=trim((string)($row['serial'] ?? '')); $inv=trim((string)($row['otherserial'] ?? '')); if ($sort === 'location' && $lastLoc !== $loc): $lastLoc = $loc; ?><div class="gsm-group"><div class="left"><b><?= gsm_icon_svg('location') ?></b><span><?= htmlspecialchars($loc, ENT_QUOTES, 'UTF-8') ?></span></div><?php if ($locId > 0): ?><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/classroom_detail.php?id=' . $locId . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('eye') ?><span>Detalles del aula</span></a><?php endif; ?></div><?php endif; ?>
+          <article class="gsm-card"><div class="gsm-card-top"><span class="gsm-asset-icon"><?= gsm_asset_icon_html($itemtype, $current['icon']) ?></span><div class="gsm-card-title"><h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3><div class="gsm-meta"><span class="gsm-chip">ID <?= $id ?></span><span class="gsm-chip loc <?= ($loc === 'Sin ubicación') ? 'warn' : '' ?>"><?= gsm_icon_svg('location') ?> <?= htmlspecialchars($loc, ENT_QUOTES, 'UTF-8') ?></span><?php if ($inv): ?><span class="gsm-chip">Inv. <?= htmlspecialchars($inv, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?><?php if ($serial): ?><span class="gsm-chip">S/N <?= htmlspecialchars($serial, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?></div></div></div><div class="gsm-card-actions"><a class="gsm-mini-btn edit" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/edit_asset.php?itemtype=' . urlencode($itemtype) . '&id=' . $id . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('edit') ?><span>Modificar</span></a><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . $current['native'] . '?id=' . $id, ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('external') ?><span>Vista nativa</span></a><?php if ($locId > 0): ?><a class="gsm-mini-btn native" href="<?= htmlspecialchars($root . '/plugins/schoolmanager/front/classroom_detail.php?id=' . $locId . '&v=' . urlencode(PLUGIN_SCHOOLMANAGER_VERSION), ENT_QUOTES, 'UTF-8') ?>"><?= gsm_icon_svg('location') ?><span>Aula</span></a><?php endif; ?></div></article>
         <?php endforeach; ?>
       </div><?php endif; ?>
     </main>
   </section>
-</div></div>
+</div>
 
-
-<?php Html::footer(); ?>
+<?php sm_page_footer(); ?>
 
 
 
